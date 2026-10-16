@@ -2,89 +2,65 @@ const https = require('https');
 
 function fetchJson(url) {
     return new Promise((resolve) => {
-        https.get(url, (res) => {
+        https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
             let data = '';
             res.on('data', chunk => data += chunk);
-            res.on('end', () => { try { resolve(JSON.parse(data)); } catch(e){ resolve([]); }});
-        }).on('error', () => resolve([]));
+            res.on('end', () => {
+                try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
+                catch(e) { resolve({ status: res.statusCode, data: null }); }
+            });
+        }).on('error', () => resolve({ status: 500, data: null }));
     });
 }
 
-function getSMA(data, period, index) {
+function getSMA(data, period, index, priceType) {
     let sum = 0;
-    for (let i = 0; i < period; i++) sum += parseFloat(data[index - i][4]);
+    for (let i = 0; i < period; i++) sum += parseFloat(data[index - i][priceType]);
     return sum / period;
 }
-function getStdDev(data, period, index, sma) {
-    let sum = 0;
-    for (let i = 0; i < period; i++) sum += Math.pow(parseFloat(data[index - i][4]) - sma, 2);
-    return Math.sqrt(sum / period);
-}
-function getRSI(data, period, index) {
+function getRSI(data, period, index, priceType) {
     let gains = 0, losses = 0;
     for (let i = 0; i < period; i++) {
-        let change = parseFloat(data[index - i][4]) - parseFloat(data[index - i - 1][4]);
+        let change = parseFloat(data[index - i][priceType]) - parseFloat(data[index - i - 1][priceType]);
         if (change > 0) gains += change; else losses -= change;
     }
     let rs = (gains / period) / (losses / period === 0 ? 0.0001 : (losses / period));
     return 100 - (100 / (1 + rs));
 }
 
-async function checkYesterday() {
-    console.log("🔍 Caut in arhiva Binance semnalele de ieri...");
-    // 200 de lumanari de 15m = aprox 50 de ore (ultimele 2 zile)
-    const data = await fetchJson('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=15m&limit=200');
-    
-    let found = false;
-    for (let i = 50; i < data.length - 1; i++) {
+async function testGoldFixed() {
+    const goldRes = await fetchJson('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=15m&range=5d');
+    const quote = goldRes.data.chart.result[0].indicators.quote[0];
+    const ts = goldRes.data.chart.result[0].timestamp;
+    const data = [];
+    for (let i = 0; i < quote.close.length; i++) {
+        if (quote.close[i] !== null) data.push({ t: ts[i] * 1000, 2: quote.high[i], 3: quote.low[i], 4: quote.close[i] });
+    }
+    let gWins = 0, gLosses = 0;
+    for (let i = 55; i < data.length - 1; i++) {
         const panicIndex = i - 1;
         const currIndex = i;
-        
-        const sma20 = getSMA(data, 20, panicIndex);
-        const stdDev = getStdDev(data, 20, panicIndex, sma20);
+        const rsi = getRSI(data, 14, panicIndex, 4);
+        const sma20 = getSMA(data, 20, panicIndex, 4);
         const panicClose = parseFloat(data[panicIndex][4]);
-        
-        const zScore = (panicClose - sma20) / stdDev;
-        const rsi = getRSI(data, 14, panicIndex);
-        
-        let sumVol = 0;
-        for (let v = 1; v <= 20; v++) sumVol += parseFloat(data[panicIndex - v][5]);
-        const avgVol = sumVol / 20;
-        const panicVol = parseFloat(data[panicIndex][5]);
-        
-        const currOpen = parseFloat(data[currIndex][1]);
         const currClose = parseFloat(data[currIndex][4]);
-        const isRebounding = currClose > currOpen;
-        
-        if (zScore < -2.0 && rsi < 30 && panicVol > (avgVol * 2.5) && isRebounding) {
-            found = true;
+        if (rsi < 25 && panicClose < sma20 && currClose > panicClose) {
             const entry = currClose;
-            const sl = parseFloat(data[panicIndex][3]);
             const tp = sma20;
-            
-            const date = new Date(data[currIndex][0]).toLocaleString('ro-RO');
-            console.log(`\n🚨 SEMNAL GĂSIT PE: ${date}`);
-            console.log(`- Entry: $${entry.toFixed(2)}`);
-            console.log(`- Stop Loss: $${sl.toFixed(2)}`);
-            console.log(`- Take Profit: $${tp.toFixed(2)}`);
-            
-            // Verificam viitorul dupa acest semnal
-            let result = 'În desfășurare / Nedecis';
-            let duration = 0;
-            for (let j = currIndex + 1; j < data.length; j++) {
-                duration++;
-                const low = parseFloat(data[j][3]);
-                const high = parseFloat(data[j][2]);
-                if (low <= sl) { result = `❌ A lovit Stop Loss-ul dupa ${duration * 15} minute`; break; }
-                if (high >= tp) { result = `✅ A atins Take Profit-ul dupa ${duration * 15} minute!`; break; }
+            const reward = tp - entry;
+            if (reward > 5) {
+                const sl = entry - (reward / 1.5); // 1:1.5 Risk-Reward with breathing room
+                let outcome = "OPEN";
+                for (let j = currIndex + 1; j < data.length; j++) {
+                    if (data[j][3] <= sl) { outcome = "LOSS"; gLosses++; break; }
+                    if (data[j][2] >= tp) { outcome = "WIN"; gWins++; break; }
+                }
+                console.log(`[GOLD] ${new Date(data[currIndex].t).toISOString()} | Entry: ${entry.toFixed(2)} | SL: ${sl.toFixed(2)} | TP: ${tp.toFixed(2)} => ${outcome}`);
+                i += 8; // cooldown 2 hours between signals
             }
-            console.log(`-> REZULTAT: ${result}`);
         }
     }
-    
-    if (!found) {
-        console.log("Nu am gasit niciun semnal matematic pe setarile supreme in ultimele 48 de ore. Daca ai primit ieri unul, e posibil sa fi fost cel generat de functia initiala (M15 normal) inainte sa punem filtrele SMC.");
-    }
+    console.log(`==> GOLD FIXED: Wins=${gWins}, Losses=${gLosses}`);
 }
 
-checkYesterday();
+testGoldFixed();
