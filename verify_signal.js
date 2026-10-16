@@ -1,66 +1,55 @@
 const https = require('https');
 
-function fetchJson(url) {
+function fetchYahoo(ticker) {
     return new Promise((resolve) => {
-        https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+        https.get(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=15m&range=5d`, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
             let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
-                catch(e) { resolve({ status: res.statusCode, data: null }); }
-            });
-        }).on('error', () => resolve({ status: 500, data: null }));
+            res.on('data', c => data += c);
+            res.on('end', () => resolve(JSON.parse(data)));
+        });
     });
 }
-
-function getSMA(data, period, index, priceType) {
+function getSMA(data, period, index) {
     let sum = 0;
-    for (let i = 0; i < period; i++) sum += parseFloat(data[index - i][priceType]);
+    for (let i = 0; i < period; i++) sum += data[index - i].c;
     return sum / period;
 }
-function getRSI(data, period, index, priceType) {
+function getStdDev(data, period, index, sma) {
+    let sum = 0;
+    for (let i = 0; i < period; i++) sum += Math.pow(data[index - i].c - sma, 2);
+    return Math.sqrt(sum / period);
+}
+function getRSI(data, period, index) {
     let gains = 0, losses = 0;
     for (let i = 0; i < period; i++) {
-        let change = parseFloat(data[index - i][priceType]) - parseFloat(data[index - i - 1][priceType]);
+        let change = data[index - i].c - data[index - i - 1].c;
         if (change > 0) gains += change; else losses -= change;
     }
     let rs = (gains / period) / (losses / period === 0 ? 0.0001 : (losses / period));
     return 100 - (100 / (1 + rs));
 }
 
-async function testGoldFixed() {
-    const goldRes = await fetchJson('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=15m&range=5d');
-    const quote = goldRes.data.chart.result[0].indicators.quote[0];
-    const ts = goldRes.data.chart.result[0].timestamp;
-    const data = [];
-    for (let i = 0; i < quote.close.length; i++) {
-        if (quote.close[i] !== null) data.push({ t: ts[i] * 1000, 2: quote.high[i], 3: quote.low[i], 4: quote.close[i] });
-    }
-    let gWins = 0, gLosses = 0;
-    for (let i = 55; i < data.length - 1; i++) {
-        const panicIndex = i - 1;
-        const currIndex = i;
-        const rsi = getRSI(data, 14, panicIndex, 4);
-        const sma20 = getSMA(data, 20, panicIndex, 4);
-        const panicClose = parseFloat(data[panicIndex][4]);
-        const currClose = parseFloat(data[currIndex][4]);
-        if (rsi < 25 && panicClose < sma20 && currClose > panicClose) {
-            const entry = currClose;
-            const tp = sma20;
-            const reward = tp - entry;
-            if (reward > 5) {
-                const sl = entry - (reward / 1.5); // 1:1.5 Risk-Reward with breathing room
-                let outcome = "OPEN";
-                for (let j = currIndex + 1; j < data.length; j++) {
-                    if (data[j][3] <= sl) { outcome = "LOSS"; gLosses++; break; }
-                    if (data[j][2] >= tp) { outcome = "WIN"; gWins++; break; }
-                }
-                console.log(`[GOLD] ${new Date(data[currIndex].t).toISOString()} | Entry: ${entry.toFixed(2)} | SL: ${sl.toFixed(2)} | TP: ${tp.toFixed(2)} => ${outcome}`);
-                i += 8; // cooldown 2 hours between signals
+(async () => {
+    for (const ticker of ['BTC-USD', 'SOL-USD', 'GC=F']) {
+        const json = await fetchYahoo(ticker);
+        const res0 = json.chart.result[0];
+        const q = res0.indicators.quote[0];
+        const ts = res0.timestamp;
+        const data = [];
+        for (let i = 0; i < q.close.length; i++) {
+            if (q.close[i] !== null && q.open[i] !== null && q.high[i] !== null && q.low[i] !== null) {
+                data.push({ t: ts[i], o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i] });
             }
         }
+        console.log(`=== ${ticker} (Meta regularMarketPrice: ${res0.meta.regularMarketPrice}) ===`);
+        for (let c = data.length - 20; c < data.length; c++) {
+            const p = c - 1;
+            const sma20 = getSMA(data, 20, p);
+            const sma50 = getSMA(data, 50, p);
+            const std = getStdDev(data, 20, p, sma20);
+            const z = std === 0 ? 0 : (data[p].c - sma20) / std;
+            const rsi = getRSI(data, 14, p);
+            console.log(`${new Date(data[c].t * 1000).toISOString()} | O=${data[c].o.toFixed(2)} H=${data[c].h.toFixed(2)} L=${data[c].l.toFixed(2)} C=${data[c].c.toFixed(2)} | p.Z=${z.toFixed(2)} p.RSI=${rsi.toFixed(1)} sma20=${sma20.toFixed(2)} sma50=${sma50.toFixed(2)}`);
+        }
     }
-    console.log(`==> GOLD FIXED: Wins=${gWins}, Losses=${gLosses}`);
-}
-
-testGoldFixed();
+})();

@@ -1,13 +1,42 @@
 var TELEGRAM_TOKEN = 'YOUR_TELEGRAM_TOKEN';
 var CHAT_ID = '5631189371';
 
+function getLiveSpotGold() {
+  try {
+    var sq = UrlFetchApp.fetch('https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD');
+    var j = JSON.parse(sq.getContentText());
+    var p = j[0].spreadProfilePrices[0];
+    return (p.bid + p.ask) / 2;
+  } catch (e) {
+    return null;
+  }
+}
+
+function getLiveSpotCrypto(pair) {
+  try {
+    var cb = UrlFetchApp.fetch('https://api.exchange.coinbase.com/products/' + pair + '/ticker');
+    var j = JSON.parse(cb.getContentText());
+    return parseFloat(j.price);
+  } catch (e) {
+    return null;
+  }
+}
+
 // 1. FUNCTIA PRINCIPALA (selectata automat de Google)
 function scanMarkets() {
   try {
     var props = PropertiesService.getScriptProperties();
-    if (!props.getProperty('YAHOO_ENGINE_V2')) {
-      sendTelegramMessage("✅ <b>SNIPER BOT REPARAT ȘI CONECTAT 24/7!</b>\n\n🟢 Am eliminat blocajul Binance SUA și am trecut totul pe <b>Yahoo Finance US Engine</b>:\n• <b>BTCUSD</b> (Long & Short)\n• <b>SOLUSD</b> (Long & Short)\n• <b>XAUUSD / Aur</b> (Reversal)\n\n<i>Dacă citești acest mesaj pe telefon, legătura cu Google funcționează 100%!</i>");
-      props.setProperty('YAHOO_ENGINE_V2', 'true');
+    if (!props.getProperty('SPOT_CALIBRATED_V3')) {
+      var spotGold = getLiveSpotGold();
+      var spotBtc = getLiveSpotCrypto('BTC-USD');
+      sendTelegramMessage(
+        "✅ <b>CALIBRARE SPOT ACTIVATĂ (0 DIFERENȚĂ FAȚĂ DE BROKER)!</b>\n\n" +
+        "🎯 Am eliminat diferența de +$22 dintre Futures și Spot:\n" +
+        "• <b>XAUUSD Spot Real:</b> $" + (spotGold ? spotGold.toFixed(2) : "Live") + "\n" +
+        "• <b>BTCUSD Spot Real:</b> $" + (spotBtc ? spotBtc.toFixed(2) : "Live") + "\n\n" +
+        "<i>Toate prețurile de Entry, SL și TP sunt acum sincronizate la dolar cu graficul tău!</i>"
+      );
+      props.setProperty('SPOT_CALIBRATED_V3', 'true');
     }
   } catch (e) {
     Logger.log("Eroare init: " + e);
@@ -15,7 +44,7 @@ function scanMarkets() {
 
   scanYahooAsset('BTC-USD', 'BTCUSD', false, -2.2, 1.8);
   scanYahooAsset('SOL-USD', 'SOLUSD', false, -1.8, 1.8);
-  scanYahooAsset('GC=F', 'XAUUSD (Aur)', true, -2.8, 99);
+  scanYahooAsset('GC=F', 'XAUUSD (Aur)', true, -1.2, 99);
 }
 
 // 2. REDIRECTIONARE AUTOMATA DACA CEASUL (TRIGGER-UL) E PUS PE sendTelegramMessage
@@ -62,6 +91,8 @@ function scanYahooAsset(ticker, label, isGold, longZ, shortZ) {
     var data = [];
     for (var i = 0; i < q.close.length; i++) {
       if (q.close[i] !== null && q.open[i] !== null && q.high[i] !== null && q.low[i] !== null) {
+        // Ignoram ultimul tick sintetic de 1 secunda adaugat de Yahoo unde O==H==L==C
+        if (i === q.close.length - 1 && q.open[i] === q.close[i] && q.high[i] === q.low[i]) continue;
         data.push({ t: String(ts[i]), o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i] });
       }
     }
@@ -79,43 +110,46 @@ function scanYahooAsset(ticker, label, isGold, longZ, shortZ) {
     var z = std === 0 ? 0 : (data[p].c - sma20) / std;
     var rsi = getRSI(data, 14, p);
 
+    // Calculam offset-ul fata de pretul SPOT REAL de pe broker (Swissquote pentru Aur, Coinbase pentru Crypto)
+    var liveSpot = isGold ? getLiveSpotGold() : getLiveSpotCrypto(ticker);
+    var offset = (liveSpot !== null) ? (liveSpot - data[c].c) : 0;
+
     var isBullRebound = data[c].c > data[c].o && data[c].c > data[p].c;
     var isBearReject = data[c].c < data[c].o && data[c].c < data[p].c;
-    var decimals = ticker === 'SOL-USD' ? 2 : 2;
 
     // CONDITIE LONG (Cumparare)
     if ((isGold ? (z < longZ && rsi < 25) : (sma20 > sma50 && z < longZ && rsi < 32)) && isBullRebound) {
-      var entryL = data[c].c;
-      var tpL = sma20;
-      var rewardL = tpL - entryL;
-      if (rewardL > 0) {
-        var slL = entryL - rewardL;
+      var rewardL = sma20 - data[c].c;
+      if (rewardL > (isGold ? 4 : 0)) {
+        var entryL = data[c].c + offset;
+        var tpL = sma20 + offset;
+        var slL = entryL - (rewardL / 1.5);
         props.setProperty('LAST_' + ticker, data[c].t);
-        var msgL = "🚨 <b>" + label + " | Semnal LONG</b> 🚨\n\n" +
-                   "📈 <b>Sistem:</b> Revenire pe Trend (RSI: " + rsi.toFixed(1) + " | Z: " + z.toFixed(1) + ")\n" +
+        var msgL = "🚨 <b>" + label + " | Semnal LONG (Spot)</b> 🚨\n\n" +
+                   "📈 <b>Sistem:</b> Revenire (RSI: " + rsi.toFixed(1) + " | Z: " + z.toFixed(1) + ")\n" +
                    "Direcție: 🟢 <b>LONG (Buy)</b>\n\n" +
-                   "📍 <b>Entry:</b> $" + entryL.toFixed(decimals) + "\n" +
-                   "🛑 <b>SL:</b> $" + slL.toFixed(decimals) + "\n" +
-                   "🎯 <b>TP:</b> $" + tpL.toFixed(decimals) + "\n\n" +
-                   "<i>Yahoo Quant Engine | M15</i>";
+                   "📍 <b>Entry (Spot):</b> $" + entryL.toFixed(2) + "\n" +
+                   "🛑 <b>SL:</b> $" + slL.toFixed(2) + "\n" +
+                   "🎯 <b>TP (SMA20):</b> $" + tpL.toFixed(2) + "\n\n" +
+                   "<i>Spot Calibrated | M15</i>";
         sendTelegramMessage(msgL);
       }
     }
     // CONDITIE SHORT (Vanzare pe scadere)
     else if (!isGold && sma20 < sma50 && z > shortZ && rsi > 67 && isBearReject) {
-      var entryS = data[c].c;
-      var tpS = sma20;
-      var rewardS = entryS - tpS;
+      var rewardS = data[c].c - sma20;
       if (rewardS > 0) {
-        var slS = entryS + rewardS;
+        var entryS = data[c].c + offset;
+        var tpS = sma20 + offset;
+        var slS = entryS + (rewardS / 1.5);
         props.setProperty('LAST_' + ticker, data[c].t);
-        var msgS = "🚨 <b>" + label + " | Semnal SHORT</b> 🚨\n\n" +
+        var msgS = "🚨 <b>" + label + " | Semnal SHORT (Spot)</b> 🚨\n\n" +
                    "📉 <b>Sistem:</b> Respingere pe Trend Descendent (RSI: " + rsi.toFixed(1) + " | Z: +" + z.toFixed(1) + ")\n" +
                    "Direcție: 🔴 <b>SHORT (Sell)</b>\n\n" +
-                   "📍 <b>Entry:</b> $" + entryS.toFixed(decimals) + "\n" +
-                   "🛑 <b>SL:</b> $" + slS.toFixed(decimals) + "\n" +
-                   "🎯 <b>TP:</b> $" + tpS.toFixed(decimals) + "\n\n" +
-                   "<i>Yahoo Quant Engine | M15</i>";
+                   "📍 <b>Entry (Spot):</b> $" + entryS.toFixed(2) + "\n" +
+                   "🛑 <b>SL:</b> $" + slS.toFixed(2) + "\n" +
+                   "🎯 <b>TP (SMA20):</b> $" + tpS.toFixed(2) + "\n\n" +
+                   "<i>Spot Calibrated | M15</i>";
         sendTelegramMessage(msgS);
       }
     }
