@@ -4,7 +4,9 @@
   "description": "Standalone Forex & Crypto Sniper",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "orchestrator": "node orchestrator.js",
+    "stress-test": "node stress_test_suite.js"
   },
   "dependencies": {
     "express": "^4.19.2"

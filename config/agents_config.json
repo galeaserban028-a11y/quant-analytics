@@ -1,0 +1,237 @@
+{
+  "companyName": "APEX QUANT 300-AGENT FOREX & SMC INSTITUTIONAL DESK",
+  "version": "1.0.0-MODULAR",
+  "totalAgents": 300,
+  "executionPolicy": {
+    "mode": "MARKET_EXECUTION_0_DELAY",
+    "confluenceThreshold": 85,
+    "maxScore": 100,
+    "maxChaseRatioFromZone": 0.15,
+    "slBufferPips": 1.5,
+    "tp1RiskReward": 1.5,
+    "tp2MinRiskReward": 3.0,
+    "devilsAdvocateMinRR": 2.5,
+    "marketSignalValiditySeconds": 180,
+    "maxDailySlPerSymbol": 2,
+    "maxConcurrentExposurePerCurrency": 1
+  },
+  "scoringWeights": {
+    "div2_multi_tf_alignment": 25,
+    "div3_branch3A_liquidity_sweep": 25,
+    "div3_branch3BCE_ob_fvg_equilibrium": 20,
+    "div3_branch3D_whale_volume": 15,
+    "div1_branch1D_macro_compass": 15,
+    "div5_branch5B_devils_advocate_penalty": -25
+  },
+  "instruments": {
+    "EURUSD": {
+      "category": "MAJORS",
+      "krakenPair": "EURUSD",
+      "swissquotePair": "EUR/USD",
+      "baseCurrency": "EUR",
+      "quoteCurrency": "USD",
+      "pipSize": 0.0001,
+      "decimals": 5,
+      "maxSpreadPips": 1.8,
+      "maxMarketSlippagePips": 2.0,
+      "prefix": ""
+    },
+    "GBPUSD": {
+      "category": "MAJORS",
+      "krakenPair": "GBPUSD",
+      "swissquotePair": "GBP/USD",
+      "baseCurrency": "GBP",
+      "quoteCurrency": "USD",
+      "pipSize": 0.0001,
+      "decimals": 5,
+      "maxSpreadPips": 1.8,
+      "maxMarketSlippagePips": 2.5,
+      "prefix": ""
+    },
+    "USDJPY": {
+      "category": "MAJORS",
+      "krakenPair": "USDJPY",
+      "swissquotePair": "USD/JPY",
+      "baseCurrency": "USD",
+      "quoteCurrency": "JPY",
+      "pipSize": 0.01,
+      "decimals": 3,
+      "maxSpreadPips": 1.8,
+      "maxMarketSlippagePips": 2.5,
+      "prefix": ""
+    },
+    "USDCHF": {
+      "category": "MAJORS",
+      "krakenPair": "USDCHF",
+      "swissquotePair": "USD/CHF",
+      "baseCurrency": "USD",
+      "quoteCurrency": "CHF",
+      "pipSize": 0.0001,
+      "decimals": 5,
+      "maxSpreadPips": 1.8,
+      "maxMarketSlippagePips": 2.0,
+      "prefix": ""
+    },
+    "AUDUSD": {
+      "category": "CROSSES",
+      "krakenPair": "AUDUSD",
+      "swissquotePair": "AUD/USD",
+      "baseCurrency": "AUD",
+      "quoteCurrency": "USD",
+      "pipSize": 0.0001,
+      "decimals": 5,
+      "maxSpreadPips": 2.0,
+      "maxMarketSlippagePips": 2.0,
+      "prefix": ""
+    },
+    "USDCAD": {
+      "category": "CROSSES",
+      "krakenPair": "USDCAD",
+      "swissquotePair": "USD/CAD",
+      "baseCurrency": "USD",
+      "quoteCurrency": "CAD",
+      "pipSize": 0.0001,
+      "decimals": 5,
+      "maxSpreadPips": 2.0,
+      "maxMarketSlippagePips": 2.5,
+      "prefix": ""
+    },
+    "GBPJPY": {
+      "category": "CROSSES",
+      "krakenPair": "GBPJPY",
+      "swissquotePair": "GBP/JPY",
+      "baseCurrency": "GBP",
+      "quoteCurrency": "JPY",
+      "pipSize": 0.01,
+      "decimals": 3,
+      "maxSpreadPips": 2.5,
+      "maxMarketSlippagePips": 3.0,
+      "prefix": ""
+    },
+    "XAUUSD": {
+      "category": "GOLD_METALS",
+      "krakenPair": "PAXGUSD",
+      "swissquotePair": "XAU/USD",
+      "baseCurrency": "XAU",
+      "quoteCurrency": "USD",
+      "pipSize": 0.1,
+      "decimals": 2,
+      "maxSpreadPips": 30.0,
+      "maxMarketSlippagePips": 15.0,
+      "prefix": "$"
+    },
+    "BTCUSD": {
+      "category": "INDICES_CRYPTO",
+      "krakenPair": "XBTUSD",
+      "swissquotePair": null,
+      "baseCurrency": "BTC",
+      "quoteCurrency": "USD",
+      "pipSize": 1.0,
+      "decimals": 2,
+      "maxSpreadPips": 80.0,
+      "maxMarketSlippagePips": 60.0,
+      "prefix": "$"
+    },
+    "ETHUSD": {
+      "category": "INDICES_CRYPTO",
+      "krakenPair": "ETHUSD",
+      "swissquotePair": null,
+      "baseCurrency": "ETH",
+      "quoteCurrency": "USD",
+      "pipSize": 0.1,
+      "decimals": 2,
+      "maxSpreadPips": 30.0,
+      "maxMarketSlippagePips": 25.0,
+      "prefix": "$"
+    },
+    "SOLUSD": {
+      "category": "INDICES_CRYPTO",
+      "krakenPair": "SOLUSD",
+      "swissquotePair": null,
+      "baseCurrency": "SOL",
+      "quoteCurrency": "USD",
+      "pipSize": 0.01,
+      "decimals": 2,
+      "maxSpreadPips": 25.0,
+      "maxMarketSlippagePips": 20.0,
+      "prefix": "$"
+    }
+  },
+  "divisions": [
+    {
+      "divisionId": "div1_shield_macro",
+      "name": "1. DIVIZIA SCUT & MACRO",
+      "totalAgents": 40,
+      "branches": [
+        { "branchId": "1A", "name": "Spot Price & Spread Calibrators (0 Delay)", "agentCount": 10, "canVeto": true, "role": "SPOT_SPREAD_GUARD" },
+        { "branchId": "1B", "name": "Killzone & Session Filters (Londra / NY)", "agentCount": 8, "canVeto": true, "role": "SESSION_KILLZONE_FILTER" },
+        { "branchId": "1C", "name": "Red-Folder News Blockers (CPI, NFP, FOMC)", "agentCount": 10, "canVeto": true, "role": "NEWS_BLOCKER" },
+        { "branchId": "1D", "name": "Macro Compass (DXY, US10Y, Risk-On/Off)", "agentCount": 12, "canVeto": false, "maxPoints": 15, "role": "MACRO_DXY_COMPASS" }
+      ]
+    },
+    {
+      "divisionId": "div2_multi_tf",
+      "name": "2. DIVIZIA CARTOGRAFIERE MULTI-TIMEFRAME PE ACTIVE",
+      "totalAgents": 60,
+      "branches": [
+        { "branchId": "2A", "name": "Ramura Majors Scouters (H4/H1 + M15)", "agentCount": 20, "canVeto": true, "maxPoints": 25, "role": "MTF_MAJORS" },
+        { "branchId": "2B", "name": "Ramura Crosses Scouters (H4/H1 + M15)", "agentCount": 20, "canVeto": true, "maxPoints": 25, "role": "MTF_CROSSES" },
+        { "branchId": "2C", "name": "Ramura Gold & Metals (XAUUSD H1 + M15)", "agentCount": 10, "canVeto": true, "maxPoints": 25, "role": "MTF_GOLD" },
+        { "branchId": "2D", "name": "Ramura Indici & Crypto (H1 + M15)", "agentCount": 10, "canVeto": true, "maxPoints": 25, "role": "MTF_CRYPTO_INDICES" }
+      ]
+    },
+    {
+      "divisionId": "div3_orderflow_smc",
+      "name": "3. DIVIZIA INSTITUTIONAL ORDERFLOW & SMC",
+      "totalAgents": 90,
+      "branches": [
+        { "branchId": "3A", "name": "Liquidity Sweep & Stop-Hunt Raiders", "agentCount": 25, "canVeto": false, "maxPoints": 25, "role": "SMC_LIQUIDITY_SWEEP" },
+        { "branchId": "3B", "name": "Order Block (OB) & Breaker Validators", "agentCount": 20, "canVeto": false, "maxPoints": 10, "requiresBranch": "3A", "role": "SMC_ORDER_BLOCK" },
+        { "branchId": "3C", "name": "Fair Value Gap (FVG) & IFVG Snipers", "agentCount": 20, "canVeto": false, "maxPoints": 5, "requiresBranch": "3A", "role": "SMC_FVG_SNIPER" },
+        { "branchId": "3D", "name": "Whale Volume Explosion & Displacement", "agentCount": 15, "canVeto": false, "maxPoints": 15, "role": "SMC_WHALE_VOLUME" },
+        { "branchId": "3E", "name": "Premium / Discount Fibonacci 50% Equilibrium", "agentCount": 10, "canVeto": false, "maxPoints": 5, "requiresBranch": "3A", "role": "SMC_FIBO_EQUILIBRIUM" }
+      ]
+    },
+    {
+      "divisionId": "div4_cro_risk",
+      "name": "4. DIVIZIA CHIEF RISK OFFICER - CRO",
+      "totalAgents": 40,
+      "branches": [
+        { "branchId": "4A", "name": "Market Entry, SL Buffer & TP1/TP2 Calculators", "agentCount": 12, "canVeto": true, "role": "CRO_LEVELS_CALCULATOR" },
+        { "branchId": "4B", "name": "Anti-Chase Filter (Max 15% Distance)", "agentCount": 10, "canVeto": true, "role": "CRO_ANTI_CHASE_GUARD" },
+        { "branchId": "4C", "name": "Multi-FX Correlation Guard (USD, EUR, JPY, Gold)", "agentCount": 10, "canVeto": true, "role": "CRO_CORRELATION_GUARD" },
+        { "branchId": "4D", "name": "Daily Drawdown & Streak Breaker (Max 2 SL/zi)", "agentCount": 8, "canVeto": true, "role": "CRO_DRAWDOWN_BREAKER" }
+      ]
+    },
+    {
+      "divisionId": "div5_board_voting",
+      "name": "5. DIVIZIA ARBITRAJ & VOT FINAL",
+      "totalAgents": 20,
+      "branches": [
+        { "branchId": "5A", "name": "Confluence Score Aggregators (Prag >= 85/100)", "agentCount": 8, "canVeto": true, "role": "BOARD_CONFLUENCE_AGGREGATOR" },
+        { "branchId": "5B", "name": "Red-Team / Avocatul Diavolului (-25p Penalty)", "agentCount": 6, "canVeto": false, "penaltyPoints": -25, "role": "BOARD_DEVILS_ADVOCATE" },
+        { "branchId": "5C", "name": "Priority Queue / Best Setup Selector", "agentCount": 6, "canVeto": false, "role": "BOARD_PRIORITY_SELECTOR" }
+      ]
+    },
+    {
+      "divisionId": "div6_execution_watch",
+      "name": "6. DIVIZIA EXECUTIE TELEGRAM & LIVE TRACKING",
+      "totalAgents": 25,
+      "branches": [
+        { "branchId": "6A", "name": "Ordin Telegram Dispatcher (Market Entry, SL, TP1, TP2)", "agentCount": 8, "canVeto": false, "role": "EXEC_TELEGRAM_DISPATCHER" },
+        { "branchId": "6B", "name": "Break-Even Watchdog la TP1 & 3-Min Expiry Alert", "agentCount": 10, "canVeto": false, "role": "EXEC_BREAKEVEN_EXPIRY_WATCHDOG" },
+        { "branchId": "6C", "name": "Emergency Exit Watchers (Reversal Volume Alert)", "agentCount": 7, "canVeto": false, "role": "EXEC_EMERGENCY_EXIT_WATCHER" }
+      ]
+    },
+    {
+      "divisionId": "div7_ai_research_bg",
+      "name": "7. DIVIZIA AI RESEARCH & AUTO-TUNING IN FUNDAL",
+      "totalAgents": 25,
+      "branches": [
+        { "branchId": "7A", "name": "Dead-Market Killer (Opreste perechile in consolidare/pierdere)", "agentCount": 8, "canVeto": true, "role": "BG_DEAD_MARKET_KILLER" },
+        { "branchId": "7B", "name": "Walk-Forward Trainer (Antrenament asincron cu Post-Trade Feedback)", "agentCount": 9, "canVeto": false, "role": "BG_WALK_FORWARD_TRAINER" },
+        { "branchId": "7C", "name": "Strategy Switcher (Pullback / Breakout / Reversal)", "agentCount": 8, "canVeto": false, "role": "BG_STRATEGY_SWITCHER" }
+      ]
+    }
+  ]
+}
