@@ -17,7 +17,8 @@
     "research": "node src/research/run.js",
     "research:trend": "node src/research/trendRun.js",
     "test": "node --test",
-    "research:prop": "node src/research/propRun.js"
+    "research:prop": "node src/research/propRun.js",
+    "research:academy": "node src/research/academyRun.js"
   },
   "dependencies": {}
 }

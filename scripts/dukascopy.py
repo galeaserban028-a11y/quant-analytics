@@ -85,9 +85,12 @@ def download_daily(pair, y0, y1):
     Fragmentul de duminică seara se lipește de luni (piața Forex se deschide duminică seara)."""
     now = dt.datetime.now(dt.timezone.utc)
     bid, ask = {}, {}
-    for y in range(y0, min(y1, now.year) + 1):
-        for side, store in (('BID', bid), ('ASK', ask)):
-            for r in year_days(pair, y, side):
+    jobs = [(y, side) for y in range(y0, min(y1, now.year) + 1) for side in ('BID', 'ASK')]
+    with cf.ThreadPoolExecutor(max_workers=3) as ex:
+        futs = {ex.submit(year_days, pair, y, side): side for (y, side) in jobs}
+        for f in cf.as_completed(futs):
+            store = bid if futs[f] == 'BID' else ask
+            for r in f.result():
                 store[r[0]] = r
     days = []
     for t in sorted(set(bid) & set(ask)):
@@ -213,6 +216,25 @@ def to_h4(hours):
     return [(b[0] * 1000, b[1], b[2], b[3], b[4], b[5] / b[6]) for b in bars if b[6] >= 2]
 
 
+def read_csv_gz(path):
+    rows = []
+    with gzip.open(path, 'rt', encoding='utf-8') as f:
+        next(f, None)
+        for line in f:
+            p = line.strip().split(',')
+            if len(p) >= 6:
+                rows.append((int(p[0]), float(p[1]), float(p[2]), float(p[3]), float(p[4]), float(p[5])))
+    return rows
+
+
+def merge_rows(old, new):
+    """Păstrează istoricul vechi până la prima zi nou descărcată, apoi datele noi."""
+    if not new:
+        return old
+    first = new[0][0]
+    return [r for r in old if r[0] < first] + list(new)
+
+
 def write_csv_gz(path, rows, decimals):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     fmt = f'{{:.{decimals}f}}'
@@ -229,11 +251,10 @@ def main(argv=None):
     ap.add_argument('--from', dest='y0', type=int, default=2003)
     ap.add_argument('--to', dest='y1', type=int, default=dt.datetime.now(dt.timezone.utc).year)
     ap.add_argument('--out', default='data/fx/dk')
+    ap.add_argument('--merge', action='store_true', help='lipește anii descărcați peste fișierul existent (pentru actualizarea lunară)')
     ap.add_argument('--tf', default='d1', choices=['d1', 'h1'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
     a = ap.parse_args(argv)
     pairs = PAIRS if a.all else [p.strip().upper() for p in a.pairs.split(',') if p.strip()]
-    if not diagnose(pairs[0] if pairs else 'EURUSD'):
-        return 1
     ok = 0
     for p in pairs:
         t0 = time.time()
@@ -244,7 +265,10 @@ def main(argv=None):
                     print(f'::error::{p}: prea puține zile ({len(d1)})')
                     continue
                 dec = 3 if p.endswith('JPY') else 5
-                write_csv_gz(os.path.join(a.out, 'd1', f'{p}.csv.gz'), d1, dec + 1)
+                path = os.path.join(a.out, 'd1', f'{p}.csv.gz')
+                if a.merge and os.path.exists(path):
+                    d1 = merge_rows(read_csv_gz(path), d1)
+                write_csv_gz(path, d1, dec + 1)
                 first = dt.datetime.fromtimestamp(d1[0][0] / 1000, dt.timezone.utc).date()
                 last = dt.datetime.fromtimestamp(d1[-1][0] / 1000, dt.timezone.utc).date()
                 print(f'::notice::{p}: {len(d1)} zile ({first} → {last}) în {time.time() - t0:.0f}s')

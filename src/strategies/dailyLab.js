@@ -111,6 +111,73 @@ function makeRules(bars, p) {
         }
       };
     }
+    case 'mom': {
+      // momentum pe serii de timp: în direcția variației pe ultimele `lookback` zile; ieșire când semnul se întoarce
+      const sig = (i) => (i >= p.lookback ? Math.sign(closes[i] - closes[i - p.lookback]) : 0);
+      return {
+        warm: Math.max(p.lookback, p.trendLen || 0) + 15,
+        entry(i) {
+          const s = sig(i), prev = sig(i - 1);
+          if (s > 0 && prev <= 0) return 'LONG';
+          if (p.allowShort && s < 0 && prev >= 0) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) { return pos.dir === 'LONG' ? sig(i) < 0 : sig(i) > 0; }
+      };
+    }
+    case 'donch': {
+      // breakout Donchian: intrare la depășirea maximului/minimului pe `entryLen` zile (fără ziua curentă), ieșire la extrema opusă pe `exitLen`
+      const hiLo = (i, n) => {
+        let hi = -Infinity, lo = Infinity;
+        for (let k = Math.max(0, i - n); k < i; k++) { hi = Math.max(hi, bars[k].high); lo = Math.min(lo, bars[k].low); }
+        return [hi, lo];
+      };
+      return {
+        warm: p.entryLen + 15,
+        entry(i) {
+          const [hi, lo] = hiLo(i, p.entryLen);
+          if (closes[i] > hi) return 'LONG';
+          if (p.allowShort && closes[i] < lo) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) {
+          const [hi, lo] = hiLo(i, p.exitLen);
+          return pos.dir === 'LONG' ? closes[i] < lo : closes[i] > hi;
+        }
+      };
+    }
+    case 'macross': {
+      const f = smaSeries(closes, p.fast), sl = smaSeries(closes, p.slow);
+      const side = (i) => (Number.isFinite(sl[i]) ? Math.sign(f[i] - sl[i]) : 0);
+      return {
+        warm: p.slow + 15,
+        entry(i) {
+          if (side(i) > 0 && side(i - 1) <= 0) return 'LONG';
+          if (p.allowShort && side(i) < 0 && side(i - 1) >= 0) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) { return pos.dir === 'LONG' ? side(i) < 0 : side(i) > 0; }
+      };
+    }
+    case 'bb': {
+      // revenire Bollinger: închidere sub banda de jos (k deviații) ⇒ cumpără; ieșire la medie
+      const m = smaSeries(closes, p.len);
+      const sd = closes.map((_, i) => {
+        if (i < p.len - 1) return NaN;
+        let a = 0; for (let k = i - p.len + 1; k <= i; k++) a += (closes[k] - m[i]) ** 2;
+        return Math.sqrt(a / p.len);
+      });
+      return {
+        warm: Math.max(p.len, p.trendLen || 0) + 15,
+        entry(i) {
+          if (!Number.isFinite(sd[i]) || !ready(i)) return null;
+          if (closes[i] < m[i] - p.k * sd[i] && (!p.trendLen || above(i))) return 'LONG';
+          if (p.allowShort && closes[i] > m[i] + p.k * sd[i] && (!p.trendLen || below(i))) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) { return pos.dir === 'LONG' ? closes[i] >= m[i] : closes[i] <= m[i]; }
+      };
+    }
     case 'tom':
       return {
         warm: (p.trendLen || 0) + 15,

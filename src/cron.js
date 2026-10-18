@@ -19,6 +19,7 @@ const { loadConfig } = require('./config');
 const MarketStateBus = require('./core/MarketStateBus');
 const { runTrendCycle } = require('./trendLive');
 const { runPropCycle, propSummary } = require('./propLive');
+const { runFxCycle } = require('./fxLive');
 const FX_INSTRUMENTS = require('../config/forex_instruments.json');
 const { sendTelegram, roTime } = require('./notify/telegram');
 
@@ -55,7 +56,8 @@ async function main() {
 
   const trendOn = Boolean((config.trendDesk || {}).enabled);
   const propOn = Boolean((config.propDesk || {}).enabled);
-  if (!trendOn && !propOn) {
+  const fxOn = Boolean((config.fxDesk || {}).enabled);
+  if (!trendOn && !propOn && !fxOn) {
     console.log('Niciun departament activ (nu au trecut validarea sau au fost dezactivate). Nimic de făcut.');
     return;
   }
@@ -71,6 +73,15 @@ async function main() {
     nSym += (pr.fetched || []).length + symErr; // doar instrumentele încercate la această rulare
     console.log(`${new Date(now).toISOString()} | PROP | ${JSON.stringify(pr.account)} | evenimente: ${JSON.stringify(pr.events)} | erori: ${Object.keys(pr.errors || {}).length}`);
     if (Object.keys(pr.errors || {}).length) console.log('erori prop:', JSON.stringify(pr.errors));
+  }
+  // ACADEMIA FOREX (doar agenții ELITĂ, doar dacă Academia a trecut validarea)
+  if (fxOn) {
+    const fr = await runFxCycle({ config, instruments: FX_INSTRUMENTS, bus, notify, now });
+    reports.fx = fr;
+    const symErr = Object.keys(fr.errors || {}).filter((k) => !k.startsWith('fx:')).length;
+    nErr += symErr;
+    nSym += (fr.fetched || []).length + symErr;
+    console.log(`${new Date(now).toISOString()} | FOREX | ${JSON.stringify(fr.account || fr.skipped)} | evenimente: ${JSON.stringify(fr.events || [])}`);
   }
   // Departamentul TREND crypto (doar dacă e activ)
   const report = trendOn ? await runTrendCycle({ config, bus, notify, now }) : { openPositions: [], updated: [], errors: {} };
@@ -95,11 +106,12 @@ async function main() {
 
   // Mesaj zilnic de verificare
   const { hour, date } = roHourAndDate(now);
-  const anyInit = (trendOn && st.initialized) || (propOn && bus.state.prop && bus.state.prop.initialized);
+  const anyInit = (trendOn && st.initialized) || (propOn && bus.state.prop && bus.state.prop.initialized) || (fxOn && bus.state.fx && bus.state.fx.initialized);
   if (hour >= 9 && st.heartbeatDate !== date && anyInit) {
     st.heartbeatDate = date;
     const parts = [`☀️ <b>APEX QUANT: verificare zilnică</b>\nSistemul funcționează. Ultima verificare: ${roTime(now)}.`];
     if (propOn) parts.push(propSummary(bus.state.prop, config));
+    if (fxOn && bus.state.fx) parts.push(propSummary(bus.state.fx, config).replace('Contul de prop', 'Academia Forex · contul de prop'));
     if (trendOn) {
       const pos = Object.values(st.positions);
       parts.push(pos.length ? `Crypto trend: ${pos.map((p) => `${p.symbol} ${p.direction} (stop ${p.stop.toPrecision(6)})`).join(', ')}` : 'Crypto trend: nicio poziție.');

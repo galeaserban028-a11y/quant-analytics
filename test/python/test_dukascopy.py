@@ -37,4 +37,9 @@ raw_days = [[day(2024, 7, 13), 1, 1, 1, 1, 0], [day(2024, 7, 14), 1.0, 1.02, 0.9
 m = d.merge_sundays(raw_days)
 assert len(m) == 2, m
 assert m[0][0] == day(2024, 7, 15) * 1000 and m[0][1] == 1.0 and m[0][2] == 1.02 and m[0][3] == 0.99 and m[0][4] == 1.012
-print('OK parser, zile Forex, agregare, duminici', len(dd), len(h4))
+# 5) actualizarea lunară: istoricul vechi + anii noi
+old = [(1, 1, 1, 1, 1, 0), (2, 1, 1, 1, 1, 0), (3, 1, 1, 1, 1, 0)]
+new = [(3, 2, 2, 2, 2, 0), (4, 2, 2, 2, 2, 0)]
+assert d.merge_rows(old, new) == [(1, 1, 1, 1, 1, 0), (2, 1, 1, 1, 1, 0), (3, 2, 2, 2, 2, 0), (4, 2, 2, 2, 2, 0)]
+assert d.merge_rows(old, []) == old
+print('OK parser, zile Forex, agregare, duminici, actualizare', len(dd), len(h4))

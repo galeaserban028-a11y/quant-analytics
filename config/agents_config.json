@@ -611,5 +611,15 @@
     "trendDesk",
     "propDesk"
   ],
-  "_userDisabledDesks_note": "Oprite la cererea ta: crypto (trendDesk) și indicii (propDesk). Tranzacționezi doar Forex: semnalele vin de la Academia Forex, doar după ce agenții trec testele."
+  "_userDisabledDesks_note": "Oprite la cererea ta: crypto (trendDesk) și indicii (propDesk). Tranzacționezi doar Forex: semnalele vin de la Academia Forex, doar după ce agenții trec testele.",
+  "fxDesk": {
+    "enabled": false,
+    "firm": "THE5ERS_HIGH_STAKES",
+    "riskPct": 1,
+    "safety": 0.7,
+    "maxOpen": 3,
+    "elite": [],
+    "symbols": [],
+    "note": "Academia Forex: se activează doar dacă compania agenților ELITĂ are avantaj clar în toate cele 3 rulări (npm run research:academy -- --apply)."
+  }
 }

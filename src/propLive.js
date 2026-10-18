@@ -128,8 +128,8 @@ function shouldFetch(acct, sym, inst, now) {
  * @param {number} [p.now]
  * @param {object} [p.env] suprascrieri: PROP_BALANCE, PROP_ACCOUNT_SIZE, PROP_FIRM, PROP_PHASE
  */
-async function runPropCycle({ config, instruments, bus, notify, fetch, now = Date.now(), env = process.env }) {
-  const desk = Object.assign({}, config.propDesk || {});
+async function runPropCycle({ config, instruments, bus, notify, fetch, now = Date.now(), env = process.env, deskKey = 'propDesk', stateKey = 'prop', label = 'APEX PROP' }) {
+  const desk = Object.assign({}, config[deskKey] || {});
   if (!desk.enabled) return { skipped: 'PROP_DESK_DISABLED' };
   if (env.PROP_FIRM && PROP_RULES[env.PROP_FIRM]) desk.firm = env.PROP_FIRM;
   if (env.PROP_ACCOUNT_SIZE && Number(env.PROP_ACCOUNT_SIZE) > 0) desk.accountSize = Number(env.PROP_ACCOUNT_SIZE);
@@ -138,11 +138,11 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
   const benched = new Set(desk.benched || []);
   const fetcher = fetch || ((sym, inst) => fetchDaily(inst, { now }));
 
-  const prevAcct = bus.state.prop;
+  const prevAcct = bus.state[stateKey];
   if (!prevAcct || prevAcct.v !== STATE_VERSION || prevAcct.firm !== desk.firm || prevAcct.initial !== (desk.accountSize || 10000)) {
-    bus.state.prop = initAccount(desk, rules, now);
+    bus.state[stateKey] = initAccount(desk, rules, now);
   }
-  const acct = bus.state.prop;
+  const acct = bus.state[stateKey];
   // Sincronizare manuală cu soldul real (opțional)
   if (env.PROP_BALANCE && Number(env.PROP_BALANCE) > 0 && Number(env.PROP_BALANCE) !== acct.syncedBalance) {
     acct.balance = Number(env.PROP_BALANCE);
@@ -200,8 +200,9 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
     const stale = now - barClose > FRESH_MS;
 
     for (const st of strategies) {
-      const key = `${sym}|${st.kind}`;
-      const who = `${nameFor(st.kind, sym)} (${st.name || st.kind})`;
+      if (st.symbols && !st.symbols.includes(sym)) continue; // agenții Academiei au fiecare perechea lui
+      const key = st.id ? `${sym}|${st.id}` : `${sym}|${st.kind}`;
+      const who = st.who || `${nameFor(st.kind, sym)} (${st.name || st.kind})`;
       const params = Object.assign({ kind: st.kind }, st.params);
       const { position, lastClosed } = lab.liveState(sym, candles, inst, params, { barMs: DAY_MS });
       const prev = acct.positions[key];
@@ -213,7 +214,7 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
         const r = closed ? closed.resultR : 0;
         const pnl = prev.riskUsd * r;
         acct.balance += pnl;
-        acct.history.push({ sym, strategy: st.kind, direction: prev.direction, openedAt: prev.openedAt, closedAt: closed ? closed.closedAt : now, r, pnl, outcome: closed ? closed.outcome : 'NECUNOSCUT' });
+        acct.history.push({ sym, strategy: st.kind, agent: st.id || null, direction: prev.direction, openedAt: prev.openedAt, closedAt: closed ? closed.closedAt : now, r, pnl, outcome: closed ? closed.outcome : 'NECUNOSCUT' });
         if (acct.history.length > 300) acct.history.shift();
         const why = !closed ? 'poziția s-a închis' : (closed.outcome === 'STOP' ? 'stop-ul a fost atins (s-a închis singur la broker)' : (closed.outcome === 'TIME' ? `a expirat timpul maxim de ${params.maxDays || 10} zile — ÎNCHIDE ACUM` : 'prețul a revenit — ÎNCHIDE ACUM'));
         await notify([
@@ -227,6 +228,13 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
       if (acct.skipped[key] != null && !skippedHere) delete acct.skipped[key];
 
       if (!position || acct.positions[key] || skippedHere) continue;
+
+      // O singură poziție pe pereche (când mai mulți agenți tranzacționează aceeași pereche)
+      if (desk.onePerSymbol && Object.values(acct.positions).some((p) => p.symbol === sym)) {
+        acct.skipped[key] = position.openedAt;
+        report.events.push({ sym, strategy: st.kind, event: 'SKIP', reason: 'PERECHE_OCUPATĂ' });
+        continue;
+      }
 
       // Traderii de pe bancă nu deschid poziții noi (pozițiile deja deschise le închid normal)
       if (benched.has(key)) {
@@ -261,13 +269,13 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
         if (lot.reason === 'CONVERSIE_LIPSĂ') await notify(`⚠️ <b>PROP: ${escapeHtml(sym)}</b> semnal sărit: lipsește cursul valutar pentru calculul lotului. Nu face nimic.`);
         continue;
       }
-      acct.positions[key] = Object.assign({}, position, { strategy: st.kind, riskUsd: lot.actualRiskUsd, lots: lot.lots });
+      acct.positions[key] = Object.assign({}, position, { strategy: st.kind, agent: st.id || null, who, riskUsd: lot.actualRiskUsd, lots: lot.lots });
       const day = dayKeyIn(now, rules.resetTz);
       if (!acct.tradingDays.includes(day)) acct.tradingDays.push(day);
       const long = position.direction === 'LONG';
       const pts = stopDist / inst.pipSize;
       await notify([
-        `📈 <b>SEMNAL PROP: ${escapeHtml(sym)}</b> ${long ? '🟢 CUMPĂRĂ (Buy)' : '🔴 VINDE (Sell)'} la prețul pieței, ACUM`,
+        `📈 <b>SEMNAL ${label === 'APEX PROP' ? 'PROP' : 'FOREX'}: ${escapeHtml(sym)}</b> ${long ? '🟢 CUMPĂRĂ (Buy)' : '🔴 VINDE (Sell)'} la prețul pieței, ACUM`,
         `🧠 Trader: ${escapeHtml(who)}`,
         `📦 Lot: <b>${lot.lots.toFixed(2)}</b> (risc ${money(lot.actualRiskUsd)} = ${(lot.actualRiskUsd / acct.initial * 100).toFixed(2)}% din cont)`,
         `🛑 Stop loss: la <b>${pts.toFixed(inst.pipSize >= 1 ? 0 : 1)} ${inst.category === 'FX' ? 'pips' : 'puncte'}</b> ${long ? 'SUB' : 'PESTE'} prețul tău de intrare`,
@@ -314,8 +322,8 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
   const nSyms = (desk.symbols || []).length;
   if (firstRun && Object.keys(series).length > 0 && Object.keys(report.errors).length * 2 < nSyms) {
     acct.initialized = true;
-    await notify(`🚀 <b>APEX PROP a pornit</b>: ${rules.name}, cont ${money(acct.initial)}, ${nSyms} indici, ${strategies.length} strategii (${strategies.map((s) => escapeHtml(s.name || s.kind)).join(', ')}).\n` +
-      `Semnalele vin la ~10–15 minute după închiderea fiecărei burse, cu lot exact și stop. Riscul de bază e de ${desk.riskPct}% pe tranzacție; Gardianul îl reduce automat ca să nu atingi niciodată limitele (${(rules.dailyLoss * 100).toFixed(0)}% pe zi, ${(rules.maxLoss * 100).toFixed(0)}% total).\n` +
+    await notify(`🚀 <b>${label} a pornit</b>: ${rules.name}, cont ${money(acct.initial)}, ${nSyms} instrumente, ${strategies.length} ${label === 'APEX PROP' ? 'strategii' : 'agenți ELITĂ'} (${strategies.slice(0, 8).map((s) => escapeHtml(s.who || s.name || s.kind)).join(', ')}${strategies.length > 8 ? '…' : ''}).\n` +
+      `Semnalele vin după închiderea zilei, cu lot exact și stop. Riscul de bază e de ${desk.riskPct}% pe tranzacție; Gardianul îl reduce automat ca să nu atingi niciodată limitele (${(rules.dailyLoss * 100).toFixed(0)}% pe zi, ${(rules.maxLoss * 100).toFixed(0)}% total).\n` +
       `Pozițiile deja începute în piață NU îți sunt trimise. Așteptăm semnale noi.`);
   }
   bus.saveSnapshot();

@@ -18,7 +18,7 @@ function applyOverrides(config, overrides) {
   if (overrides.scoringWeights) c.scoringWeights = Object.assign({}, c.scoringWeights, overrides.scoringWeights);
   if (Array.isArray(overrides.advisoryFilters)) c.advisoryFilters = overrides.advisoryFilters.slice();
   if (Array.isArray(overrides.disabledSymbols)) c.disabledSymbols = overrides.disabledSymbols.slice();
-  for (const key of ['executionPolicy', 'regimeFilter', 'smcDesk', 'trendDesk', 'propDesk']) {
+  for (const key of ['executionPolicy', 'regimeFilter', 'smcDesk', 'trendDesk', 'propDesk', 'fxDesk']) {
     if (overrides[key]) c[key] = Object.assign({}, c[key], overrides[key]);
   }
   return c;
@@ -40,7 +40,7 @@ function loadConfig({ basePath = BASE_PATH, promotionsPath = PROMOTIONS_PATH, ig
   if (ignorePromotions || !fs.existsSync(promotionsPath)) return applyUserDisabled(cfg);
   try {
     const p = JSON.parse(fs.readFileSync(promotionsPath, 'utf8'));
-    for (const section of ['smc', 'trend', 'prop']) {
+    for (const section of ['smc', 'trend', 'prop', 'fx']) {
       if (p[section] && p[section].validatedOOS && p[section].overrides) cfg = applyOverrides(cfg, p[section].overrides);
     }
     return applyUserDisabled(cfg);
