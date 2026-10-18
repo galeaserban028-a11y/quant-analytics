@@ -119,6 +119,23 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     </div>
   </section>
 
+  <section aria-labelledby="h-cap">
+    <h2 id="h-cap">APEX Capital · compania cu bani fictivi</h2>
+    <div class="tiles" id="capTiles"></div>
+    <div class="two">
+      <div class="card" id="capCurve"></div>
+      <div class="card" id="capRanks"></div>
+    </div>
+    <div class="two">
+      <div class="card tbl" id="capYears"></div>
+      <div class="card" id="capBest"></div>
+    </div>
+    <div class="two">
+      <div class="card tbl" id="capJournal"></div>
+      <div class="card" id="capWorst"></div>
+    </div>
+  </section>
+
   <section aria-labelledby="h-acct">
     <h2 id="h-acct">Contul de examen (semnalele elitei)</h2>
     <div class="tiles" id="account"></div>
@@ -367,6 +384,77 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     box.append(el('p', { class: 'muted', text: 'Au fost în elită mult timp, apoi piața s-a schimbat și s-au retras. Urmașii lor duc ADN-ul mai departe.' }));
   }
 
+  function renderCapital() {
+    const ids = ['capTiles', 'capCurve', 'capRanks', 'capYears', 'capBest', 'capJournal', 'capWorst'];
+    for (const id of ids) document.getElementById(id).replaceChildren();
+    const v = academy && academy.virtual;
+    if (!v) { document.getElementById('capTiles').append(el('p', { class: 'muted', text: 'Compania pornește după prima școală a Academiei.' })); return; }
+    const tiles = document.getElementById('capTiles');
+    const stat = (lbl, big, sub, c) => el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: lbl }), el('span', { class: 'big num ' + (c || ''), text: big }), el('span', { class: 'lbl', text: sub })]);
+    tiles.append(stat('Capital fictiv', money(v.endCapital), `pornit cu ${money(v.startCapital)} în ${v.from}`, cls(v.totalPnl)));
+    tiles.append(stat('Pe an, în medie', `${signed(v.cagrPct, 2)}%`, academy.virtualOthers && academy.virtualOthers.length ? `alte vieți: ${academy.virtualOthers.map((x) => signed(x.cagrPct, 1) + '%').join(', ')}` : '', cls(v.cagrPct)));
+    tiles.append(stat('Cea mai mare scădere', `${v.maxDrawdownPct}%`, `${v.positiveMonthsPct}% din luni pe plus`));
+    tiles.append(stat('Tranzacții', v.trades.toLocaleString('ro-RO'), `${v.suspensions} trimiteri acasă · ${v.skippedRisk} refuzate de risc`));
+
+    // curba capitalului
+    const box = document.getElementById('capCurve');
+    box.append(el('h3', { text: 'Capitalul companiei, lună de lună' }));
+    const pts = v.months.map((m) => m.endEquity);
+    const W = 640, H = 210, L = 60, B = 22, T = 10;
+    const lo = Math.min(v.startCapital, ...pts), hi = Math.max(v.startCapital, ...pts);
+    const x = (i) => L + i / Math.max(1, pts.length - 1) * (W - L - 8);
+    const y = (val) => T + (H - T - B) * (1 - (val - lo) / Math.max(1, hi - lo));
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', role: 'img', 'aria-label': 'Capitalul APEX Capital în timp' });
+    for (const g of [lo, (lo + hi) / 2, hi]) { svg.append(svgEl('line', { x1: L, x2: W - 4, y1: y(g), y2: y(g), stroke: 'var(--line)' })); const t = svgEl('text', { x: L - 6, y: y(g) + 4, 'text-anchor': 'end' }); t.textContent = Math.round(g / 1000) + 'k'; svg.append(t); }
+    svg.append(svgEl('line', { x1: L, x2: W - 4, y1: y(v.startCapital), y2: y(v.startCapital), stroke: 'var(--muted)', 'stroke-dasharray': '4 4' }));
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p).toFixed(1)}`).join(' ');
+    svg.append(svgEl('path', { d: `${d} L${x(pts.length - 1)},${H - B} L${L},${H - B} Z`, fill: 'var(--accent-soft)' }));
+    svg.append(svgEl('path', { d, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2 }));
+    v.months.forEach((m, i) => { if (m.month.endsWith('-01') && Number(m.month.slice(0, 4)) % 4 === 0) { const t = svgEl('text', { x: x(i), y: H - 5, 'text-anchor': 'middle' }); t.textContent = m.month.slice(0, 4); svg.append(t); } });
+    box.append(el('div', {}, [svg]));
+    box.append(el('p', { class: 'muted', text: 'Linia punctată: capitalul de pornire. Bani fictivi, pe istoria reală.' }));
+
+    // pe grade
+    const rb = document.getElementById('capRanks');
+    rb.append(el('h3', { text: 'Câștigă mai mult cei promovați?' }));
+    rb.append(el('p', { class: 'muted', text: 'R pe tranzacție după gradul pe care agentul îl avea când a intrat. Dacă promovările au sens, cifrele cresc de la stagiar la elită.' }));
+    const rows = ['STAGIAR', 'JUNIOR', 'SENIOR', 'ELITĂ'].map((rk) => [`${RANK_TXT[rk]} (${v.ranks[rk].trades} tranz.)`, `${signed(v.ranks[rk].expectancyR)}R`, cls(v.ranks[rk].expectancyR)]);
+    rb.append(kv(rows));
+    rb.append(el('p', { class: 'muted', text: `Risc pe tranzacție: stagiar ${v.policy.riskByRank.STAGIAR * 100}%, junior ${v.policy.riskByRank.JUNIOR * 100}%, senior ${v.policy.riskByRank.SENIOR * 100}%, elită ${v.policy.riskByRank['ELITĂ'] * 100}% din capital. Limita unui trader: ${v.policy.traderLimitR}R în ${v.policy.traderWindowDays} de zile.` }));
+
+    // pe ani
+    const yb = document.getElementById('capYears');
+    yb.append(el('h3', { text: 'Raportul anual' }));
+    const t = el('table');
+    t.append(el('thead', {}, [el('tr', {}, [el('th', { text: 'An' }), el('th', { class: 'r', text: 'Profit fictiv' }), el('th', { class: 'r', text: 'Randament' }), el('th', { class: 'r', text: 'Tranzacții' })])]));
+    const tb = el('tbody');
+    for (const yr of v.yearly.slice().reverse()) tb.append(el('tr', {}, [el('td', { text: yr.year }), el('td', { class: 'r num ' + cls(yr.pnl), text: money(yr.pnl) }), el('td', { class: 'r num ' + cls(yr.returnPct), text: `${signed(yr.returnPct, 1)}%` }), el('td', { class: 'r num', text: String(yr.trades) })]));
+    t.append(tb); yb.append(t);
+
+    // contribuitori
+    const bb = document.getElementById('capBest');
+    bb.append(el('h3', { text: 'Cine a adus banii' }));
+    bb.append(kv(v.best.slice(0, 8).map((a) => [`${a.name} · ${a.pair}`, money(a.pnl), cls(a.pnl)])));
+    bb.append(el('h3', { text: 'Cine a pierdut cel mai mult' }));
+    bb.append(kv(v.worstAgents.map((a) => [`${a.name} · ${a.pair}`, money(a.pnl), cls(a.pnl)])));
+
+    // jurnal
+    const jb = document.getElementById('capJournal');
+    jb.append(el('h3', { text: 'Jurnalul de tranzacții (ultimele)' }));
+    const jt = el('table');
+    jt.append(el('thead', {}, [el('tr', {}, [el('th', { text: 'Închisă' }), el('th', { text: 'Agent' }), el('th', { text: 'Pereche' }), el('th', { class: 'r', text: 'R' }), el('th', { class: 'r', text: 'Profit fictiv' })])]));
+    const jtb = el('tbody');
+    for (const j of v.journal.slice(0, 15)) jtb.append(el('tr', {}, [el('td', { text: new Date(j.at).toISOString().slice(0, 10) }), el('td', { text: `${j.name} (${RANK_TXT[j.rank]})` }), el('td', { text: `${j.pair} ${j.direction === 'LONG' ? '↑' : '↓'}` }), el('td', { class: 'r num ' + cls(j.r), text: signed(j.r, 2) }), el('td', { class: 'r num ' + cls(j.pnl), text: money(j.pnl) })]));
+    jt.append(jtb); jb.append(jt);
+
+    // cele mai mari pierderi
+    const wb = document.getElementById('capWorst');
+    wb.append(el('h3', { text: 'Analiza celor mai mari pierderi' }));
+    for (const w of v.worstTrades) {
+      wb.append(el('div', { style: 'display:grid;gap:2px' }, [el('b', { text: `${money(w.pnl)} · ${w.name}, ${w.pair}, ${new Date(w.at).toISOString().slice(0, 10)}` }), el('span', { class: 'muted', text: w.lesson })]));
+    }
+  }
+
   function renderHeader() {
     const live = document.getElementById('live');
     live.dataset.mode = mode;
@@ -374,7 +462,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     document.getElementById('liveText').textContent = mode === 'live' ? `Live · stare ${saved ? roDateTime(saved) : '—'} · reîmprospătare la fiecare minut` : mode === 'snap' ? `Instantaneu din ${academy ? roDate(academy.generatedAt) : '—'}` : 'Datele nu s-au încărcat';
   }
 
-  function renderAll() { renderHeader(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderAccount(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
+  function renderAll() { renderHeader(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderCapital(); renderAccount(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
 
   async function load() {
     const [a, s] = await Promise.all([fetchFirst(SOURCES.academy), fetchFirst(SOURCES.state)]);

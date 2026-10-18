@@ -172,3 +172,28 @@ test('live Forex: Academia oprită = tăcere; agenții ELITĂ trimit pe perechea
   assert.match(msgs[msgs.length - 1], /Trader: Andrei Popescu/);
   assert.ok(bus.state.fx && !bus.state.prop, 'starea Forex e separată de cea a indicilor');
 });
+
+test('APEX Capital (bani fictivi): contabilitate corectă, risc după grad, limite pe companie și pe trader', () => {
+  const { simulateCompany, postMortem } = require('../src/academy/company');
+  const res = runAcademy(universe(4200, 1300), INSTR, { sim, populationSize: 120, seed: 2 });
+  const v = simulateCompany(res);
+  assert.ok(v.trades > 100);
+  const sumMonths = v.months.reduce((s, m) => s + m.pnl, 0);
+  assert.ok(Math.abs(v.startCapital + sumMonths - v.endCapital) <= v.months.length + 1, 'soldul = start + profitul lunilor');
+  assert.equal(v.months[v.months.length - 1].endEquity, v.endCapital);
+  // riscul pe tranzacție urmează gradul: |pnl| / |R| / capital ≈ procentul gradului (capitalul se schimbă, deci aproximativ)
+  for (const j of v.journal.filter((x) => Math.abs(x.r) > 0.2)) {
+    const pct = Math.abs(j.pnl / j.r) / v.startCapital;
+    const want = v.policy.riskByRank[j.rank];
+    assert.ok(pct > want * 0.3 && pct < want * 3, `${j.rank}: ${pct}`);
+  }
+  assert.ok(v.maxDrawdownPct >= 0 && v.maxDrawdownPct < 100);
+  assert.ok(v.worstTrades.length === 5 && v.worstTrades.every((t) => t.lesson.length > 20));
+  // limite mai stricte ⇒ mai multe tranzacții refuzate
+  const strict = simulateCompany(res, { maxOpenRisk: 0.005 });
+  assert.ok(strict.skippedRisk > v.skippedRisk);
+  // trader trimis acasă: cu o limită foarte strictă apar suspendări și tranzacții sărite
+  const harsh = simulateCompany(res, { traderLimitR: -1 });
+  assert.ok(harsh.suspensions > 0 && harsh.skippedHome > 0);
+  assert.match(postMortem({ direction: 'LONG', outcome: 'STOP', exit: 0.9, stop: 1, r: -1.4 }), /gap/);
+});

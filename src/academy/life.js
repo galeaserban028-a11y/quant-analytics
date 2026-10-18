@@ -156,7 +156,9 @@ function runAcademy(data, instruments, opts) {
       if (!birth(T, parent)) break;
       born++;
     }
-    quarters.push({ at: new Date(T).toISOString().slice(0, 10), counts, elites: elites.length, retired: retiring.length, born });
+    // lista de prezență a trimestrului (cine lucrează și cu ce grad) — pentru compania cu bani fictivi
+    const roster = alive.filter((a) => !retiring.some(([x]) => x === a)).map((a) => ({ id: a.id, rank: a.rank }));
+    quarters.push({ at: new Date(T).toISOString().slice(0, 10), T, counts, elites: elites.length, retired: retiring.length, born, roster });
     if (quarters.length % 8 === 0) log(`${new Date(T).toISOString().slice(0, 10)}: ${JSON.stringify(counts)} · pensionați ${retiring.length} · născuți ${born}`);
   }
 
@@ -176,7 +178,7 @@ function runAcademy(data, instruments, opts) {
     a.stats = forwardStats(tradesOf(a.genome), a.bornAt, end, end - YEAR);
     a.rank = rankOf(a.stats, age, R);
   }
-  return { agents, quarters, companyTrades, company: computeMetrics(companyTrades), rules: R, t0, end };
+  return { agents, quarters, companyTrades, company: computeMetrics(companyTrades), rules: R, t0, end, step, tradesOf };
 }
 
 module.exports = { runAcademy, forwardStats, rankOf, shouldRetire, RULES };

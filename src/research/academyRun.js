@@ -20,6 +20,7 @@ const { DATA_DIR } = require('../backtest/dataLoader');
 const { cleanSpikes } = require('../core/candles');
 const lab = require('../strategies/dailyLab');
 const { runAcademy } = require('../academy/life');
+const { simulateCompany } = require('../academy/company');
 const { FAMILIES, describe } = require('../academy/genome');
 const { computeMetrics } = require('../backtest/metrics');
 const { PROP_RULES } = require('../prop/rules');
@@ -104,6 +105,12 @@ async function main() {
     scenario = { firm: rules.name, config: cfg, fee: top.fee, challengeMonth: monthDistribution(trades, rules, cfg, { target: rules.phases[0] }), journey: journey(trades, rules, cfg, { months: 12, fee: top.fee }) };
   }
 
+  // APEX Capital: compania cu bani fictivi în care lucrează toți agenții (rulările 1–3, pentru robustețe)
+  const virtual = simulateCompany(main0);
+  const virtualOthers = runs.slice(1).map((x) => { const v = simulateCompany(x); return { seed: x.seed, cagrPct: v.cagrPct, maxDrawdownPct: v.maxDrawdownPct, totalPnl: v.totalPnl, ranks: v.ranks }; });
+  console.log(`APEX Capital (bani fictivi, seed 1): ${virtual.startCapital} $ → ${virtual.endCapital} $ (${virtual.cagrPct}%/an, scădere maximă ${virtual.maxDrawdownPct}%), ${virtual.trades} tranzacții`);
+  for (const [rk, m] of Object.entries(virtual.ranks)) console.log(`  ${rk}: ${m.trades} tranzacții, ${m.expectancyR}R`);
+
   const alive = main0.agents.filter((a) => !a.retiredAt);
   const byFamily = {};
   for (const a of alive) byFamily[a.genome.family] = (byFamily[a.genome.family] || 0) + 1;
@@ -125,7 +132,8 @@ async function main() {
     enabled,
     seeds: runs.map((x) => ({ seed: x.seed, ok: x.ok, company: { trades: x.company.trades, winRatePct: x.company.winRatePct, expectancyR: x.company.expectancyR, ci: x.company.expectancyCI95 }, agentsEver: x.agents.length, everElite: x.agents.filter((a) => a.bestRank === 'ELITĂ').length })),
     families: Object.fromEntries(Object.keys(FAMILIES).map((f) => [f, { name: FAMILIES[f].name, alive: byFamily[f] || 0, company: famCompany[f] ? (({ trades: n, expectancyR: e }) => ({ trades: n, expectancyR: e }))(computeMetrics(famCompany[f])) : null }])),
-    quarters: main0.quarters,
+    quarters: main0.quarters.map(({ roster, T, ...q }) => q),
+    virtual, virtualOthers,
     population, hallOfFame,
     exam: ranking.map((r) => ({ key: r.key, name: r.rules, riskPct: r.riskPct, safety: r.safety, maxOpen: r.maxOpen, passPct: r.passPct, failPct: r.failPct, medianDaysToPass: r.medianDaysToPass, passWithin180Pct: r.passWithin180Pct, fee: r.fee, ev: r.expectedValuePerAttempt })),
     scenario
@@ -162,6 +170,16 @@ async function main() {
     for (const r of ranking) L.push(`| ${r.rules} | ${r.riskPct}% | ${r.passPct}% | ${r.failPct}% | ${r.medianDaysToPass ?? '–'} | ${r.passWithin180Pct}% | ${r.expectedValuePerAttempt}$ |`);
     L.push('');
   }
+  L.push('## APEX Capital — compania cu bani fictivi (1.000.000 $)');
+  L.push('');
+  L.push(`Toți agenții lucrează cu bani fictivi, cu risc după grad (stagiar 0,05%, junior 0,10%, senior 0,20%, elită 0,30% pe tranzacție) și limită de 8R pierdere în 90 de zile pe trader. Din ${virtual.from}: **${virtual.startCapital.toLocaleString('ro-RO')} $ → ${virtual.endCapital.toLocaleString('ro-RO')} $** (${virtual.cagrPct}% pe an), scădere maximă ${virtual.maxDrawdownPct}%, ${virtual.positiveMonthsPct}% din luni pe plus. Celelalte rulări: ${virtualOthers.map((v) => `${v.cagrPct}%/an`).join(', ')}.`);
+  L.push('');
+  L.push('| Grad | Tranzacții | R / tranzacție (IC95%) |');
+  L.push('|---|---|---|');
+  for (const [rk, m] of Object.entries(virtual.ranks)) L.push(`| ${rk} | ${m.trades} | ${fmt(m.expectancyR)} (${fmt(m.ci[0])} … ${fmt(m.ci[1])}) |`);
+  L.push('');
+  L.push('Dacă gradele au valoare, R pe tranzacție ar trebui să crească de la stagiar la elită.');
+  L.push('');
   L.push('## Elita de acum');
   L.push('');
   for (const a of population.filter((x) => x.rank === 'ELITĂ').slice(0, 30)) L.push(`- **${a.name}** (${a.pair}, ${a.familyName}): ${a.describe}. Pe hârtie: ${a.stats.trades} tranzacții, ${fmt(a.stats.expectancyR)}R, t=${a.stats.t}.`);
