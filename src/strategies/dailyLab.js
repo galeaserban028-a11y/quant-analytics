@@ -208,7 +208,11 @@ function makeRules(bars, p) {
 function simulateBars(symbol, bars, inst, params, opts = {}) {
   const p = Object.assign({ maxDays: 10, stopAtr: 3, allowShort: false }, params);
   const BAR = opts.barMs || DAY_MS;
-  const spread = (inst.typicalSpreadPips || 0) * inst.pipSize * (opts.spreadMultiplier != null ? opts.spreadMultiplier : 1);
+  const spreadMult = opts.spreadMultiplier != null ? opts.spreadMultiplier : 1;
+  const baseSpread = (inst.typicalSpreadPips || 0) * inst.pipSize * spreadMult;
+  // costul real al zilei: spread-ul măsurat (Dukascopy) când e mai mare decât cel obișnuit (știri, crize), niciodată mai mic
+  const spreadAt = (bar) => Math.max(baseSpread, (bar.spread || 0) * spreadMult);
+  let spread = baseSpread;
   const costMult = opts.costMultiplier != null ? opts.costMultiplier : 1;
   const swapRate = (inst.swapRatePct || 0) / 100;
   const from = opts.tradeFromTs || -Infinity;
@@ -243,6 +247,7 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
   for (let i = 0; i < bars.length; i++) {
     const bar = bars[i];
     const closeTime = bar.timestamp + BAR;
+    spread = spreadAt(bar);
     if (nextOpen) {
       if (pos && pendingExit) finish(pos.dir === 'LONG' ? bar.open : bar.open + spread, pendingExit, bar.timestamp);
       pendingExit = null;

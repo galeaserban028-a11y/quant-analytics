@@ -49,3 +49,11 @@ u = d.to_utc_days(rows)
 assert sorted(u) == [base, base + 86400]
 assert u[base][1] == 1.0 and u[base][4] == 1.005 + 23 / 100 and u[base][2] == 1.01 + 23 / 100 and u[base][3] == 0.99
 print('OK parser, zile Forex, agregare, duminici, actualizare, an curent', len(dd), len(h4))
+
+# 7) dobânzile FRED: medie lunară din serii zilnice, lipirea seriilor
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'scripts'))
+import rates as rt
+m = rt.monthly('DATE,VAL\n2024-01-02,5.0\n2024-01-03,5.5\n2024-02-01,.\n2024-02-02,4.0\n')
+assert m == {'2024-01': 5.25, '2024-02': 4.0}, m
+assert rt.splice([{'2024-01': 1.0}, {'2024-01': 9.0, '2024-02': 2.0}]) == {'2024-01': 1.0, '2024-02': 2.0}
+print('OK dobânzi')

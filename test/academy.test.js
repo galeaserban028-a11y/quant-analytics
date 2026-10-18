@@ -197,3 +197,14 @@ test('APEX Capital (bani fictivi): contabilitate corectă, risc după grad, limi
   assert.ok(harsh.suspensions > 0 && harsh.skippedHome > 0);
   assert.match(postMortem({ direction: 'LONG', outcome: 'STOP', exit: 0.9, stop: 1, r: -1.4 }), /gap/);
 });
+
+test('costuri reale: o zi cu spread mare (știri) costă mai mult; spread-ul mic nu scade niciodată sub cel obișnuit', () => {
+  const bars = walk(1500, 77, 0.0002);
+  const p = { kind: 'rsi2', trendLen: 100, entryRsi: 10, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: true };
+  const base = lab.simulateBars('EURUSD', bars, INSTR.EURUSD, p);
+  const tiny = lab.simulateBars('EURUSD', bars.map((b) => Object.assign({}, b, { spread: 0.00001 })), INSTR.EURUSD, p);
+  assert.deepEqual(tiny.map((t) => t.resultR), base.map((t) => t.resultR), 'spread mic ⇒ se păstrează minimul din config');
+  const wide = lab.simulateBars('EURUSD', bars.map((b) => Object.assign({}, b, { spread: 0.0010 })), INSTR.EURUSD, p);
+  const sum = (ts) => ts.reduce((s, t) => s + t.resultR, 0);
+  assert.ok(sum(wide) < sum(base) - 1, 'spread de 10 pips ⇒ rezultate clar mai slabe');
+});
