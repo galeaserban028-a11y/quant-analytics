@@ -52,10 +52,10 @@ def parse_bi5(raw, period_start_s, pair):
     return out
 
 
-PACE_S = 1.5  # Dukascopy limitează cererile rapide (503): mergem încet și reîncercăm cu pauze tot mai lungi
+PACE_S = float(os.environ.get('DK_PACE', '2.5'))  # Dukascopy limitează cererile rapide (503): mergem încet și reîncercăm cu pauze tot mai lungi
 
 
-def fetch(url, tries=7):
+def fetch(url, tries=10):
     last = None
     for a in range(tries):
         try:
@@ -70,7 +70,7 @@ def fetch(url, tries=7):
             last = f'HTTP {e.code}'
         except Exception as e:
             last = f'{type(e).__name__}: {e}'
-        time.sleep(min(120, 5 * 2 ** a))
+        time.sleep(min(300, 10 * 2 ** a))
     raise RuntimeError(f'nu am putut descărca {url} ({last})')
 
 
@@ -115,7 +115,7 @@ def download_daily(pair, y0, y1):
     now = dt.datetime.now(dt.timezone.utc)
     bid, ask = {}, {}
     jobs = [(y, side) for y in range(y0, min(y1, now.year) + 1) for side in ('BID', 'ASK')]
-    with cf.ThreadPoolExecutor(max_workers=3) as ex:
+    with cf.ThreadPoolExecutor(max_workers=int(os.environ.get('DK_THREADS', '1'))) as ex:
         futs = {ex.submit(year_days, pair, y, side): side for (y, side) in jobs}
         for f in cf.as_completed(futs):
             store = bid if futs[f] == 'BID' else ask

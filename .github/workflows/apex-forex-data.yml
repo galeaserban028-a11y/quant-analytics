@@ -1,31 +1,50 @@
-# Descarcă istoricul Forex de la Dukascopy (bid/ask reale, din 2003), câte o pereche pe mașină (în paralel),
-# pentru că Dukascopy încetinește cererile repetate de pe aceeași adresă.
+# Descarcă istoricul Forex de la Dukascopy (bid/ask reale, din 2003). Dukascopy respinge cererile prea dese (503),
+# așa că mergem încet: câteva mașini în paralel, o cerere pe rând, pauze lungi la refuz.
 name: APEX date Forex (Dukascopy)
 
 on:
   workflow_dispatch:
     inputs:
+      pairs:
+        description: 'Perechi separate prin virgulă (gol = toate cele 26)'
+        required: false
+        default: ''
       from:
         description: 'Anul de început'
         required: false
         default: '2003'
       merge:
-        description: 'Doar anii recenți, lipiți peste istoricul existent (true/false)'
+        description: 'Lipește peste istoricul existent (true/false)'
         required: false
         default: 'false'
+      parallel:
+        description: 'Câte mașini în paralel'
+        required: false
+        default: '4'
 
 permissions:
   contents: write
 
 jobs:
-  fetch:
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    outputs:
+      pairs: ${{ steps.p.outputs.pairs }}
+    steps:
+      - id: p
+        run: |
+          ALL="EURUSD,GBPUSD,AUDUSD,NZDUSD,USDJPY,USDCAD,USDCHF,EURJPY,GBPJPY,AUDJPY,EURGBP,EURCHF,EURAUD,EURCAD,EURNZD,GBPAUD,GBPCAD,GBPCHF,GBPNZD,AUDCAD,AUDNZD,AUDCHF,NZDJPY,CADJPY,CHFJPY,NZDCAD"
+          P="${{ github.event.inputs.pairs }}"; [ -z "$P" ] && P="$ALL"
+          echo "pairs=$(echo "$P" | python3 -c 'import sys,json; print(json.dumps([x.strip() for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
+  fetch:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
     strategy:
       fail-fast: false
-      max-parallel: 20
+      max-parallel: ${{ fromJSON(github.event.inputs.parallel || '4') }}
       matrix:
-        pair: [EURUSD, GBPUSD, AUDUSD, NZDUSD, USDJPY, USDCAD, USDCHF, EURJPY, GBPJPY, AUDJPY, EURGBP, EURCHF, EURAUD, EURCAD, EURNZD, GBPAUD, GBPCAD, GBPCHF, GBPNZD, AUDCAD, AUDNZD, AUDCHF, NZDJPY, CADJPY, CHFJPY, NZDCAD]
+        pair: ${{ fromJSON(needs.plan.outputs.pairs) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
