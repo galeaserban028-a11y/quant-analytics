@@ -17,6 +17,10 @@ on:
         description: 'Lipește peste istoricul existent (true/false)'
         required: false
         default: 'false'
+      since:
+        description: 'YYYY-MM: doar lunile de atunci încoace (lipite peste istoric); gol = tot istoricul'
+        required: false
+        default: ''
       parallel:
         description: 'Câte mașini în paralel'
         required: false
@@ -53,6 +57,7 @@ jobs:
       - name: Descarcă ${{ matrix.pair }}
         run: |
           M=""; if [ "${{ github.event.inputs.merge }}" = "true" ]; then M="--merge"; fi
+          if [ -n "${{ github.event.inputs.since }}" ]; then M="--since ${{ github.event.inputs.since }}"; fi
           python3 scripts/dukascopy.py --pairs ${{ matrix.pair }} --from ${{ github.event.inputs.from || '2003' }} --out data/fx/dk $M
       - name: Salvează
         run: |
