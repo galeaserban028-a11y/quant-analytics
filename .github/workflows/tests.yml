@@ -1,0 +1,19 @@
+# La fiecare modificare a codului rulează toate testele. Dacă unul pică, primești email de la GitHub.
+name: Teste
+
+on:
+  push:
+    paths-ignore:
+      - 'state/**'
+  pull_request: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --test

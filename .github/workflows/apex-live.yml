@@ -1,0 +1,42 @@
+# Rulează Departamentul Trend din oră în oră, non-stop, pe serverele GitHub (gratuit).
+# Trimite pe Telegram doar la evenimente: intrare, mutare de stop, ieșire, plus un mesaj zilnic la ora 9.
+name: APEX live (Trend H4)
+
+on:
+  schedule:
+    - cron: '7 * * * *'      # în fiecare oră, la minutul 7 (după închiderea lumânărilor)
+  workflow_dispatch: {}       # buton „Run workflow” pentru pornire manuală
+
+permissions:
+  contents: write             # ca să poată salva starea (state/live_state.json)
+
+concurrency:
+  group: apex-state
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Ciclu Departament Trend
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ACCOUNT_EQUITY: ${{ vars.ACCOUNT_EQUITY }}
+          LIVE_TELEGRAM: '1'
+          STATE_PATH: state/live_state.json
+        run: node src/cron.js
+      - name: Salvează starea
+        run: |
+          git config user.name "apex-bot"
+          git config user.email "apex-bot@users.noreply.github.com"
+          git add state/live_state.json
+          if git diff --cached --quiet; then echo "Nicio schimbare de stare."; exit 0; fi
+          git commit -m "stare live $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase --autostash
+          git push

@@ -1,0 +1,67 @@
+{
+  "trend": {
+    "generatedAt": "2026-10-17T17:38:25.479Z",
+    "level": "LIVE",
+    "validatedOOS": true,
+    "oos": {
+      "trades": 1753,
+      "wins": 611,
+      "losses": 1142,
+      "winRatePct": 34.9,
+      "avgWinR": 1.743,
+      "avgLossR": 0.568,
+      "expectancyR": 0.237,
+      "expectancyCI95": [
+        0.138,
+        0.343
+      ],
+      "tStat": 4.5,
+      "totalR": 415.84,
+      "profitFactor": 1.64,
+      "maxDrawdownR": 43.61,
+      "maxLosingStreak": 27,
+      "outcomes": {
+        "STOP": 1692,
+        "SIGNAL_FLIP": 43,
+        "END_OF_DATA": 18
+      }
+    },
+    "portfolio": {
+      "cagrPct": 26.93,
+      "maxDrawdownPct": 18.63,
+      "positiveMonthsPct": 42.7
+    },
+    "overrides": {
+      "trendDesk": {
+        "enabled": true,
+        "symbols": [
+          "BTCUSD",
+          "ETHUSD",
+          "BNBUSD",
+          "XRPUSD",
+          "SOLUSD",
+          "ADAUSD",
+          "LTCUSD",
+          "LINKUSD",
+          "DOGEUSD",
+          "TRXUSD"
+        ],
+        "params": {
+          "lookbacks": [
+            40,
+            80,
+            160
+          ],
+          "atrMult": 4,
+          "entry": 0.6,
+          "allowShort": false
+        },
+        "riskPerTradePct": 0.5,
+        "maxOpenRiskPct": 5,
+        "maxOpen": 10,
+        "liveBars": 700,
+        "note": "Se activează doar dacă trece validarea out-of-sample (npm run research:trend -- --apply)."
+      }
+    }
+  }
+}

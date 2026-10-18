@@ -1,0 +1,1120 @@
+{
+  "level": "LIVE",
+  "portfolio": {
+    "startEquity": 10000,
+    "endEquity": 51018.18,
+    "totalReturnPct": 410.18,
+    "cagrPct": 26.93,
+    "maxDrawdownPct": 18.63,
+    "sharpeMonthly": 1.04,
+    "months": 82,
+    "avgMonthlyPct": 2.26,
+    "medianMonthlyPct": -0.41,
+    "positiveMonthsPct": 42.7,
+    "worstMonthPct": -9.57,
+    "bestMonthPct": 31.93,
+    "yearly": {
+      "2020": 54,
+      "2021": 67.4,
+      "2022": -10.6,
+      "2023": 40.1,
+      "2024": 51.7,
+      "2025": -0.3,
+      "2026": 4.5
+    },
+    "monthly": [
+      {
+        "month": "2020-01",
+        "returnPct": 0.03,
+        "trades": 47
+      },
+      {
+        "month": "2020-02",
+        "returnPct": 15.69,
+        "trades": 34
+      },
+      {
+        "month": "2020-03",
+        "returnPct": 9.19,
+        "trades": 56
+      },
+      {
+        "month": "2020-04",
+        "returnPct": 8.52,
+        "trades": 40
+      },
+      {
+        "month": "2020-05",
+        "returnPct": -8.05,
+        "trades": 37
+      },
+      {
+        "month": "2020-06",
+        "returnPct": -3.6,
+        "trades": 56
+      },
+      {
+        "month": "2020-07",
+        "returnPct": 9.07,
+        "trades": 49
+      },
+      {
+        "month": "2020-08",
+        "returnPct": 16.85,
+        "trades": 53
+      },
+      {
+        "month": "2020-09",
+        "returnPct": -0.78,
+        "trades": 48
+      },
+      {
+        "month": "2020-10",
+        "returnPct": -9.57,
+        "trades": 61
+      },
+      {
+        "month": "2020-11",
+        "returnPct": 6,
+        "trades": 60
+      },
+      {
+        "month": "2020-12",
+        "returnPct": 4.52,
+        "trades": 48
+      },
+      {
+        "month": "2021-01",
+        "returnPct": 9.17,
+        "trades": 21
+      },
+      {
+        "month": "2021-02",
+        "returnPct": 25.15,
+        "trades": 17
+      },
+      {
+        "month": "2021-03",
+        "returnPct": -1.86,
+        "trades": 19
+      },
+      {
+        "month": "2021-04",
+        "returnPct": 11.4,
+        "trades": 14
+      },
+      {
+        "month": "2021-05",
+        "returnPct": 1.13,
+        "trades": 16
+      },
+      {
+        "month": "2021-06",
+        "returnPct": -2.99,
+        "trades": 12
+      },
+      {
+        "month": "2021-07",
+        "returnPct": -2.83,
+        "trades": 11
+      },
+      {
+        "month": "2021-08",
+        "returnPct": 17.14,
+        "trades": 12
+      },
+      {
+        "month": "2021-09",
+        "returnPct": 4.35,
+        "trades": 15
+      },
+      {
+        "month": "2021-10",
+        "returnPct": -0.41,
+        "trades": 21
+      },
+      {
+        "month": "2021-11",
+        "returnPct": -0.5,
+        "trades": 17
+      },
+      {
+        "month": "2021-12",
+        "returnPct": -2.93,
+        "trades": 14
+      },
+      {
+        "month": "2022-01",
+        "returnPct": -0.91,
+        "trades": 7
+      },
+      {
+        "month": "2022-02",
+        "returnPct": 1.36,
+        "trades": 11
+      },
+      {
+        "month": "2022-03",
+        "returnPct": -1.59,
+        "trades": 8
+      },
+      {
+        "month": "2022-04",
+        "returnPct": 4.34,
+        "trades": 16
+      },
+      {
+        "month": "2022-05",
+        "returnPct": -2.15,
+        "trades": 8
+      },
+      {
+        "month": "2022-06",
+        "returnPct": -3.61,
+        "trades": 18
+      },
+      {
+        "month": "2022-07",
+        "returnPct": -3.06,
+        "trades": 20
+      },
+      {
+        "month": "2022-08",
+        "returnPct": -3.29,
+        "trades": 21
+      },
+      {
+        "month": "2022-09",
+        "returnPct": -3.79,
+        "trades": 17
+      },
+      {
+        "month": "2022-10",
+        "returnPct": -1.28,
+        "trades": 7
+      },
+      {
+        "month": "2022-11",
+        "returnPct": 8.74,
+        "trades": 15
+      },
+      {
+        "month": "2022-12",
+        "returnPct": -5.06,
+        "trades": 19
+      },
+      {
+        "month": "2023-01",
+        "returnPct": 10.2,
+        "trades": 13
+      },
+      {
+        "month": "2023-02",
+        "returnPct": -1.32,
+        "trades": 27
+      },
+      {
+        "month": "2023-03",
+        "returnPct": -1.46,
+        "trades": 8
+      },
+      {
+        "month": "2023-04",
+        "returnPct": 0.27,
+        "trades": 21
+      },
+      {
+        "month": "2023-05",
+        "returnPct": -0.34,
+        "trades": 7
+      },
+      {
+        "month": "2023-06",
+        "returnPct": -1.12,
+        "trades": 11
+      },
+      {
+        "month": "2023-07",
+        "returnPct": -0.61,
+        "trades": 26
+      },
+      {
+        "month": "2023-08",
+        "returnPct": -1.49,
+        "trades": 6
+      },
+      {
+        "month": "2023-09",
+        "returnPct": -0.26,
+        "trades": 1
+      },
+      {
+        "month": "2023-10",
+        "returnPct": -0.02,
+        "trades": 16
+      },
+      {
+        "month": "2023-11",
+        "returnPct": 27.22,
+        "trades": 23
+      },
+      {
+        "month": "2023-12",
+        "returnPct": 6.53,
+        "trades": 22
+      },
+      {
+        "month": "2024-01",
+        "returnPct": -1.33,
+        "trades": 32
+      },
+      {
+        "month": "2024-02",
+        "returnPct": 4.7,
+        "trades": 18
+      },
+      {
+        "month": "2024-03",
+        "returnPct": 13.76,
+        "trades": 34
+      },
+      {
+        "month": "2024-04",
+        "returnPct": -3.77,
+        "trades": 22
+      },
+      {
+        "month": "2024-05",
+        "returnPct": -1.34,
+        "trades": 14
+      },
+      {
+        "month": "2024-06",
+        "returnPct": -0.74,
+        "trades": 15
+      },
+      {
+        "month": "2024-07",
+        "returnPct": -0.35,
+        "trades": 20
+      },
+      {
+        "month": "2024-08",
+        "returnPct": -0.45,
+        "trades": 7
+      },
+      {
+        "month": "2024-09",
+        "returnPct": 0.01,
+        "trades": 9
+      },
+      {
+        "month": "2024-10",
+        "returnPct": -4.13,
+        "trades": 31
+      },
+      {
+        "month": "2024-11",
+        "returnPct": 9.14,
+        "trades": 24
+      },
+      {
+        "month": "2024-12",
+        "returnPct": 31.93,
+        "trades": 31
+      },
+      {
+        "month": "2025-01",
+        "returnPct": -3.74,
+        "trades": 21
+      },
+      {
+        "month": "2025-02",
+        "returnPct": -1.03,
+        "trades": 4
+      },
+      {
+        "month": "2025-03",
+        "returnPct": -3.72,
+        "trades": 13
+      },
+      {
+        "month": "2025-04",
+        "returnPct": -1.13,
+        "trades": 6
+      },
+      {
+        "month": "2025-05",
+        "returnPct": 2.52,
+        "trades": 26
+      },
+      {
+        "month": "2025-06",
+        "returnPct": -2.2,
+        "trades": 7
+      },
+      {
+        "month": "2025-07",
+        "returnPct": 13.43,
+        "trades": 17
+      },
+      {
+        "month": "2025-08",
+        "returnPct": 1.35,
+        "trades": 19
+      },
+      {
+        "month": "2025-09",
+        "returnPct": 1.04,
+        "trades": 20
+      },
+      {
+        "month": "2025-10",
+        "returnPct": -2.47,
+        "trades": 10
+      },
+      {
+        "month": "2025-11",
+        "returnPct": -0.77,
+        "trades": 2
+      },
+      {
+        "month": "2025-12",
+        "returnPct": -2.44,
+        "trades": 10
+      },
+      {
+        "month": "2026-01",
+        "returnPct": 0.1,
+        "trades": 23
+      },
+      {
+        "month": "2026-02",
+        "returnPct": 0,
+        "trades": 0
+      },
+      {
+        "month": "2026-03",
+        "returnPct": -2.46,
+        "trades": 20
+      },
+      {
+        "month": "2026-04",
+        "returnPct": -0.67,
+        "trades": 23
+      },
+      {
+        "month": "2026-05",
+        "returnPct": 0.99,
+        "trades": 24
+      },
+      {
+        "month": "2026-06",
+        "returnPct": 0.44,
+        "trades": 2
+      },
+      {
+        "month": "2026-07",
+        "returnPct": -1.92,
+        "trades": 18
+      },
+      {
+        "month": "2026-08",
+        "returnPct": 11.61,
+        "trades": 25
+      },
+      {
+        "month": "2026-09",
+        "returnPct": 0.46,
+        "trades": 29
+      },
+      {
+        "month": "2026-10",
+        "returnPct": -3.43,
+        "trades": 20
+      }
+    ],
+    "riskPct": 0.5,
+    "maxOpen": 10,
+    "maxOpenRiskPct": 5,
+    "tradesTaken": 1722,
+    "tradesSkipped": 31
+  },
+  "monteCarlo": {
+    "horizonMonths": 12,
+    "returnPct": {
+      "p5": -11.4,
+      "p25": 6.7,
+      "median": 24.2,
+      "p75": 47.3,
+      "p95": 94.4
+    },
+    "maxDrawdownPct": {
+      "median": 8.4,
+      "p95": 18.9,
+      "p99": 24
+    },
+    "probLossPct": 16.1
+  },
+  "folds": [
+    {
+      "testFrom": "2020-01-01",
+      "testTo": "2020-12-31",
+      "chosen": {
+        "lookbacks": [
+          10,
+          20,
+          40
+        ],
+        "atrMult": 3,
+        "entry": 1,
+        "allowShort": true
+      },
+      "trainMetrics": {
+        "trades": 792,
+        "wins": 294,
+        "losses": 498,
+        "winRatePct": 37.1,
+        "avgWinR": 1.687,
+        "avgLossR": 0.606,
+        "expectancyR": 0.245,
+        "expectancyCI95": [
+          0.121,
+          0.382
+        ],
+        "tStat": 3.8,
+        "totalR": 194.19,
+        "profitFactor": 1.64,
+        "maxDrawdownR": 23.56,
+        "maxLosingStreak": 16,
+        "outcomes": {
+          "STOP": 779,
+          "SIGNAL_FLIP": 9,
+          "END_OF_DATA": 4
+        }
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oosFixed": {
+        "trades": 545,
+        "wins": 200,
+        "losses": 345,
+        "winRatePct": 36.7,
+        "avgWinR": 1.613,
+        "avgLossR": 0.592,
+        "expectancyR": 0.217,
+        "expectancyCI95": [
+          0.07,
+          0.369
+        ],
+        "tStat": 2.78,
+        "totalR": 118.36,
+        "profitFactor": 1.58,
+        "maxDrawdownR": 34.46,
+        "maxLosingStreak": 19,
+        "outcomes": {
+          "STOP": 535,
+          "SIGNAL_FLIP": 3,
+          "END_OF_DATA": 7
+        }
+      },
+      "oosSelected": {
+        "trades": 599,
+        "wins": 210,
+        "losses": 389,
+        "winRatePct": 35.1,
+        "avgWinR": 1.608,
+        "avgLossR": 0.608,
+        "expectancyR": 0.169,
+        "expectancyCI95": [
+          0.031,
+          0.316
+        ],
+        "tStat": 2.29,
+        "totalR": 101.16,
+        "profitFactor": 1.43,
+        "maxDrawdownR": 43.61,
+        "maxLosingStreak": 19,
+        "outcomes": {
+          "STOP": 584,
+          "SIGNAL_FLIP": 8,
+          "END_OF_DATA": 7
+        }
+      }
+    },
+    {
+      "testFrom": "2020-12-31",
+      "testTo": "2022-01-01",
+      "chosen": {
+        "lookbacks": [
+          10,
+          20,
+          40
+        ],
+        "atrMult": 5,
+        "entry": 0.6,
+        "allowShort": false
+      },
+      "trainMetrics": {
+        "trades": 343,
+        "wins": 137,
+        "losses": 206,
+        "winRatePct": 39.9,
+        "avgWinR": 2.031,
+        "avgLossR": 0.542,
+        "expectancyR": 0.486,
+        "expectancyCI95": [
+          0.271,
+          0.722
+        ],
+        "tStat": 4.32,
+        "totalR": 166.54,
+        "profitFactor": 2.49,
+        "maxDrawdownR": 20.64,
+        "maxLosingStreak": 16,
+        "outcomes": {
+          "SIGNAL_FLIP": 18,
+          "STOP": 318,
+          "END_OF_DATA": 7
+        }
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oosFixed": {
+        "trades": 634,
+        "wins": 233,
+        "losses": 401,
+        "winRatePct": 36.8,
+        "avgWinR": 1.544,
+        "avgLossR": 0.582,
+        "expectancyR": 0.199,
+        "expectancyCI95": [
+          0.05,
+          0.381
+        ],
+        "tStat": 2.45,
+        "totalR": 126.17,
+        "profitFactor": 1.54,
+        "maxDrawdownR": 29.02,
+        "maxLosingStreak": 16,
+        "outcomes": {
+          "STOP": 626,
+          "SIGNAL_FLIP": 5,
+          "END_OF_DATA": 3
+        }
+      },
+      "oosSelected": {
+        "trades": 193,
+        "wins": 78,
+        "losses": 115,
+        "winRatePct": 40.4,
+        "avgWinR": 2.526,
+        "avgLossR": 0.53,
+        "expectancyR": 0.705,
+        "expectancyCI95": [
+          0.321,
+          1.201
+        ],
+        "tStat": 3.09,
+        "totalR": 136.01,
+        "profitFactor": 3.23,
+        "maxDrawdownR": 13.67,
+        "maxLosingStreak": 19,
+        "outcomes": {
+          "STOP": 185,
+          "SIGNAL_FLIP": 8
+        }
+      }
+    },
+    {
+      "testFrom": "2022-01-01",
+      "testTo": "2023-01-01",
+      "chosen": {
+        "lookbacks": [
+          10,
+          20,
+          40
+        ],
+        "atrMult": 5,
+        "entry": 0.6,
+        "allowShort": false
+      },
+      "trainMetrics": {
+        "trades": 392,
+        "wins": 152,
+        "losses": 240,
+        "winRatePct": 38.8,
+        "avgWinR": 2.492,
+        "avgLossR": 0.528,
+        "expectancyR": 0.643,
+        "expectancyCI95": [
+          0.369,
+          0.951
+        ],
+        "tStat": 4.27,
+        "totalR": 252.21,
+        "profitFactor": 2.99,
+        "maxDrawdownR": 20.64,
+        "maxLosingStreak": 19,
+        "outcomes": {
+          "STOP": 375,
+          "SIGNAL_FLIP": 17
+        }
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oosFixed": {
+        "trades": 630,
+        "wins": 241,
+        "losses": 389,
+        "winRatePct": 38.3,
+        "avgWinR": 1.054,
+        "avgLossR": 0.605,
+        "expectancyR": 0.03,
+        "expectancyCI95": [
+          -0.071,
+          0.143
+        ],
+        "tStat": 0.54,
+        "totalR": 18.61,
+        "profitFactor": 1.08,
+        "maxDrawdownR": 64.79,
+        "maxLosingStreak": 27,
+        "outcomes": {
+          "STOP": 615,
+          "SIGNAL_FLIP": 7,
+          "END_OF_DATA": 8
+        }
+      },
+      "oosSelected": {
+        "trades": 172,
+        "wins": 40,
+        "losses": 132,
+        "winRatePct": 23.3,
+        "avgWinR": 1.196,
+        "avgLossR": 0.52,
+        "expectancyR": -0.121,
+        "expectancyCI95": [
+          -0.286,
+          0.078
+        ],
+        "tStat": -1.31,
+        "totalR": -20.78,
+        "profitFactor": 0.7,
+        "maxDrawdownR": 41.02,
+        "maxLosingStreak": 27,
+        "outcomes": {
+          "STOP": 155,
+          "SIGNAL_FLIP": 15,
+          "END_OF_DATA": 2
+        }
+      }
+    },
+    {
+      "testFrom": "2023-01-01",
+      "testTo": "2024-01-01",
+      "chosen": {
+        "lookbacks": [
+          40,
+          80,
+          160
+        ],
+        "atrMult": 5,
+        "entry": 0.6,
+        "allowShort": false
+      },
+      "trainMetrics": {
+        "trades": 276,
+        "wins": 103,
+        "losses": 173,
+        "winRatePct": 37.3,
+        "avgWinR": 1.88,
+        "avgLossR": 0.53,
+        "expectancyR": 0.369,
+        "expectancyCI95": [
+          0.074,
+          0.743
+        ],
+        "tStat": 2.21,
+        "totalR": 101.92,
+        "profitFactor": 2.11,
+        "maxDrawdownR": 34.57,
+        "maxLosingStreak": 22,
+        "outcomes": {
+          "STOP": 270,
+          "SIGNAL_FLIP": 5,
+          "END_OF_DATA": 1
+        }
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oosFixed": {
+        "trades": 605,
+        "wins": 204,
+        "losses": 401,
+        "winRatePct": 33.7,
+        "avgWinR": 1.606,
+        "avgLossR": 0.614,
+        "expectancyR": 0.134,
+        "expectancyCI95": [
+          -0.007,
+          0.301
+        ],
+        "tStat": 1.74,
+        "totalR": 81.2,
+        "profitFactor": 1.33,
+        "maxDrawdownR": 39.08,
+        "maxLosingStreak": 22,
+        "outcomes": {
+          "STOP": 595,
+          "SIGNAL_FLIP": 4,
+          "END_OF_DATA": 6
+        }
+      },
+      "oosSelected": {
+        "trades": 191,
+        "wins": 75,
+        "losses": 116,
+        "winRatePct": 39.3,
+        "avgWinR": 1.829,
+        "avgLossR": 0.47,
+        "expectancyR": 0.433,
+        "expectancyCI95": [
+          0.129,
+          0.829
+        ],
+        "tStat": 2.43,
+        "totalR": 82.62,
+        "profitFactor": 2.52,
+        "maxDrawdownR": 18.58,
+        "maxLosingStreak": 11,
+        "outcomes": {
+          "STOP": 179,
+          "SIGNAL_FLIP": 4,
+          "END_OF_DATA": 8
+        }
+      }
+    },
+    {
+      "testFrom": "2024-01-01",
+      "testTo": "2024-12-31",
+      "chosen": {
+        "lookbacks": [
+          40,
+          80,
+          160
+        ],
+        "atrMult": 4,
+        "entry": 0.6,
+        "allowShort": false
+      },
+      "trainMetrics": {
+        "trades": 406,
+        "wins": 158,
+        "losses": 248,
+        "winRatePct": 38.9,
+        "avgWinR": 1.411,
+        "avgLossR": 0.541,
+        "expectancyR": 0.219,
+        "expectancyCI95": [
+          0.042,
+          0.425
+        ],
+        "tStat": 2.22,
+        "totalR": 88.86,
+        "profitFactor": 1.66,
+        "maxDrawdownR": 19.79,
+        "maxLosingStreak": 13,
+        "outcomes": {
+          "STOP": 396,
+          "SIGNAL_FLIP": 3,
+          "END_OF_DATA": 7
+        }
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oosFixed": {
+        "trades": 669,
+        "wins": 221,
+        "losses": 448,
+        "winRatePct": 33,
+        "avgWinR": 1.41,
+        "avgLossR": 0.624,
+        "expectancyR": 0.048,
+        "expectancyCI95": [
+          -0.059,
+          0.171
+        ],
+        "tStat": 0.78,
+        "totalR": 32.18,
+        "profitFactor": 1.12,
+        "maxDrawdownR": 52.89,
+        "maxLosingStreak": 21,
+        "outcomes": {
+          "STOP": 662,
+          "SIGNAL_FLIP": 2,
+          "END_OF_DATA": 5
+        }
+      },
+      "oosSelected": {
+        "trades": 250,
+        "wins": 97,
+        "losses": 153,
+        "winRatePct": 38.8,
+        "avgWinR": 2.021,
+        "avgLossR": 0.601,
+        "expectancyR": 0.416,
+        "expectancyCI95": [
+          0.078,
+          0.861
+        ],
+        "tStat": 2.05,
+        "totalR": 104.06,
+        "profitFactor": 2.13,
+        "maxDrawdownR": 28.22,
+        "maxLosingStreak": 11,
+        "outcomes": {
+          "STOP": 249,
+          "SIGNAL_FLIP": 1
+        }
+      }
+    },
+    {
+      "testFrom": "2024-12-31",
+      "testTo": "2026-01-01",
+      "chosen": {
+        "lookbacks": [
+          20,
+          40,
+          80
+        ],
+        "atrMult": 5,
+        "entry": 0.6,
+        "allowShort": false
+      },
+      "trainMetrics": {
+        "trades": 354,
+        "wins": 132,
+        "losses": 222,
+        "winRatePct": 37.3,
+        "avgWinR": 2.089,
+        "avgLossR": 0.565,
+        "expectancyR": 0.424,
+        "expectancyCI95": [
+          0.15,
+          0.766
+        ],
+        "tStat": 2.55,
+        "totalR": 150.19,
+        "profitFactor": 2.2,
+        "maxDrawdownR": 20.28,
+        "maxLosingStreak": 12,
+        "outcomes": {
+          "STOP": 347,
+          "SIGNAL_FLIP": 7
+        }
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oosFixed": {
+        "trades": 686,
+        "wins": 221,
+        "losses": 465,
+        "winRatePct": 32.2,
+        "avgWinR": 1.049,
+        "avgLossR": 0.601,
+        "expectancyR": -0.069,
+        "expectancyCI95": [
+          -0.149,
+          0.018
+        ],
+        "tStat": -1.57,
+        "totalR": -47.59,
+        "profitFactor": 0.83,
+        "maxDrawdownR": 71.96,
+        "maxLosingStreak": 16,
+        "outcomes": {
+          "STOP": 677,
+          "SIGNAL_FLIP": 4,
+          "END_OF_DATA": 5
+        }
+      },
+      "oosSelected": {
+        "trades": 160,
+        "wins": 41,
+        "losses": 119,
+        "winRatePct": 25.6,
+        "avgWinR": 1.681,
+        "avgLossR": 0.546,
+        "expectancyR": 0.025,
+        "expectancyCI95": [
+          -0.174,
+          0.247
+        ],
+        "tStat": 0.23,
+        "totalR": 3.99,
+        "profitFactor": 1.06,
+        "maxDrawdownR": 20.02,
+        "maxLosingStreak": 26,
+        "outcomes": {
+          "STOP": 152,
+          "SIGNAL_FLIP": 7,
+          "END_OF_DATA": 1
+        }
+      }
+    },
+    {
+      "testFrom": "2026-01-01",
+      "testTo": "2026-10-17",
+      "chosen": {
+        "lookbacks": [
+          40,
+          80,
+          160
+        ],
+        "atrMult": 4,
+        "entry": 0.6,
+        "allowShort": false
+      },
+      "trainMetrics": {
+        "trades": 424,
+        "wins": 157,
+        "losses": 267,
+        "winRatePct": 37,
+        "avgWinR": 1.745,
+        "avgLossR": 0.57,
+        "expectancyR": 0.287,
+        "expectancyCI95": [
+          0.069,
+          0.553
+        ],
+        "tStat": 2.28,
+        "totalR": 121.84,
+        "profitFactor": 1.8,
+        "maxDrawdownR": 28.22,
+        "maxLosingStreak": 16,
+        "outcomes": {
+          "STOP": 424
+        }
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oosFixed": {
+        "trades": 517,
+        "wins": 181,
+        "losses": 336,
+        "winRatePct": 35,
+        "avgWinR": 1.339,
+        "avgLossR": 0.643,
+        "expectancyR": 0.051,
+        "expectancyCI95": [
+          -0.064,
+          0.18
+        ],
+        "tStat": 0.78,
+        "totalR": 26.29,
+        "profitFactor": 1.12,
+        "maxDrawdownR": 53.13,
+        "maxLosingStreak": 17,
+        "outcomes": {
+          "STOP": 506,
+          "SIGNAL_FLIP": 2,
+          "END_OF_DATA": 9
+        }
+      },
+      "oosSelected": {
+        "trades": 188,
+        "wins": 70,
+        "losses": 118,
+        "winRatePct": 37.2,
+        "avgWinR": 1.147,
+        "avgLossR": 0.606,
+        "expectancyR": 0.047,
+        "expectancyCI95": [
+          -0.124,
+          0.232
+        ],
+        "tStat": 0.5,
+        "totalR": 8.79,
+        "profitFactor": 1.12,
+        "maxDrawdownR": 15.71,
+        "maxLosingStreak": 10,
+        "outcomes": {
+          "STOP": 188
+        }
+      }
+    }
+  ],
+  "oosFixed": {
+    "trades": 4286,
+    "wins": 1501,
+    "losses": 2785,
+    "winRatePct": 35,
+    "avgWinR": 1.365,
+    "avgLossR": 0.608,
+    "expectancyR": 0.083,
+    "expectancyCI95": [
+      0.037,
+      0.131
+    ],
+    "tStat": 3.3,
+    "totalR": 355.23,
+    "profitFactor": 1.21,
+    "maxDrawdownR": 88.5,
+    "maxLosingStreak": 27,
+    "outcomes": {
+      "STOP": 4216,
+      "SIGNAL_FLIP": 27,
+      "END_OF_DATA": 43
+    }
+  },
+  "oosSelected": {
+    "trades": 1753,
+    "wins": 611,
+    "losses": 1142,
+    "winRatePct": 34.9,
+    "avgWinR": 1.743,
+    "avgLossR": 0.568,
+    "expectancyR": 0.237,
+    "expectancyCI95": [
+      0.138,
+      0.343
+    ],
+    "tStat": 4.5,
+    "totalR": 415.84,
+    "profitFactor": 1.64,
+    "maxDrawdownR": 43.61,
+    "maxLosingStreak": 27,
+    "outcomes": {
+      "STOP": 1692,
+      "SIGNAL_FLIP": 43,
+      "END_OF_DATA": 18
+    }
+  },
+  "latest": {
+    "params": {
+      "lookbacks": [
+        40,
+        80,
+        160
+      ],
+      "atrMult": 4,
+      "entry": 0.6,
+      "allowShort": false
+    },
+    "trainMetrics": {
+      "trades": 424,
+      "wins": 157,
+      "losses": 267,
+      "winRatePct": 37,
+      "avgWinR": 1.745,
+      "avgLossR": 0.57,
+      "expectancyR": 0.287,
+      "expectancyCI95": [
+        0.069,
+        0.553
+      ],
+      "tStat": 2.28,
+      "totalR": 121.84,
+      "profitFactor": 1.8,
+      "maxDrawdownR": 28.22,
+      "maxLosingStreak": 16,
+      "outcomes": {
+        "STOP": 424
+      }
+    }
+  }
+}

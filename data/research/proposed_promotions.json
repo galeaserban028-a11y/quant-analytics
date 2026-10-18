@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-10-17T17:46:04.145Z",
+  "level": "NIMIC",
+  "validatedOOS": false,
+  "oos": {
+    "trades": 189,
+    "wins": 75,
+    "losses": 114,
+    "winRatePct": 39.7,
+    "avgWinR": 1.312,
+    "avgLossR": 1.015,
+    "expectancyR": -0.091,
+    "expectancyCI95": [
+      -0.257,
+      0.083
+    ],
+    "tStat": -1.03,
+    "totalR": -17.27,
+    "profitFactor": 0.85,
+    "maxDrawdownR": 24.53,
+    "maxLosingStreak": 13,
+    "outcomes": {
+      "TRAIL": 25,
+      "TP2": 17,
+      "SL": 100,
+      "MAX_AGE": 21,
+      "BE": 23,
+      "END_OF_DATA": 3
+    }
+  },
+  "baselineOos": {
+    "trades": 1,
+    "wins": 0,
+    "losses": 1,
+    "winRatePct": 0,
+    "avgWinR": 0,
+    "avgLossR": 1.138,
+    "expectancyR": -1.138,
+    "expectancyCI95": [
+      null,
+      null
+    ],
+    "tStat": null,
+    "totalR": -1.14,
+    "profitFactor": 0,
+    "maxDrawdownR": 1.14,
+    "maxLosingStreak": 1,
+    "outcomes": {
+      "SL": 1
+    }
+  },
+  "overrides": {
+    "executionPolicy": {
+      "minRiskAtr": 0,
+      "tp2RiskReward": 3,
+      "confluenceThreshold": 40,
+      "maxCostToRiskRatio": 0.12
+    },
+    "scoringWeights": {
+      "mtfAlignment": 25,
+      "liquiditySweep": 25,
+      "orderBlock": 10,
+      "fairValueGap": 5,
+      "premiumDiscount": 5,
+      "displacement": 15,
+      "macroCompass": 15,
+      "devilsAdvocatePenalty": -25
+    },
+    "advisoryFilters": [],
+    "disabledSymbols": []
+  },
+  "moves": []
+}

@@ -1,14 +1,22 @@
 {
-  "name": "my-sniper-bot",
-  "version": "1.0.0",
-  "description": "Standalone Forex & Crypto Sniper",
-  "main": "bot.js",
-  "scripts": {
-    "start": "node bot.js",
-    "orchestrator": "node orchestrator.js",
-    "stress-test": "node stress_test_suite.js"
+  "name": "apex-quant",
+  "version": "2.0.0",
+  "description": "Companie de trading algoritmic cu departamente evaluate out-of-sample: Trend H4 (validat) și SMC M15 (în observație). Backtest onest, walk-forward, evaluarea agenților, semnale Telegram.",
+  "main": "src/live.js",
+  "private": true,
+  "engines": {
+    "node": ">=18"
   },
-  "dependencies": {
-    "express": "^4.19.2"
-  }
+  "scripts": {
+    "start": "node src/live.js",
+    "cron": "node src/cron.js",
+    "live": "node src/live.js",
+    "demo": "node scripts/demo.js",
+    "backtest": "node src/backtest/run.js",
+    "backtest:synthetic": "node src/backtest/run.js --synthetic --days 120 --seeds 5",
+    "research": "node src/research/run.js",
+    "research:trend": "node src/research/trendRun.js",
+    "test": "node --test"
+  },
+  "dependencies": {}
 }

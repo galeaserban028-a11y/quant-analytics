@@ -1,0 +1,904 @@
+{
+  "level": "NIMIC",
+  "period": "2025-10-07 → 2026-10-17",
+  "folds": [
+    {
+      "trainFrom": "2025-10-07T17:15:00.000Z",
+      "testFrom": "2026-02-04T17:15:00.000Z",
+      "testTo": "2026-04-05T17:15:00.000Z",
+      "choice": {
+        "geometry": {
+          "minRiskAtr": 1,
+          "tp2RiskReward": 3
+        },
+        "threshold": 40,
+        "maxCost": 0.12,
+        "trainMetrics": {
+          "trades": 73,
+          "wins": 34,
+          "losses": 39,
+          "winRatePct": 46.6,
+          "avgWinR": 1.435,
+          "avgLossR": 1.06,
+          "expectancyR": 0.102,
+          "expectancyCI95": [
+            -0.202,
+            0.412
+          ],
+          "tStat": 0.66,
+          "totalR": 7.44,
+          "profitFactor": 1.18,
+          "maxDrawdownR": 20.98,
+          "maxLosingStreak": 9,
+          "outcomes": {
+            "TP2": 10,
+            "BE": 9,
+            "SL": 39,
+            "END_OF_DATA": 5,
+            "TRAIL": 10
+          }
+        },
+        "moves": []
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oos": {
+        "trades": 50,
+        "wins": 19,
+        "losses": 31,
+        "winRatePct": 38,
+        "avgWinR": 1.572,
+        "avgLossR": 0.985,
+        "expectancyR": -0.013,
+        "expectancyCI95": [
+          -0.376,
+          0.353
+        ],
+        "tStat": -0.07,
+        "totalR": -0.65,
+        "profitFactor": 0.98,
+        "maxDrawdownR": 8.91,
+        "maxLosingStreak": 5,
+        "outcomes": {
+          "TRAIL": 7,
+          "TP2": 7,
+          "SL": 27,
+          "MAX_AGE": 5,
+          "BE": 4
+        }
+      },
+      "baselineOos": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRatePct": null,
+        "avgWinR": 0,
+        "avgLossR": 0,
+        "expectancyR": null,
+        "expectancyCI95": [
+          null,
+          null
+        ],
+        "tStat": null,
+        "totalR": 0,
+        "profitFactor": null,
+        "maxDrawdownR": 0,
+        "maxLosingStreak": 0,
+        "outcomes": {}
+      }
+    },
+    {
+      "trainFrom": "2025-12-06T17:15:00.000Z",
+      "testFrom": "2026-04-05T17:15:00.000Z",
+      "testTo": "2026-06-04T17:15:00.000Z",
+      "choice": {
+        "geometry": {
+          "minRiskAtr": 2,
+          "tp2RiskReward": 3
+        },
+        "threshold": 25,
+        "maxCost": 0.12,
+        "trainMetrics": {
+          "trades": 120,
+          "wins": 54,
+          "losses": 66,
+          "winRatePct": 45,
+          "avgWinR": 1.485,
+          "avgLossR": 1.064,
+          "expectancyR": 0.083,
+          "expectancyCI95": [
+            -0.149,
+            0.32
+          ],
+          "tStat": 0.68,
+          "totalR": 9.95,
+          "profitFactor": 1.14,
+          "maxDrawdownR": 12.39,
+          "maxLosingStreak": 7,
+          "outcomes": {
+            "SL": 66,
+            "BE": 14,
+            "TRAIL": 23,
+            "TP2": 17
+          }
+        },
+        "moves": [
+          {
+            "id": "BTCUSD",
+            "name": "Biroul BTCUSD",
+            "action": "SUSPENDAT (expectancy negativ semnificativ) → rămâne în Observație"
+          }
+        ]
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oos": {
+        "trades": 35,
+        "wins": 15,
+        "losses": 20,
+        "winRatePct": 42.9,
+        "avgWinR": 1.197,
+        "avgLossR": 1.03,
+        "expectancyR": -0.076,
+        "expectancyCI95": [
+          -0.447,
+          0.314
+        ],
+        "tStat": -0.38,
+        "totalR": -2.65,
+        "profitFactor": 0.87,
+        "maxDrawdownR": 13.39,
+        "maxLosingStreak": 11,
+        "outcomes": {
+          "TRAIL": 6,
+          "BE": 5,
+          "SL": 19,
+          "MAX_AGE": 3,
+          "TP2": 1,
+          "END_OF_DATA": 1
+        }
+      },
+      "baselineOos": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRatePct": null,
+        "avgWinR": 0,
+        "avgLossR": 0,
+        "expectancyR": null,
+        "expectancyCI95": [
+          null,
+          null
+        ],
+        "tStat": null,
+        "totalR": 0,
+        "profitFactor": null,
+        "maxDrawdownR": 0,
+        "maxLosingStreak": 0,
+        "outcomes": {}
+      }
+    },
+    {
+      "trainFrom": "2026-02-04T17:15:00.000Z",
+      "testFrom": "2026-06-04T17:15:00.000Z",
+      "testTo": "2026-08-03T17:15:00.000Z",
+      "choice": {
+        "geometry": {
+          "minRiskAtr": 2,
+          "tp2RiskReward": 3
+        },
+        "threshold": 40,
+        "maxCost": 0.12,
+        "trainMetrics": {
+          "trades": 123,
+          "wins": 57,
+          "losses": 66,
+          "winRatePct": 46.3,
+          "avgWinR": 1.431,
+          "avgLossR": 1.063,
+          "expectancyR": 0.093,
+          "expectancyCI95": [
+            -0.135,
+            0.314
+          ],
+          "tStat": 0.79,
+          "totalR": 11.39,
+          "profitFactor": 1.16,
+          "maxDrawdownR": 12.9,
+          "maxLosingStreak": 11,
+          "outcomes": {
+            "SL": 66,
+            "BE": 15,
+            "TP2": 15,
+            "TRAIL": 26,
+            "END_OF_DATA": 1
+          }
+        },
+        "moves": []
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oos": {
+        "trades": 40,
+        "wins": 15,
+        "losses": 25,
+        "winRatePct": 37.5,
+        "avgWinR": 1.203,
+        "avgLossR": 0.977,
+        "expectancyR": -0.159,
+        "expectancyCI95": [
+          -0.522,
+          0.189
+        ],
+        "tStat": -0.86,
+        "totalR": -6.38,
+        "profitFactor": 0.74,
+        "maxDrawdownR": 14.82,
+        "maxLosingStreak": 11,
+        "outcomes": {
+          "SL": 20,
+          "TRAIL": 1,
+          "TP2": 4,
+          "BE": 7,
+          "MAX_AGE": 7,
+          "END_OF_DATA": 1
+        }
+      },
+      "baselineOos": {
+        "trades": 1,
+        "wins": 0,
+        "losses": 1,
+        "winRatePct": 0,
+        "avgWinR": 0,
+        "avgLossR": 1.138,
+        "expectancyR": -1.138,
+        "expectancyCI95": [
+          null,
+          null
+        ],
+        "tStat": null,
+        "totalR": -1.14,
+        "profitFactor": 0,
+        "maxDrawdownR": 1.14,
+        "maxLosingStreak": 1,
+        "outcomes": {
+          "SL": 1
+        }
+      }
+    },
+    {
+      "trainFrom": "2026-04-05T17:15:00.000Z",
+      "testFrom": "2026-08-03T17:15:00.000Z",
+      "testTo": "2026-10-02T17:15:00.000Z",
+      "choice": {
+        "geometry": {
+          "minRiskAtr": 1,
+          "tp2RiskReward": 3
+        },
+        "threshold": 40,
+        "maxCost": 0.25,
+        "trainMetrics": {
+          "trades": 84,
+          "wins": 43,
+          "losses": 41,
+          "winRatePct": 51.2,
+          "avgWinR": 1.385,
+          "avgLossR": 1.079,
+          "expectancyR": 0.182,
+          "expectancyCI95": [
+            -0.088,
+            0.473
+          ],
+          "tStat": 1.29,
+          "totalR": 15.31,
+          "profitFactor": 1.35,
+          "maxDrawdownR": 8.15,
+          "maxLosingStreak": 6,
+          "outcomes": {
+            "TP2": 10,
+            "BE": 11,
+            "TRAIL": 22,
+            "SL": 40,
+            "END_OF_DATA": 1
+          }
+        },
+        "moves": [
+          {
+            "id": "BNBUSD",
+            "name": "Biroul BNBUSD",
+            "action": "SUSPENDAT (expectancy negativ semnificativ) → rămâne în Observație"
+          },
+          {
+            "id": "ETHUSD",
+            "name": "Biroul ETHUSD",
+            "action": "SUSPENDAT (expectancy negativ semnificativ) → rămâne în Observație"
+          }
+        ]
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oos": {
+        "trades": 55,
+        "wins": 22,
+        "losses": 33,
+        "winRatePct": 40,
+        "avgWinR": 1.256,
+        "avgLossR": 1.094,
+        "expectancyR": -0.154,
+        "expectancyCI95": [
+          -0.466,
+          0.165
+        ],
+        "tStat": -0.93,
+        "totalR": -8.48,
+        "profitFactor": 0.77,
+        "maxDrawdownR": 9.05,
+        "maxLosingStreak": 6,
+        "outcomes": {
+          "SL": 31,
+          "MAX_AGE": 5,
+          "TP2": 5,
+          "BE": 6,
+          "TRAIL": 8
+        }
+      },
+      "baselineOos": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRatePct": null,
+        "avgWinR": 0,
+        "avgLossR": 0,
+        "expectancyR": null,
+        "expectancyCI95": [
+          null,
+          null
+        ],
+        "tStat": null,
+        "totalR": 0,
+        "profitFactor": null,
+        "maxDrawdownR": 0,
+        "maxLosingStreak": 0,
+        "outcomes": {}
+      }
+    },
+    {
+      "trainFrom": "2026-06-04T17:15:00.000Z",
+      "testFrom": "2026-10-02T17:15:00.000Z",
+      "testTo": "2026-10-17T16:45:00.001Z",
+      "choice": {
+        "geometry": {
+          "minRiskAtr": 0,
+          "tp2RiskReward": 3
+        },
+        "threshold": 40,
+        "maxCost": 0.12,
+        "trainMetrics": {
+          "trades": 85,
+          "wins": 41,
+          "losses": 44,
+          "winRatePct": 48.2,
+          "avgWinR": 1.444,
+          "avgLossR": 1.073,
+          "expectancyR": 0.141,
+          "expectancyCI95": [
+            -0.146,
+            0.42
+          ],
+          "tStat": 0.98,
+          "totalR": 12.02,
+          "profitFactor": 1.25,
+          "maxDrawdownR": 8.43,
+          "maxLosingStreak": 6,
+          "outcomes": {
+            "TP2": 12,
+            "TRAIL": 17,
+            "SL": 44,
+            "BE": 12
+          }
+        },
+        "moves": []
+      },
+      "decision": "TRANZACȚIONEAZĂ",
+      "oos": {
+        "trades": 9,
+        "wins": 4,
+        "losses": 5,
+        "winRatePct": 44.4,
+        "avgWinR": 1.222,
+        "avgLossR": 0.801,
+        "expectancyR": 0.098,
+        "expectancyCI95": [
+          -0.6,
+          0.797
+        ],
+        "tStat": 0.26,
+        "totalR": 0.88,
+        "profitFactor": 1.22,
+        "maxDrawdownR": 2.18,
+        "maxLosingStreak": 2,
+        "outcomes": {
+          "MAX_AGE": 1,
+          "SL": 3,
+          "TRAIL": 3,
+          "BE": 1,
+          "END_OF_DATA": 1
+        }
+      },
+      "baselineOos": {
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRatePct": null,
+        "avgWinR": 0,
+        "avgLossR": 0,
+        "expectancyR": null,
+        "expectancyCI95": [
+          null,
+          null
+        ],
+        "tStat": null,
+        "totalR": 0,
+        "profitFactor": null,
+        "maxDrawdownR": 0,
+        "maxLosingStreak": 0,
+        "outcomes": {}
+      }
+    }
+  ],
+  "oos": {
+    "trades": 189,
+    "wins": 75,
+    "losses": 114,
+    "winRatePct": 39.7,
+    "avgWinR": 1.312,
+    "avgLossR": 1.015,
+    "expectancyR": -0.091,
+    "expectancyCI95": [
+      -0.257,
+      0.083
+    ],
+    "tStat": -1.03,
+    "totalR": -17.27,
+    "profitFactor": 0.85,
+    "maxDrawdownR": 24.53,
+    "maxLosingStreak": 13,
+    "outcomes": {
+      "TRAIL": 25,
+      "TP2": 17,
+      "SL": 100,
+      "MAX_AGE": 21,
+      "BE": 23,
+      "END_OF_DATA": 3
+    }
+  },
+  "baselineOos": {
+    "trades": 1,
+    "wins": 0,
+    "losses": 1,
+    "winRatePct": 0,
+    "avgWinR": 0,
+    "avgLossR": 1.138,
+    "expectancyR": -1.138,
+    "expectancyCI95": [
+      null,
+      null
+    ],
+    "tStat": null,
+    "totalR": -1.14,
+    "profitFactor": 0,
+    "maxDrawdownR": 1.14,
+    "maxLosingStreak": 1,
+    "outcomes": {
+      "SL": 1
+    }
+  },
+  "latest": {
+    "overrides": {
+      "executionPolicy": {
+        "minRiskAtr": 0,
+        "tp2RiskReward": 3,
+        "confluenceThreshold": 40,
+        "maxCostToRiskRatio": 0.12
+      },
+      "scoringWeights": {
+        "mtfAlignment": 25,
+        "liquiditySweep": 25,
+        "orderBlock": 10,
+        "fairValueGap": 5,
+        "premiumDiscount": 5,
+        "displacement": 15,
+        "macroCompass": 15,
+        "devilsAdvocatePenalty": -25
+      },
+      "advisoryFilters": [],
+      "disabledSymbols": []
+    },
+    "trainMetrics": {
+      "trades": 85,
+      "wins": 41,
+      "losses": 44,
+      "winRatePct": 48.2,
+      "avgWinR": 1.444,
+      "avgLossR": 1.073,
+      "expectancyR": 0.141,
+      "expectancyCI95": [
+        -0.146,
+        0.42
+      ],
+      "tStat": 0.98,
+      "totalR": 12.02,
+      "profitFactor": 1.25,
+      "maxDrawdownR": 8.43,
+      "maxLosingStreak": 6,
+      "outcomes": {
+        "TP2": 12,
+        "TRAIL": 17,
+        "SL": 44,
+        "BE": 12
+      }
+    },
+    "review": {
+      "candidates": 518,
+      "tradable": 172,
+      "candidateExpectancy": -0.233,
+      "tradableExpectancy": -0.052,
+      "agents": [
+        {
+          "id": "3A",
+          "name": "Liquidity Sweep",
+          "department": "SCOR",
+          "weightKey": "liquiditySweep",
+          "nYes": 12,
+          "nNo": 160,
+          "expectancyYes": 0.233,
+          "expectancyNo": -0.073,
+          "lift": 0.306,
+          "liftCI95": [
+            -0.435,
+            1.047
+          ],
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "3B",
+          "name": "Order Block",
+          "department": "SCOR",
+          "weightKey": "orderBlock",
+          "nYes": 5,
+          "nNo": 167,
+          "expectancyYes": -0.114,
+          "expectancyNo": -0.05,
+          "lift": -0.065,
+          "liftCI95": [
+            -1.177,
+            1.173
+          ],
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "3C",
+          "name": "Fair Value Gap",
+          "department": "SCOR",
+          "weightKey": "fairValueGap",
+          "nYes": 2,
+          "nNo": 170,
+          "expectancyYes": -0.265,
+          "expectancyNo": -0.049,
+          "lift": -0.216,
+          "liftCI95": [
+            -1.314,
+            0.9
+          ],
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "3E",
+          "name": "Premium/Discount",
+          "department": "SCOR",
+          "weightKey": "premiumDiscount",
+          "nYes": 2,
+          "nNo": 170,
+          "expectancyYes": 0.552,
+          "expectancyNo": -0.059,
+          "lift": 0.611,
+          "liftCI95": [
+            -1.207,
+            2.405
+          ],
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "3D",
+          "name": "Displacement",
+          "department": "SCOR",
+          "weightKey": "displacement",
+          "nYes": 144,
+          "nNo": 28,
+          "expectancyYes": -0.04,
+          "expectancyNo": -0.111,
+          "lift": 0.071,
+          "liftCI95": [
+            -0.481,
+            0.585
+          ],
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "1D",
+          "name": "Macro USD Compass",
+          "department": "SCOR",
+          "weightKey": "macroCompass",
+          "nYes": 0,
+          "nNo": 172,
+          "expectancyYes": null,
+          "expectancyNo": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "5B",
+          "name": "Devil's Advocate",
+          "department": "SCOR",
+          "weightKey": "devilsAdvocatePenalty",
+          "nYes": 20,
+          "nNo": 152,
+          "expectancyYes": -0.071,
+          "expectancyNo": -0.049,
+          "lift": 0.022,
+          "liftCI95": [
+            -0.586,
+            0.597
+          ],
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "7A",
+          "name": "Dead-Market & Lockout",
+          "department": "FILTRE",
+          "protected": false,
+          "nBlocked": 0,
+          "nPassed": 172,
+          "expectancyBlocked": null,
+          "expectancyPassed": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "rSavedTotal": 0,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "7B",
+          "name": "Performance Breaker",
+          "department": "FILTRE",
+          "protected": false,
+          "nBlocked": 0,
+          "nPassed": 172,
+          "expectancyBlocked": null,
+          "expectancyPassed": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "rSavedTotal": 0,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "7C",
+          "name": "Regime Filter",
+          "department": "FILTRE",
+          "protected": false,
+          "nBlocked": 55,
+          "nPassed": 172,
+          "expectancyBlocked": -0.39,
+          "expectancyPassed": -0.052,
+          "lift": 0.338,
+          "liftCI95": [
+            -0.047,
+            0.688
+          ],
+          "rSavedTotal": 21.45,
+          "grade": "STABIL"
+        },
+        {
+          "id": "1A",
+          "name": "Spot & Spread Guard",
+          "department": "FILTRE",
+          "protected": true,
+          "nBlocked": 0,
+          "nPassed": 172,
+          "expectancyBlocked": null,
+          "expectancyPassed": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "rSavedTotal": 0,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "1B",
+          "name": "Session Killzone",
+          "department": "FILTRE",
+          "protected": false,
+          "nBlocked": 48,
+          "nPassed": 172,
+          "expectancyBlocked": 0.129,
+          "expectancyPassed": -0.052,
+          "lift": -0.181,
+          "liftCI95": [
+            -0.621,
+            0.207
+          ],
+          "rSavedTotal": -6.196,
+          "grade": "STABIL"
+        },
+        {
+          "id": "1C",
+          "name": "News Blocker",
+          "department": "FILTRE",
+          "protected": false,
+          "nBlocked": 0,
+          "nPassed": 172,
+          "expectancyBlocked": null,
+          "expectancyPassed": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "rSavedTotal": 0,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "4A",
+          "name": "Risk Geometry",
+          "department": "FILTRE",
+          "protected": true,
+          "nBlocked": 0,
+          "nPassed": 172,
+          "expectancyBlocked": null,
+          "expectancyPassed": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "rSavedTotal": 0,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "4B",
+          "name": "Anti-Chase",
+          "department": "FILTRE",
+          "protected": false,
+          "nBlocked": 39,
+          "nPassed": 172,
+          "expectancyBlocked": -0.1,
+          "expectancyPassed": -0.052,
+          "lift": 0.048,
+          "liftCI95": [
+            -0.392,
+            0.502
+          ],
+          "rSavedTotal": 3.907,
+          "grade": "STABIL"
+        },
+        {
+          "id": "4C",
+          "name": "Correlation Guard",
+          "department": "FILTRE",
+          "protected": true,
+          "nBlocked": 0,
+          "nPassed": 172,
+          "expectancyBlocked": null,
+          "expectancyPassed": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "rSavedTotal": 0,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "4D",
+          "name": "Daily Drawdown",
+          "department": "FILTRE",
+          "protected": true,
+          "nBlocked": 0,
+          "nPassed": 172,
+          "expectancyBlocked": null,
+          "expectancyPassed": -0.052,
+          "lift": null,
+          "liftCI95": [
+            null,
+            null
+          ],
+          "rSavedTotal": 0,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "id": "4E",
+          "name": "Cost Guard",
+          "department": "FILTRE",
+          "protected": false,
+          "nBlocked": 64,
+          "nPassed": 172,
+          "expectancyBlocked": -0.67,
+          "expectancyPassed": -0.052,
+          "lift": 0.618,
+          "liftCI95": [
+            0.223,
+            1.025
+          ],
+          "rSavedTotal": 42.864,
+          "grade": "PROMOVAT"
+        }
+      ],
+      "desks": [
+        {
+          "symbol": "ETHUSD",
+          "n": 29,
+          "expectancy": 0.018,
+          "ci95": [
+            -0.45,
+            0.493
+          ],
+          "vsOthers": 0.084,
+          "grade": "DATE_PUTINE"
+        },
+        {
+          "symbol": "BNBUSD",
+          "n": 53,
+          "expectancy": -0.3,
+          "ci95": [
+            -0.612,
+            0.04
+          ],
+          "vsOthers": -0.359,
+          "grade": "STABIL"
+        },
+        {
+          "symbol": "SOLUSD",
+          "n": 31,
+          "expectancy": 0.265,
+          "ci95": [
+            -0.202,
+            0.758
+          ],
+          "vsOthers": 0.387,
+          "grade": "STABIL"
+        },
+        {
+          "symbol": "XRPUSD",
+          "n": 38,
+          "expectancy": 0.093,
+          "ci95": [
+            -0.305,
+            0.477
+          ],
+          "vsOthers": 0.186,
+          "grade": "STABIL"
+        },
+        {
+          "symbol": "BTCUSD",
+          "n": 21,
+          "expectancy": -0.252,
+          "ci95": [
+            -0.797,
+            0.315
+          ],
+          "vsOthers": -0.228,
+          "grade": "DATE_PUTINE"
+        }
+      ]
+    },
+    "moves": [],
+    "tradeable": true
+  }
+}
