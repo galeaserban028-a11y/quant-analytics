@@ -20,7 +20,7 @@ const { cleanSpikes } = require('../src/core/candles');
 const { rng } = require('../src/backtest/metrics');
 const { runPropCycle, propSummary, dayKeyIn, samePos, shouldFetch, deskStrategies } = require('../src/propLive');
 const lab = require('../src/strategies/dailyLab');
-const { chooseRisk, pickBest, STRATEGIES } = require('../src/research/propRun');
+const { chooseRisk, pickBest, rankFirms, STRATEGIES } = require('../src/research/propRun');
 const MarketStateBus = require('../src/core/MarketStateBus');
 const { loadConfig } = require('../src/config');
 const INSTR = require('../config/forex_instruments.json');
@@ -191,6 +191,11 @@ test('gardian: se oprește la țintă, reduce riscul în drawdown, iar contul fi
   const base = { initial: 10000, dayStartBalance: 10000, openRisk: 0, highestEod: 10000 };
   const at = (balance, phaseTarget) => decide(Object.assign({}, base, { balance, dayStartBalance: balance, phaseTarget }), rules, { riskPct: 2, safety: 0.8, maxOpen: 5, openCount: 0 });
   assert.equal(at(10800, 0.08).reason, 'ȚINTA_ATINSĂ');
+  // ținta atinsă, dar lipsesc zile minime: doar poziții minuscule
+  const days = decide(Object.assign({}, base, { balance: 10850, dayStartBalance: 10850, phaseTarget: 0.08, tradingDays: 1 }), rules, { riskPct: 2, safety: 0.8, maxOpen: 5, openCount: 0 });
+  assert.equal(days.reason, 'ZILE_MINIME');
+  assert.equal(days.riskAmount, 25);
+  assert.equal(decide(Object.assign({}, base, { balance: 10850, dayStartBalance: 10850, phaseTarget: 0.08, tradingDays: 3 }), rules, { riskPct: 2, safety: 0.8, maxOpen: 5, openCount: 0 }).reason, 'ȚINTA_ATINSĂ');
   assert.equal(at(10000, 0.08).riskAmount, 200);
   assert.equal(at(9500, 0.08).riskAmount, 100); // −5% ⇒ jumătate
   assert.equal(at(9300, 0.08).riskAmount, 50); // −7% ⇒ un sfert
@@ -578,7 +583,7 @@ test('live: două strategii pe același indice → două poziții separate, lot 
   const entries = r.events.filter((e) => e.event === 'ENTRY');
   assert.equal(entries.length, 2, JSON.stringify(r.events));
   assert.deepEqual(Object.keys(bus.state.prop.positions).sort(), ['GER40|down', 'GER40|rsi2']);
-  assert.ok(msgs.some((m) => /Strategia: 3 zile de scădere/.test(m)));
+  assert.ok(msgs.some((m) => /Trader: Tudor \(3 zile de scădere\)/.test(m)));
   assert.ok(msgs.some((m) => /puncte<\/b> SUB/.test(m)));
   const totalRisk = Object.values(bus.state.prop.positions).reduce((s, p) => s + p.riskUsd, 0);
   assert.ok(totalRisk <= 10000 * 0.05 * 0.8 + 1e-6, 'Gardianul împarte bugetul zilnic între poziții');
@@ -637,4 +642,129 @@ test('live: un semnal început cu o zi înainte (ratat) nu e trimis ca intrare n
   assert.deepEqual(r.events, []);
   assert.equal(msgs.length, 1, 'doar mesajul de pornire');
   assert.equal(Object.keys(bus.state.prop.positions).length, 0);
+});
+
+test('stare: nu rescrie fișierul dacă nimic nu s-a schimbat (rulare din 5 în 5 minute fără commit-uri inutile)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apex-snap-'));
+  const snap = path.join(dir, 'state.json');
+  const clock = { t: Date.UTC(2026, 9, 18, 12) };
+  const bus = new MarketStateBus(loadConfig(), { snapshotPath: snap, clock: () => clock.t });
+  bus.state.prop = { v: 2, balance: 10000 };
+  bus.saveSnapshot();
+  const first = fs.readFileSync(snap, 'utf8');
+  clock.t += 5 * 60e3;
+  bus.saveSnapshot();
+  assert.equal(fs.readFileSync(snap, 'utf8'), first, 'doar ora s-ar fi schimbat');
+  bus.state.prop.balance = 10100;
+  bus.saveSnapshot();
+  assert.notEqual(fs.readFileSync(snap, 'utf8'), first);
+  assert.equal(JSON.parse(fs.readFileSync(snap, 'utf8')).prop.balance, 10100);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// ───────────────────────────── Echipa și scenariile ─────────────────────────────
+const team = require('../src/research/team');
+const scen = require('../src/research/scenario');
+
+test('echipa: 20 de traderi cu nume unice, câte unul pe fiecare indice și strategie; 5 oameni în personal', () => {
+  const names = Object.values(team.NAMES).flatMap((m) => Object.values(m));
+  assert.equal(names.length, 20);
+  assert.equal(new Set(names).size, 20);
+  for (const kind of ['rsi2', 'down']) for (const [s, i] of Object.entries(INSTR)) if (i && i.category === 'INDEX') assert.ok(team.NAMES[kind][s], `${kind}/${s} fără nume`);
+  assert.equal(team.nameFor('down', 'GER40'), 'Tudor');
+  assert.equal(team.STAFF.length, 5);
+});
+
+test('echipa: regula băncii — doar pierderi clare (sub −0,05R) și cu destule tranzacții', () => {
+  const tr = (n, r) => Array.from({ length: n }, (_, k) => ({ resultR: r, openedAt: k, closedAt: k + 1 }));
+  assert.equal(team.benchDecision(tr(12, -0.2)).benched, true);
+  assert.equal(team.benchDecision(tr(12, -0.04)).benched, false, 'sub prag: lucrează');
+  assert.equal(team.benchDecision(tr(5, -1)).benched, false, 'prea puține tranzacții pentru o judecată');
+  assert.equal(team.benchDecision([]).benched, false);
+});
+
+test('echipa: walk-forward fără look-ahead — banca se decide doar din trecut; tranzacțiile celor de pe bancă nu intră', () => {
+  // indice „bun” (trend cu scăderi) și indice „rău” (scade)
+  const good = randomWalk(2200, 31, { drift: 0.0006, start: 100 });
+  const bad = randomWalk(2200, 32, { drift: -0.0006, start: 100 });
+  const data = { US30: good, GER40: bad };
+  const strategies = { rsi2: { name: 'Pullback RSI(2)', grid: [{ kind: 'rsi2', trendLen: 100, entryRsi: 10, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: true }] } };
+  // GER40 pierde mereu (rezultat forțat), deci trebuie să stea pe bancă în fiecare an după primul antrenament
+  const sim = (d, i, p, o) => lab.simulate(d, i, p, o).map((t) => (t.symbol === 'GER40' ? Object.assign({}, t, { resultR: -0.5 }) : Object.assign({}, t, { resultR: Math.abs(t.resultR) + 0.1 })));
+  const r = team.teamWalkForward(data, INSTR, strategies, sim, { trainYears: 2, minTrades: 5 });
+  const S = r.byStrategy.rsi2;
+  assert.ok(S.folds.length >= 3);
+  assert.ok(S.folds.every((f) => f.benched.includes('GER40')), 'GER40 pe bancă în fiecare an');
+  assert.ok(!S.oos.some((t) => t.symbol === 'GER40'), 'tranzacțiile celor de pe bancă nu intră');
+  assert.ok(S.oos.some((t) => t.symbol === 'US30'));
+  assert.equal(r.agents.find((a) => a.symbol === 'GER40').status, 'BANCĂ');
+  for (const f of S.folds) {
+    const inOos = S.oos.filter((t) => t.openedAt >= Date.parse(f.testFrom) && t.openedAt < Date.parse(f.testTo) + DAY);
+    for (const sym of f.benched) assert.ok(!inOos.some((t) => t.symbol === sym), `${sym} era pe bancă în ${f.testFrom}`);
+  }
+  assert.equal(r.agents.length, 2);
+  assert.ok(r.agents.every((a) => ['LUCREAZĂ', 'BANCĂ'].includes(a.status) && a.record && a.why));
+});
+
+test('scenariu: luna și drumul pe 12 luni sunt coerente (procente care însumează 100, plăți doar după finanțare)', () => {
+  const r = rng(11);
+  const trades = dailyTrades(1500, () => (r() < 0.62 ? 0.7 : -1), ['A', 'B']);
+  const rules = PROP_RULES.THE5ERS_HIGH_STAKES;
+  const cfg = { riskPct: 3, safety: 0.7, maxOpen: 3 };
+  const m = scen.monthDistribution(trades, rules, cfg, { target: 0.08, stepDays: 30 });
+  assert.ok(m.months > 10 && m.p10 <= m.p25 && m.p25 <= m.median && m.median <= m.p75 && m.p75 <= m.p90);
+  assert.ok(m.positivePct >= 0 && m.positivePct <= 100);
+  const j = scen.journey(trades, rules, cfg, { months: 12, stepDays: 30, fee: 95 });
+  for (const x of j.byMonth) {
+    const sum = x.phase1Pct + x.phase2Pct + x.fundedPct + x.failedPct + x.lostFundedPct;
+    assert.ok(Math.abs(sum - 100) < 0.6, `luna ${x.month}: ${sum}`);
+    if (x.fundedPct === 0 && x.lostFundedPct === 0) assert.equal(x.cumPayoutAvg, 0, 'plăți fără cont finanțat');
+  }
+  for (let i = 1; i < j.byMonth.length; i++) assert.ok(j.byMonth[i].cumPayoutAvg >= j.byMonth[i - 1].cumPayoutAvg, 'încasările cumulate nu scad');
+  assert.ok(j.byMonth[0].phase1Pct >= j.byMonth[11].phase1Pct);
+});
+
+test('live: un trader de pe bancă nu deschide poziții; numele lui apare în mesajele celorlalți', async () => {
+  const { config, bus, msgs, notify } = liveFixture();
+  config.propDesk.benched = ['EURUSD|rsi2'];
+  const bars = pullbackSeries();
+  const tLast = bars[bars.length - 1].timestamp + DAY;
+  await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars.slice(0, -1)), now: tLast - DAY + 3600e3, env: {} });
+  const r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars), now: tLast + 3600e3, env: {} });
+  assert.deepEqual(r.events.map((e) => e.reason), ['BANCĂ']);
+  assert.equal(Object.keys(bus.state.prop.positions).length, 0);
+  assert.equal(msgs.length, 1);
+});
+
+test('scenariu: contul finanțat pierdut printr-un gap apare separat; plățile nu numără același profit de două ori', () => {
+  const rules = PROP_RULES.THE5ERS_HIGH_STAKES;
+  const cfg = { riskPct: 3, safety: 0.7, maxOpen: 1 };
+  // câștiguri constante: plata lunară trebuie să rămână aproximativ constantă (nu să crească de la lună la lună)
+  const wins = dailyTrades(700, () => 1, ['A']);
+  const j = scen.journey(wins, rules, cfg, { months: 12, stepDays: 60 });
+  const inc = j.byMonth.map((x, i) => x.cumPayoutAvg - (i ? j.byMonth[i - 1].cumPayoutAvg : 0));
+  const paid = inc.filter((v) => v > 0);
+  assert.ok(paid.length >= 3);
+  assert.ok(Math.max(...paid) <= Math.min(...paid.slice(1)) * 1.5 + 50, `plăți în creștere: ${paid.join(', ')}`);
+  // după ~4 luni de câștiguri, un gap de −6R pe zi: contul finanțat se pierde
+  const gap = dailyTrades(700, (i) => (i < 120 ? 1 : -6), ['A']);
+  const g = scen.journey(gap, rules, { riskPct: 3, safety: 0.9, maxOpen: 1 }, { months: 12, stepDays: 400 });
+  assert.ok(g.byMonth.some((x) => x.lostFundedPct > 0), JSON.stringify(g.byMonth.map((x) => [x.fundedPct, x.lostFundedPct, x.failedPct])));
+});
+
+test('examen: ținta atinsă în mai puține zile decât minimul firmei nu blochează contul (bug găsit)', () => {
+  const rules = PROP_RULES.THE5ERS_HIGH_STAKES; // minim 3 zile
+  const wins = dailyTrades(400, () => 1, ['A']);
+  const a = runAccount(wins, rules, { riskPct: 3, safety: 0.7, maxOpen: 1 }, { startTs: T0, endTs: T0 + 300 * DAY, target: 0.05 });
+  assert.equal(a.outcome, 'PASS');
+  assert.ok(a.tradingDays >= rules.minDays);
+  const r = simulateChallenges(wins, rules, { riskPct: 3, safety: 0.7, maxOpen: 1 }, { horizonDays: 200, fundedMonths: 2, stepDays: 30, orderSeeds: 1 });
+  assert.equal(r.passPct, 100);
+});
+
+test('cercetare: la valoare așteptată practic egală, câștigă firma la care treci mai repede', () => {
+  const a = { key: 'A', expectedValuePerAttempt: 381, passWithin180Pct: 12, failPct: 3.2 };
+  const b = { key: 'B', expectedValuePerAttempt: 377, passWithin180Pct: 12.5, failPct: 3.2 };
+  const c = { key: 'C', expectedValuePerAttempt: 250, passWithin180Pct: 20, failPct: 1 };
+  assert.deepEqual([a, b, c].sort(rankFirms).map((x) => x.key), ['B', 'A', 'C']);
 });

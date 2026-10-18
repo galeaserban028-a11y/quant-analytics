@@ -7,7 +7,7 @@
  *
  * Reguli de siguranță (pe lângă regulile firmei):
  *  - buffer: folosim doar `safety` (implicit 70%) din limita zilnică și din limita totală;
- *  - după ce ținta fazei e atinsă → nu mai deschidem nimic (doar zilele minime, cu risc minuscul);
+ *  - după ce ținta fazei e atinsă → nu mai deschidem nimic, cu excepția pozițiilor minuscule (0,25%) cât lipsesc zilele minime;
  *  - în drawdown riscul se reduce automat (la jumătate sub −4%, la un sfert sub −6%).
  *
  * @param {object} acct { initial, balance, dayStartBalance, openRisk, highestEod, phaseTarget, tradingDays }
@@ -22,9 +22,13 @@ function decide(acct, rules, cfg) {
   const hasTarget = acct.phaseTarget != null; // contul finanțat nu are țintă
   const targetBalance = hasTarget ? initial * (1 + acct.phaseTarget) : Infinity;
 
-  if (hasTarget && balance >= targetBalance) {
+  // Ținta atinsă: nu mai riscăm nimic serios. Dacă firma cere încă zile minime de tranzacționare,
+  // permitem doar poziții minuscule (0,25% din cont), cât să bifăm zilele fără să punem examenul în pericol.
+  const needsDays = rules.minDays && acct.tradingDays != null && acct.tradingDays < rules.minDays;
+  if (hasTarget && balance >= targetBalance && !needsDays) {
     return { allow: false, riskAmount: 0, reason: 'ȚINTA_ATINSĂ' };
   }
+  const onlyDays = hasTarget && balance >= targetBalance && needsDays;
   if (cfg.maxOpen != null && cfg.openCount >= cfg.maxOpen) {
     return { allow: false, riskAmount: 0, reason: 'PREA_MULTE_POZIȚII' };
   }
@@ -37,6 +41,7 @@ function decide(acct, rules, cfg) {
   // Nu risca mai mult decât lipsește până la țintă (+ puțin): evită să dai „tot” când ești aproape
   let risk = initial * riskPct / 100;
   if (hasTarget) risk = Math.min(risk, Math.max(initial * 0.0025, targetBalance - balance));
+  if (onlyDays) risk = initial * 0.0025;
 
   // Limita totală (static sau trailing la final de zi)
   const floor = rules.maxLossType === 'trailingEod'
@@ -49,7 +54,7 @@ function decide(acct, rules, cfg) {
 
   risk = Math.min(risk, roomTotal, roomDaily);
   if (!(risk > initial * 0.0005)) return { allow: false, riskAmount: 0, reason: roomDaily <= roomTotal ? 'LIMITA_ZILNICĂ' : 'LIMITA_TOTALĂ' };
-  return { allow: true, riskAmount: risk, reason: 'OK' };
+  return { allow: true, riskAmount: risk, reason: onlyDays ? 'ZILE_MINIME' : 'OK' };
 }
 
 module.exports = { decide };

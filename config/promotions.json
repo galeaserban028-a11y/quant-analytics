@@ -65,31 +65,31 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-18T11:26:10.425Z",
+    "generatedAt": "2026-10-18T18:40:52.946Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
-      "trades": 3742,
-      "wins": 2440,
-      "losses": 1302,
-      "winRatePct": 65.2,
-      "avgWinR": 0.42,
-      "avgLossR": 0.661,
-      "expectancyR": 0.044,
+      "trades": 3472,
+      "wins": 2266,
+      "losses": 1206,
+      "winRatePct": 65.3,
+      "avgWinR": 0.422,
+      "avgLossR": 0.656,
+      "expectancyR": 0.048,
       "expectancyCI95": [
-        0.025,
-        0.065
+        0.027,
+        0.068
       ],
-      "tStat": 4.33,
-      "totalR": 164.68,
-      "profitFactor": 1.19,
-      "maxDrawdownR": 41.31,
-      "maxLosingStreak": 14,
+      "tStat": 4.54,
+      "totalR": 165.87,
+      "profitFactor": 1.21,
+      "maxDrawdownR": 26.47,
+      "maxLosingStreak": 9,
       "outcomes": {
-        "STOP": 672,
-        "TARGET": 2987,
-        "TIME": 23,
-        "END_OF_DATA": 60
+        "TARGET": 2777,
+        "STOP": 617,
+        "TIME": 21,
+        "END_OF_DATA": 57
       }
     },
     "overrides": {
@@ -138,6 +138,12 @@
           "JP225",
           "AUS200",
           "US2000"
+        ],
+        "benched": [
+          "FRA40|rsi2",
+          "AUS200|rsi2",
+          "UK100|down",
+          "FRA40|down"
         ]
       }
     }

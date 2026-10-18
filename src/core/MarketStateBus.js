@@ -232,6 +232,14 @@ class MarketStateBus {
         prop: this.state.prop || null,
         savedAt: new Date(this.now()).toISOString()
       };
+      // Rulăm des (din 5 în 5 minute): dacă nimic nu s-a schimbat în afară de oră, nu rescriem fișierul (evită commit-uri inutile)
+      if (fs.existsSync(this.snapshotPath)) {
+        try {
+          const prev = JSON.parse(fs.readFileSync(this.snapshotPath, 'utf8'));
+          const strip = (o) => JSON.stringify(Object.assign({}, o, { savedAt: null }));
+          if (strip(prev) === strip(JSON.parse(JSON.stringify(payload)))) return true;
+        } catch (_) { /* fișier corupt: îl rescriem */ }
+      }
       const tmp = `${this.snapshotPath}.tmp`;
       fs.writeFileSync(tmp, JSON.stringify(payload, null, 2), 'utf8');
       fs.renameSync(tmp, this.snapshotPath); // scriere atomică

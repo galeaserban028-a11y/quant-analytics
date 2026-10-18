@@ -18,16 +18,27 @@ Instrumente: **US30, NAS100, SPX500, US2000, GER40, UK100, FRA40, EU50, JP225, A
 
 | Firmă | Risc ales | Trece | Pică | Timp median | Trece în ≤6 luni | Taxă | Valoare așteptată / încercare* |
 |---|---|---|---|---|---|---|---|
-| **The5ers High Stakes** (recomandat) | 4%, max 3 poziții | **~52%** | ~3,8% | **~10 luni** | ~12% | ~95 $ | ~+308 $ |
-| FundedNext Stellar 2-Step | 4%, max 3 poziții | ~47% | ~3,8% | ~10 luni | ~9% | ~99 $ | ~+258 $ |
-| FTMO 2-Step | 4%, max 3 poziții | ~45% | ~4,3% | ~12 luni | ~7% | ~170 $ | ~+165 $ |
-| FTMO 1-Step | 4%, max 3 poziții | ~54% | ~4,4% | ~12 luni | ~8% | ~150 $ | ~+146 $ |
+| **The5ers High Stakes** (recomandat) | 4%, max 3 poziții | **~55%** | ~3,2% | **~10 luni** | ~12,5% | ~95 $ | ~+377 $ |
+| FundedNext Stellar 2-Step | 4%, max 3 poziții | ~55% | ~3,2% | ~10 luni | ~12% | ~99 $ | ~+381 $ |
+| FTMO 2-Step | 4%, max 3 poziții | ~52% | ~3,3% | ~12 luni | ~8% | ~170 $ | ~+266 $ |
+| FTMO 1-Step | 4%, max 3 poziții | ~58% | ~4,3% | ~13 luni | ~7% | ~150 $ | ~+248 $ |
 
 \* plățile din primele 12 luni pe contul finanțat × șansa de a trece − taxa. Medie istorică, **nu** promisiune.
 
-Față de versiunea anterioară (Forex + indici, o strategie), măsurat la fel de prudent: trecerea crește de la ~43% la ~52%, timpul median scade de la ~18 la ~10 luni, iar șansa de a trece în 6 luni crește de la ~2,5% la ~12%. Riscul mai mare pe tranzacție NU accelerează examenul (Gardianul împarte bugetul zilnic între poziții), de aceea viteza vine din strategii și instrumente, nu din risc.
+Față de versiunea anterioară (Forex + indici, o strategie), măsurat la fel de prudent: trecerea crește de la ~43% la ~55%, timpul median scade de la ~18 la ~10 luni, iar șansa de a trece în 6 luni crește de la ~2,5% la ~12,5%. Riscul mai mare pe tranzacție NU accelerează examenul (Gardianul împarte bugetul zilnic între poziții), de aceea viteza vine din strategii și instrumente, nu din risc.
 
 **Maximul pe care îl poți pierde este taxa examenului.**
+
+### Echipa: 20 de traderi cu nume
+
+Fiecare strategie × indice e un „trader” cu fișa lui (`data/research/team.json`): Andrei, Maria, Mihai, Elena, Radu, Ioana, Vlad, Ana, Cristi și Diana pe Pullback; Bogdan, Irina, Alex, Raluca, Tudor, Bianca, Matei, Sara, Ștefan și Larisa pe „3 zile de scădere”. Personalul: Victor (Gardianul), Sofia (școala lunară), Dan (Curierul), Paul (Contabilul), Nelu (Paznicul datelor). Traderii lucrează non-stop; o dată pe lună merg la școală (re-antrenare pe ultimii 3 ani); cine a pierdut clar în ultimii 3 ani (sub −0,05R pe tranzacție) stă pe bancă până își revine. Regula băncii e testată walk-forward: efect mic, dar constant (trecere +2–3 puncte, picare −0,3 puncte).
+
+**Harta live:** `harta/index.html` (deschide fișierul în browser; citește starea direct de pe GitHub și se reîmprospătează la fiecare minut). Poate fi publicată gratuit cu GitHub Pages (Settings → Pages → Branch: main, folder /), dacă vrei un link: repo-ul e public, deci și pagina ar fi publică.
+
+### Scenariul (simulare, cont de 10.000 $)
+
+- **O lună în examen:** ~3 tranzacții; mediana ≈ 0 $; 1 lună din 4 peste +238 $, 1 din 10 peste +477 $; 1 din 4 sub −189 $, 1 din 10 sub −425 $; luna medie +22 $.
+- **Primul an:** după 6 luni ~10% au deja cont finanțat, după 12 luni ~27%; ~3% au picat; încasat în primul an: în medie ~120 $ (cei mai norocoși 10%: peste ~600 $). Câștigul vine mai ales din contul finanțat, în anii următori.
 
 ## Funcționare non-stop (GitHub Actions, gratuit)
 
@@ -126,7 +137,7 @@ Dacă pe antrenare nu există niciun avantaj, compania **stă pe loc** în perio
 
 ## Testare
 
-`npm test` rulează 111 teste:
+`npm test` rulează 120 de teste:
 - fiecare agent și filtru;
 - formula de scor;
 - managementul pozițiilor (pesimist intrabar, gap-uri, parțial la TP1, trailing);

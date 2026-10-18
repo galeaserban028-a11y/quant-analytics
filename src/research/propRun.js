@@ -22,7 +22,8 @@ const { cleanSpikes, normalizeCandles } = require('../core/candles');
 const { getJson } = require('../data/http');
 const { parseYahooChart, validOhlc } = require('../data/dailySources');
 const lab = require('../strategies/dailyLab');
-const { trendWalkForward } = require('./trendResearch');
+const { teamWalkForward, STAFF } = require('./team');
+const { monthDistribution, journey } = require('./scenario');
 const { validationLevel } = require('./walkforward');
 const { simulateChallenges } = require('../prop/challengeSim');
 const { PROP_RULES } = require('../prop/rules');
@@ -94,6 +95,10 @@ async function downloadDaily(file, inst) {
   return cleanSpikes(candles);
 }
 
+function nextFirstOfMonth(d) {
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1, 2, 30));
+}
+
 const fmt = (v, d = 3) => (v === null || v === undefined || !Number.isFinite(v) ? '–' : Number(v).toFixed(d));
 
 /** Alege riscul: cea mai bună valoare așteptată, cu P(pică) ≤ 5%. */
@@ -108,6 +113,13 @@ function chooseRisk(trades, rules, opts = {}) {
     }
   }
   return { best: pickBest(table), table };
+}
+
+/** Ordinea firmelor: valoarea așteptată; la egalitate practică (diferență ≤ 3%) câștigă cea la care treci mai repede. */
+function rankFirms(a, b) {
+  const ea = a.expectedValuePerAttempt, eb = b.expectedValuePerAttempt;
+  if (Math.abs(ea - eb) <= 0.03 * Math.max(Math.abs(ea), Math.abs(eb), 1)) return (b.passWithin180Pct - a.passWithin180Pct) || (a.failPct - b.failPct) || (eb - ea);
+  return eb - ea;
 }
 
 /** Cea mai bună valoare așteptată dintre variantele cu P(pică) ≤ 5% (dacă nu există niciuna: dintre toate). */
@@ -131,24 +143,27 @@ async function main() {
   }
   if (Object.keys(data).length < 4) { console.log('Prea puține instrumente cu date.'); process.exitCode = 1; return; }
 
+  const team = teamWalkForward(data, INSTRUMENTS, STRATEGIES, prudentSim, { trainYears: 3, minTrades: 40, log: (m) => console.log(m.slice(0, 220)) });
   const results = {};
   for (const [kind, st] of Object.entries(STRATEGIES)) {
-    console.log(`\n== ${st.name} ==`);
-    const wf = trendWalkForward(data, INSTRUMENTS, { simulate: prudentSim, barMs: DAY, trainYears: 3, grid: st.grid, minTrades: 40, fixedParams: st.grid[0], log: (m) => console.log(m.slice(0, 200)) });
-    const level = validationLevel(wf.oosSelected, { expectancyR: 0 });
-    results[kind] = { name: st.name, wf, level, params: wf.latest ? wf.latest.params : st.grid[0] };
-    console.log(`${st.name}: OOS ${wf.oosSelected.trades} tranzacții, E=${fmt(wf.oosSelected.expectancyR)}R (IC95% ${fmt(wf.oosSelected.expectancyCI95[0])} … ${fmt(wf.oosSelected.expectancyCI95[1])}) → ${level}`);
+    const S = team.byStrategy[kind];
+    const oos = computeMetrics(S.oos);
+    const level = validationLevel(oos, { expectancyR: 0 });
+    results[kind] = { name: st.name, oos, folds: S.folds, level, params: S.latest ? S.latest.params : st.grid[0], trades: S.oos };
+    console.log(`${st.name}: OOS ${oos.trades} tranzacții, E=${fmt(oos.expectancyR)}R (IC95% ${fmt(oos.expectancyCI95[0])} … ${fmt(oos.expectancyCI95[1])}) → ${level}`);
   }
   const accepted = Object.entries(results).filter(([, r]) => r.level !== 'NIMIC');
-  const trades = accepted.flatMap(([, r]) => r.wf.oosSelectedTrades);
+  const acceptedKinds = accepted.map(([k]) => k);
+  const trades = accepted.flatMap(([, r]) => r.trades);
   const combined = computeMetrics(trades);
   const level = accepted.length ? validationLevel(combined, { expectancyR: 0 }) : 'NIMIC';
   const port = trades.length ? portfolioSim(trades, { riskPct: 1, maxOpen: 5, maxOpenRiskPct: 5 }) : null;
 
   const firms = {};
   if (trades.length) for (const [key, rules] of Object.entries(PROP_RULES)) firms[key] = chooseRisk(trades, rules);
-  const ranking = Object.entries(firms).map(([k, v]) => ({ key: k, ...v.best })).sort((a, b) => b.expectedValuePerAttempt - a.expectedValuePerAttempt || b.passPct - a.passPct);
+  const ranking = Object.entries(firms).map(([k, v]) => ({ key: k, ...v.best })).sort(rankFirms);
   const top = ranking[0] || {};
+  const agents = team.agents.filter((a) => acceptedKinds.includes(a.strategy));
   const proposed = {
     enabled: level !== 'NIMIC',
     firm: top.key,
@@ -156,8 +171,26 @@ async function main() {
     safety: top.safety,
     maxOpen: top.maxOpen,
     strategies: accepted.map(([kind, r]) => ({ kind, name: r.name, params: r.params })),
-    symbols: Object.keys(data)
+    symbols: Object.keys(data),
+    benched: agents.filter((a) => a.status === 'BANCĂ').map((a) => a.id)
   };
+
+  // Scenarii (cu configurația aleasă)
+  let scenario = null;
+  if (top.key) {
+    const rules = PROP_RULES[top.key];
+    const cfg = { riskPct: top.riskPct, safety: top.safety, maxOpen: top.maxOpen };
+    scenario = {
+      firm: rules.name, config: cfg, fee: top.fee,
+      challengeMonth: monthDistribution(trades, rules, cfg, { target: rules.phases[0] }),
+      fundedMonth: monthDistribution(trades, rules, cfg, { target: null }),
+      journey: journey(trades, rules, cfg, { months: 12, fee: top.fee })
+    };
+    const cm = scenario.challengeMonth, fm = scenario.fundedMonth;
+    console.log(`Luna în examen: mediană ${cm.median}$ (10% ${cm.p10}$ … 90% ${cm.p90}$), pe plus ${cm.positivePct}%, semnale ~${cm.tradesMedian}`);
+    console.log(`Luna pe finanțat: mediană ${fm.median}$ (10% ${fm.p10}$ … 90% ${fm.p90}$), pe plus ${fm.positivePct}%`);
+    for (const m of scenario.journey.byMonth.filter((x) => [1, 3, 6, 9, 12].includes(x.month))) console.log(`  luna ${m.month}: faza1 ${m.phase1Pct}% faza2 ${m.phase2Pct}% finanțat ${m.fundedPct}% picat ${m.failedPct}% | încasat mediu ${m.cumPayoutAvg}$`);
+  }
 
   console.log(`\nPortofoliu: ${combined.trades} tranzacții, E=${fmt(combined.expectancyR)}R → ${level}`);
   for (const r of ranking) console.log(`  ${r.rules.padEnd(28)} risc ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poziții): trece ${r.passPct}% | pică ${r.failPct}% | zile mediane ${r.medianDaysToPass} | ≤6 luni ${r.passWithin180Pct}% | EV ${r.expectedValuePerAttempt}$`);
@@ -172,8 +205,8 @@ async function main() {
   L.push('| Strategie | Tranzacții | Câștigătoare | R / tranzacție (IC95%) | Ani pe plus | Nivel |');
   L.push('|---|---|---|---|---|---|');
   for (const r of Object.values(results)) {
-    const o = r.wf.oosSelected;
-    L.push(`| ${r.name} | ${o.trades} | ${o.winRatePct}% | ${fmt(o.expectancyR)} (${fmt(o.expectancyCI95[0])} … ${fmt(o.expectancyCI95[1])}) | ${r.wf.folds.filter((f) => f.oosSelected.expectancyR > 0).length}/${r.wf.folds.length} | **${r.level}** |`);
+    const o = r.oos;
+    L.push(`| ${r.name} | ${o.trades} | ${o.winRatePct}% | ${fmt(o.expectancyR)} (${fmt(o.expectancyCI95[0])} … ${fmt(o.expectancyCI95[1])}) | ${r.folds.filter((f) => f.oos.expectancyR > 0).length}/${r.folds.length} | **${r.level}** |`);
   }
   L.push(`| **Portofoliu** | ${combined.trades} | ${combined.winRatePct}% | ${fmt(combined.expectancyR)} | – | **${level}** |`);
   L.push('');
@@ -189,6 +222,26 @@ async function main() {
   L.push('');
   if (top.rules) L.push(`**Recomandare:** ${top.rules}, risc ${top.riskPct}% pe tranzacție, Gardianul Prop activ.`);
   L.push('');
+  L.push('## 3. Echipa (strategie × indice)');
+  L.push('');
+  L.push('| Trader | Strategie | Indice | Status | Tranzacții OOS | Câștigătoare | R / tranzacție | Ani pe plus | Ultimii 3 ani |');
+  L.push('|---|---|---|---|---|---|---|---|---|');
+  for (const a of agents) L.push(`| ${a.name} | ${a.strategyName} | ${a.symbol} | ${a.status} | ${a.record.trades} | ${a.record.winRatePct}% | ${fmt(a.record.expectancyR)} | ${a.record.yearsPositive}/${a.record.years} | ${fmt(a.last3y.expectancyR)} (${a.last3y.trades}) |`);
+  L.push('');
+  L.push('Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe tranzacție în ultimii 3 ani (minim 10 tranzacții) stă pe bancă până își revine. Efect mic, dar constant: trecere puțin mai mare, picare puțin mai mică.');
+  L.push('');
+  if (scenario) {
+    const cm = scenario.challengeMonth, fm = scenario.fundedMonth;
+    L.push('## 4. Scenarii (cont 10.000 $)');
+    L.push('');
+    L.push(`- **O lună în examen:** mediană ${cm.median} $; 1 lună din 10 sub ${cm.p10} $, 1 din 10 peste ${cm.p90} $; ${cm.positivePct}% din luni pe plus; ~${cm.tradesMedian} tranzacții pe lună.`);
+    L.push(`- **O lună pe contul finanțat (înainte de split):** mediană ${fm.median} $; 1 din 10 sub ${fm.p10} $, 1 din 10 peste ${fm.p90} $; ${fm.positivePct}% din luni pe plus.`);
+    L.push('');
+    L.push('| Luna | Încă în faza 1 | În faza 2 | Finanțat | Picat | Încasat cumulat (medie) |');
+    L.push('|---|---|---|---|---|---|');
+    for (const m of scenario.journey.byMonth) L.push(`| ${m.month} | ${m.phase1Pct}% | ${m.phase2Pct}% | ${m.fundedPct}% | ${m.failedPct}% | ${m.cumPayoutAvg} $ |`);
+    L.push('');
+  }
   L.push('## Configurația propusă');
   L.push('');
   L.push('```json');
@@ -202,14 +255,23 @@ async function main() {
   fs.writeFileSync(path.join(outDir, 'RAPORT_PROP.md'), L.join('\n'));
   fs.writeFileSync(path.join(outDir, 'prop_report.json'), JSON.stringify({
     level,
-    strategies: Object.fromEntries(Object.entries(results).map(([k, r]) => [k, { level: r.level, oos: r.wf.oosSelected, params: r.params, folds: r.wf.folds.map((f) => ({ test: f.testFrom, params: f.chosen, oos: f.oosSelected.expectancyR, n: f.oosSelected.trades })) }])),
+    strategies: Object.fromEntries(Object.entries(results).map(([k, r]) => [k, { level: r.level, oos: r.oos, params: r.params, folds: r.folds.map((f) => ({ test: f.testFrom, params: f.params, benched: f.benched, oos: f.oos.expectancyR, n: f.oos.trades })) }])),
     combined, ranking, proposed,
     portfolio: port ? Object.assign({}, port, { monthly: undefined }) : null
+  }, null, 2));
+  fs.writeFileSync(path.join(outDir, 'team.json'), JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    nextSchool: nextFirstOfMonth(new Date()).toISOString(),
+    config: proposed,
+    agents, staff: STAFF,
+    strategies: Object.fromEntries(Object.entries(results).map(([k, r]) => [k, { name: r.name, level: r.level, params: r.params, oos: { trades: r.oos.trades, winRatePct: r.oos.winRatePct, expectancyR: r.oos.expectancyR, ci: r.oos.expectancyCI95 } }])),
+    exam: ranking.map((r) => ({ key: r.key, name: r.rules, riskPct: r.riskPct, safety: r.safety, maxOpen: r.maxOpen, passPct: r.passPct, failPct: r.failPct, timeoutPct: r.timeoutPct, medianDaysToPass: r.medianDaysToPass, passWithin180Pct: r.passWithin180Pct, passWithin365Pct: r.passWithin365Pct, fee: r.fee, ev: r.expectedValuePerAttempt })),
+    scenario
   }, null, 2));
   console.log('Raport: data/research/RAPORT_PROP.md');
 
   if (process.env.LIVE_TELEGRAM === '1' && top.rules) {
-    await sendTelegram(`🔬 <b>APEX: cercetarea lunară (Departamentul Prop)</b>\n${accepted.map(([, r]) => `${r.name}: ${fmt(r.wf.oosSelected.expectancyR)}R/tranzacție → ${r.level}`).join('\n')}\nRecomandare: ${top.rules}, risc ${top.riskPct}%: trece ${top.passPct}%, pică ${top.failPct}% (simulat, execuție prudentă).`, { enabled: true });
+    await sendTelegram(`🔬 <b>APEX: școala lunară (Departamentul Prop)</b>\n${accepted.map(([, r]) => `${r.name}: ${fmt(r.oos.expectancyR)}R/tranzacție → ${r.level}`).join('\n')}\nPe bancă: ${agents.filter((a) => a.status === 'BANCĂ').map((a) => `${a.name} (${a.symbol})`).join(', ') || 'nimeni'}\nRecomandare: ${top.rules}, risc ${top.riskPct}%: trece ${top.passPct}%, pică ${top.failPct}% (simulat, execuție prudentă).`, { enabled: true });
   }
   if (args.apply) {
     writePromotionSection('prop', { generatedAt: new Date().toISOString(), level, validatedOOS: level !== 'NIMIC', oos: combined, overrides: { propDesk: proposed } });
@@ -218,4 +280,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch((err) => { console.error(err); process.exitCode = 1; });
-module.exports = { chooseRisk, pickBest, GRID, STRATEGIES, loadDaily, D1_DIR, prudentSim };
+module.exports = { chooseRisk, pickBest, rankFirms, GRID, STRATEGIES, loadDaily, D1_DIR, prudentSim };

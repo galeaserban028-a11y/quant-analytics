@@ -599,6 +599,12 @@
           "allowShort": false
         }
       }
+    ],
+    "benched": [
+      "FRA40|rsi2",
+      "AUS200|rsi2",
+      "UK100|down",
+      "FRA40|down"
     ]
   },
   "userDisabledDesks": [

@@ -4,27 +4,27 @@
     "rsi2": {
       "level": "LIVE",
       "oos": {
-        "trades": 2228,
-        "wins": 1436,
-        "losses": 792,
-        "winRatePct": 64.5,
+        "trades": 2097,
+        "wins": 1360,
+        "losses": 737,
+        "winRatePct": 64.9,
         "avgWinR": 0.431,
-        "avgLossR": 0.678,
-        "expectancyR": 0.037,
+        "avgLossR": 0.674,
+        "expectancyR": 0.043,
         "expectancyCI95": [
-          0.009,
-          0.062
+          0.016,
+          0.07
         ],
-        "tStat": 2.73,
-        "totalR": 81.78,
-        "profitFactor": 1.15,
-        "maxDrawdownR": 41.31,
-        "maxLosingStreak": 14,
+        "tStat": 3.12,
+        "totalR": 90.1,
+        "profitFactor": 1.18,
+        "maxDrawdownR": 26.47,
+        "maxLosingStreak": 8,
         "outcomes": {
-          "STOP": 425,
-          "TARGET": 1753,
-          "TIME": 14,
-          "END_OF_DATA": 36
+          "TARGET": 1655,
+          "STOP": 395,
+          "TIME": 13,
+          "END_OF_DATA": 34
         }
       },
       "params": {
@@ -48,6 +48,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": 0.198,
           "n": 74
         },
@@ -62,6 +63,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": -0.008,
           "n": 50
         },
@@ -76,6 +78,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.099,
           "n": 127
         },
@@ -90,6 +93,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.054,
           "n": 66
         },
@@ -104,8 +108,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.066,
-          "n": 132
+          "benched": [
+            "NAS100"
+          ],
+          "oos": -0.08,
+          "n": 119
         },
         {
           "test": "2008-01-03",
@@ -118,6 +125,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": 0.108,
           "n": 202
         },
@@ -132,6 +140,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": 0.203,
           "n": 58
         },
@@ -146,6 +155,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": -0.064,
           "n": 88
         },
@@ -160,6 +170,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": -0.054,
           "n": 117
         },
@@ -174,8 +185,12 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.084,
-          "n": 144
+          "benched": [
+            "JP225",
+            "AUS200"
+          ],
+          "oos": 0.119,
+          "n": 121
         },
         {
           "test": "2013-01-02",
@@ -188,8 +203,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "oos": 0.035,
-          "n": 30
+          "benched": [
+            "NAS100"
+          ],
+          "oos": 0.032,
+          "n": 29
         },
         {
           "test": "2014-01-02",
@@ -202,6 +220,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.079,
           "n": 76
         },
@@ -216,8 +235,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.05,
-          "n": 113
+          "benched": [
+            "AUS200"
+          ],
+          "oos": -0.054,
+          "n": 106
         },
         {
           "test": "2016-01-03",
@@ -230,8 +252,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.057,
-          "n": 64
+          "benched": [
+            "SPX500"
+          ],
+          "oos": -0.095,
+          "n": 59
         },
         {
           "test": "2017-01-02",
@@ -244,6 +269,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.19,
           "n": 49
         },
@@ -258,6 +284,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": -0.169,
           "n": 87
         },
@@ -272,8 +299,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.024,
-          "n": 150
+          "benched": [
+            "FRA40"
+          ],
+          "oos": -0.023,
+          "n": 131
         },
         {
           "test": "2020-01-03",
@@ -286,8 +316,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.026,
-          "n": 38
+          "benched": [
+            "US30"
+          ],
+          "oos": -0.005,
+          "n": 35
         },
         {
           "test": "2021-01-02",
@@ -300,8 +333,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.1,
-          "n": 197
+          "benched": [
+            "FRA40"
+          ],
+          "oos": 0.141,
+          "n": 175
         },
         {
           "test": "2022-01-02",
@@ -314,8 +350,12 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.143,
-          "n": 32
+          "benched": [
+            "FRA40",
+            "US2000"
+          ],
+          "oos": -0.156,
+          "n": 30
         },
         {
           "test": "2023-01-03",
@@ -328,6 +368,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": 0.165,
           "n": 49
         },
@@ -342,8 +383,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.07,
-          "n": 93
+          "benched": [
+            "UK100"
+          ],
+          "oos": 0.095,
+          "n": 85
         },
         {
           "test": "2025-01-02",
@@ -356,8 +400,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.095,
-          "n": 77
+          "benched": [
+            "UK100"
+          ],
+          "oos": 0.103,
+          "n": 71
         },
         {
           "test": "2026-01-02",
@@ -370,35 +417,39 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.013,
-          "n": 115
+          "benched": [
+            "UK100",
+            "FRA40"
+          ],
+          "oos": 0.029,
+          "n": 93
         }
       ]
     },
     "down": {
       "level": "LIVE",
       "oos": {
-        "trades": 1514,
-        "wins": 1004,
-        "losses": 510,
-        "winRatePct": 66.3,
-        "avgWinR": 0.405,
-        "avgLossR": 0.634,
+        "trades": 1375,
+        "wins": 906,
+        "losses": 469,
+        "winRatePct": 65.9,
+        "avgWinR": 0.409,
+        "avgLossR": 0.628,
         "expectancyR": 0.055,
         "expectancyCI95": [
-          0.025,
-          0.085
+          0.021,
+          0.087
         ],
-        "tStat": 3.53,
-        "totalR": 82.9,
+        "tStat": 3.38,
+        "totalR": 75.78,
         "profitFactor": 1.26,
-        "maxDrawdownR": 18.55,
-        "maxLosingStreak": 10,
+        "maxDrawdownR": 13.62,
+        "maxLosingStreak": 9,
         "outcomes": {
-          "TARGET": 1234,
-          "STOP": 247,
-          "TIME": 9,
-          "END_OF_DATA": 24
+          "TARGET": 1122,
+          "STOP": 222,
+          "TIME": 8,
+          "END_OF_DATA": 23
         }
       },
       "params": {
@@ -422,6 +473,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": 0.115,
           "n": 73
         },
@@ -436,6 +488,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": -0.205,
           "n": 29
         },
@@ -450,6 +503,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.079,
           "n": 70
         },
@@ -464,8 +518,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.017,
-          "n": 60
+          "benched": [
+            "US30"
+          ],
+          "oos": -0.002,
+          "n": 53
         },
         {
           "test": "2007-01-03",
@@ -478,8 +535,12 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.06,
-          "n": 48
+          "benched": [
+            "NAS100",
+            "US2000"
+          ],
+          "oos": 0.042,
+          "n": 38
         },
         {
           "test": "2008-01-03",
@@ -492,6 +553,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": 0.154,
           "n": 98
         },
@@ -506,6 +568,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": 0.229,
           "n": 41
         },
@@ -520,6 +583,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": -0.061,
           "n": 40
         },
@@ -534,8 +598,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.207,
-          "n": 51
+          "benched": [
+            "AUS200"
+          ],
+          "oos": 0.221,
+          "n": 47
         },
         {
           "test": "2012-01-03",
@@ -548,8 +615,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.116,
-          "n": 99
+          "benched": [
+            "AUS200"
+          ],
+          "oos": 0.124,
+          "n": 93
         },
         {
           "test": "2013-01-02",
@@ -562,8 +632,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.198,
-          "n": 93
+          "benched": [
+            "AUS200"
+          ],
+          "oos": 0.221,
+          "n": 78
         },
         {
           "test": "2014-01-02",
@@ -576,6 +649,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.074,
           "n": 68
         },
@@ -590,8 +664,12 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.031,
-          "n": 47
+          "benched": [
+            "US30",
+            "AUS200"
+          ],
+          "oos": -0.095,
+          "n": 41
         },
         {
           "test": "2016-01-03",
@@ -604,6 +682,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.093,
           "n": 21
         },
@@ -618,6 +697,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": 0.138,
           "n": 39
         },
@@ -632,6 +712,7 @@
             "maxDays": 10,
             "allowShort": true
           },
+          "benched": [],
           "oos": -0.128,
           "n": 84
         },
@@ -646,8 +727,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.105,
-          "n": 67
+          "benched": [
+            "GER40"
+          ],
+          "oos": 0.082,
+          "n": 61
         },
         {
           "test": "2020-01-03",
@@ -660,8 +744,13 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.07,
-          "n": 67
+          "benched": [
+            "UK100",
+            "AUS200",
+            "US2000"
+          ],
+          "oos": 0.083,
+          "n": 52
         },
         {
           "test": "2021-01-02",
@@ -674,8 +763,13 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": -0.03,
-          "n": 82
+          "benched": [
+            "NAS100",
+            "UK100",
+            "AUS200"
+          ],
+          "oos": -0.064,
+          "n": 58
         },
         {
           "test": "2022-01-02",
@@ -688,8 +782,12 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.095,
-          "n": 39
+          "benched": [
+            "UK100",
+            "FRA40"
+          ],
+          "oos": 0.17,
+          "n": 28
         },
         {
           "test": "2023-01-03",
@@ -702,8 +800,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "oos": -0.019,
-          "n": 103
+          "benched": [
+            "FRA40"
+          ],
+          "oos": -0.026,
+          "n": 90
         },
         {
           "test": "2024-01-03",
@@ -716,8 +817,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "oos": -0.091,
-          "n": 41
+          "benched": [
+            "EU50"
+          ],
+          "oos": -0.095,
+          "n": 36
         },
         {
           "test": "2025-01-02",
@@ -730,8 +834,12 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "oos": 0.052,
-          "n": 79
+          "benched": [
+            "UK100",
+            "FRA40"
+          ],
+          "oos": 0.095,
+          "n": 62
         },
         {
           "test": "2026-01-02",
@@ -744,6 +852,7 @@
             "maxDays": 10,
             "allowShort": false
           },
+          "benched": [],
           "oos": -0.04,
           "n": 75
         }
@@ -751,27 +860,27 @@
     }
   },
   "combined": {
-    "trades": 3742,
-    "wins": 2440,
-    "losses": 1302,
-    "winRatePct": 65.2,
-    "avgWinR": 0.42,
-    "avgLossR": 0.661,
-    "expectancyR": 0.044,
+    "trades": 3472,
+    "wins": 2266,
+    "losses": 1206,
+    "winRatePct": 65.3,
+    "avgWinR": 0.422,
+    "avgLossR": 0.656,
+    "expectancyR": 0.048,
     "expectancyCI95": [
-      0.025,
-      0.065
+      0.027,
+      0.068
     ],
-    "tStat": 4.33,
-    "totalR": 164.68,
-    "profitFactor": 1.19,
-    "maxDrawdownR": 41.31,
-    "maxLosingStreak": 14,
+    "tStat": 4.54,
+    "totalR": 165.87,
+    "profitFactor": 1.21,
+    "maxDrawdownR": 26.47,
+    "maxLosingStreak": 9,
     "outcomes": {
-      "STOP": 672,
-      "TARGET": 2987,
-      "TIME": 23,
-      "END_OF_DATA": 60
+      "TARGET": 2777,
+      "STOP": 617,
+      "TIME": 21,
+      "END_OF_DATA": 57
     }
   },
   "ranking": [
@@ -782,19 +891,19 @@
       "rules": "The5ers High Stakes 2-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 52.4,
-      "failPct": 3.8,
-      "timeoutPct": 43.8,
-      "medianDaysToPass": 306,
-      "passWithin90Pct": 2.1,
-      "passWithin180Pct": 12.2,
-      "passWithin365Pct": 31.3,
-      "fundedSurvivalPct": 98.5,
-      "avgPayoutFirstMonths": 766,
-      "expectedValuePerAttempt": 308,
+      "passPct": 54.7,
+      "failPct": 3.2,
+      "timeoutPct": 42.1,
+      "medianDaysToPass": 313,
+      "passWithin90Pct": 2,
+      "passWithin180Pct": 12.5,
+      "passWithin365Pct": 31.5,
+      "fundedSurvivalPct": 75.8,
+      "avgPayoutFirstMonths": 864,
+      "expectedValuePerAttempt": 377,
       "fee": 95,
       "passPctRange": [
-        49.5,
+        52.3,
         56.4
       ],
       "orderSeeds": 8
@@ -806,20 +915,20 @@
       "rules": "FundedNext Stellar 2-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 46.7,
-      "failPct": 3.8,
-      "timeoutPct": 49.5,
+      "passPct": 54.7,
+      "failPct": 3.2,
+      "timeoutPct": 42.1,
       "medianDaysToPass": 314,
-      "passWithin90Pct": 0.8,
-      "passWithin180Pct": 9.3,
-      "passWithin365Pct": 27.3,
-      "fundedSurvivalPct": 98.3,
-      "avgPayoutFirstMonths": 764,
-      "expectedValuePerAttempt": 258,
+      "passWithin90Pct": 1.6,
+      "passWithin180Pct": 12,
+      "passWithin365Pct": 31.4,
+      "fundedSurvivalPct": 75.8,
+      "avgPayoutFirstMonths": 876,
+      "expectedValuePerAttempt": 381,
       "fee": 99,
       "passPctRange": [
-        41.5,
-        49.3
+        52.3,
+        56.4
       ],
       "orderSeeds": 8
     },
@@ -830,20 +939,20 @@
       "rules": "FTMO 2-Step (Swing)",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 45.2,
-      "failPct": 4.3,
-      "timeoutPct": 50.5,
-      "medianDaysToPass": 355,
-      "passWithin90Pct": 0.5,
-      "passWithin180Pct": 6.5,
-      "passWithin365Pct": 24.1,
-      "fundedSurvivalPct": 100,
-      "avgPayoutFirstMonths": 739,
-      "expectedValuePerAttempt": 165,
+      "passPct": 51.8,
+      "failPct": 3.3,
+      "timeoutPct": 44.9,
+      "medianDaysToPass": 356,
+      "passWithin90Pct": 0.8,
+      "passWithin180Pct": 7.8,
+      "passWithin365Pct": 26.3,
+      "fundedSurvivalPct": 70.4,
+      "avgPayoutFirstMonths": 844,
+      "expectedValuePerAttempt": 266,
       "fee": 170,
       "passPctRange": [
-        40.5,
-        49.5
+        48.9,
+        54.2
       ],
       "orderSeeds": 8
     },
@@ -854,20 +963,20 @@
       "rules": "FTMO 1-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 54.1,
-      "failPct": 4.4,
-      "timeoutPct": 41.5,
-      "medianDaysToPass": 374,
-      "passWithin90Pct": 0.8,
-      "passWithin180Pct": 7.6,
-      "passWithin365Pct": 26.3,
-      "fundedSurvivalPct": 100,
-      "avgPayoutFirstMonths": 548,
-      "expectedValuePerAttempt": 146,
+      "passPct": 58.2,
+      "failPct": 4.3,
+      "timeoutPct": 37.6,
+      "medianDaysToPass": 406,
+      "passWithin90Pct": 0.7,
+      "passWithin180Pct": 7.2,
+      "passWithin365Pct": 25.4,
+      "fundedSurvivalPct": 77.4,
+      "avgPayoutFirstMonths": 683,
+      "expectedValuePerAttempt": 248,
       "fee": 150,
       "passPctRange": [
-        48.3,
-        58.9
+        55,
+        62.2
       ],
       "orderSeeds": 8
     }
@@ -917,51 +1026,57 @@
       "JP225",
       "AUS200",
       "US2000"
+    ],
+    "benched": [
+      "FRA40|rsi2",
+      "AUS200|rsi2",
+      "UK100|down",
+      "FRA40|down"
     ]
   },
   "portfolio": {
     "startEquity": 10000,
-    "endEquity": 13264.61,
-    "totalReturnPct": 32.65,
-    "cagrPct": 1.21,
-    "maxDrawdownPct": 33.85,
+    "endEquity": 13097.75,
+    "totalReturnPct": 30.98,
+    "cagrPct": 1.15,
+    "maxDrawdownPct": 33.6,
     "sharpeMonthly": 0.17,
     "months": 283,
-    "avgMonthlyPct": 0.14,
+    "avgMonthlyPct": 0.13,
     "medianMonthlyPct": 0,
-    "positiveMonthsPct": 49.1,
-    "worstMonthPct": -9.06,
-    "bestMonthPct": 7.75,
+    "positiveMonthsPct": 47.7,
+    "worstMonthPct": -9.36,
+    "bestMonthPct": 6.83,
     "yearly": {
-      "2003": 5.7,
-      "2004": -4.3,
-      "2005": 7.2,
-      "2006": 4.4,
-      "2007": -1.1,
-      "2008": 20.1,
-      "2009": 10.4,
+      "2003": 5.5,
+      "2004": -4.6,
+      "2005": 8,
+      "2006": 5.7,
+      "2007": -2.6,
+      "2008": 20.8,
+      "2009": 10.1,
       "2010": -11.7,
-      "2011": -3.4,
-      "2012": 4.2,
-      "2013": 17.9,
+      "2011": -3.8,
+      "2012": 2.1,
+      "2013": 17.1,
       "2014": 5.1,
-      "2015": -13,
-      "2016": -4.7,
-      "2017": 11,
-      "2018": -11.3,
-      "2019": -1.6,
-      "2020": 6.4,
-      "2021": 10.6,
-      "2022": -2.3,
-      "2023": -6.6,
-      "2024": -2.1,
-      "2025": 6.9,
-      "2026": -10.2
+      "2015": -14.6,
+      "2016": -2.4,
+      "2017": 11.1,
+      "2018": -11,
+      "2019": -2.7,
+      "2020": 3.1,
+      "2021": 9.2,
+      "2022": -0.9,
+      "2023": -7.8,
+      "2024": -0.1,
+      "2025": 8.8,
+      "2026": -8.1
     },
     "riskPct": 1,
     "maxOpen": 5,
     "maxOpenRiskPct": 5,
-    "tradesTaken": 2394,
-    "tradesSkipped": 1348
+    "tradesTaken": 2290,
+    "tradesSkipped": 1182
   }
 }

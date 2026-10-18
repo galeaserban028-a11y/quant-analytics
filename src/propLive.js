@@ -22,6 +22,7 @@ const { decide } = require('./prop/guardian');
 const { lotsFor } = require('./prop/lots');
 const { PROP_RULES } = require('./prop/rules');
 const { escapeHtml, roTime } = require('./notify/telegram');
+const { nameFor } = require('./research/team');
 
 const DAY_MS = 864e5;
 const FRESH_MS = 36 * 3600e3; // o lumânare închisă acum mai mult de 36h (ex. sistem oprit) nu mai produce intrări
@@ -134,6 +135,7 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
   if (env.PROP_ACCOUNT_SIZE && Number(env.PROP_ACCOUNT_SIZE) > 0) desk.accountSize = Number(env.PROP_ACCOUNT_SIZE);
   const rules = PROP_RULES[desk.firm] || PROP_RULES.THE5ERS_HIGH_STAKES;
   const strategies = deskStrategies(desk);
+  const benched = new Set(desk.benched || []);
   const fetcher = fetch || ((sym, inst) => fetchDaily(inst, { now }));
 
   const prevAcct = bus.state.prop;
@@ -199,6 +201,7 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
 
     for (const st of strategies) {
       const key = `${sym}|${st.kind}`;
+      const who = `${nameFor(st.kind, sym)} (${st.name || st.kind})`;
       const params = Object.assign({ kind: st.kind }, st.params);
       const { position, lastClosed } = lab.liveState(sym, candles, inst, params, { barMs: DAY_MS });
       const prev = acct.positions[key];
@@ -214,7 +217,7 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
         if (acct.history.length > 300) acct.history.shift();
         const why = !closed ? 'poziția s-a închis' : (closed.outcome === 'STOP' ? 'stop-ul a fost atins (s-a închis singur la broker)' : (closed.outcome === 'TIME' ? `a expirat timpul maxim de ${params.maxDays || 10} zile — ÎNCHIDE ACUM` : 'prețul a revenit — ÎNCHIDE ACUM'));
         await notify([
-          `⏹️ <b>PROP: ${escapeHtml(sym)}</b> ${prev.direction === 'LONG' ? '(cumpărare)' : '(vânzare)'} · ${escapeHtml(st.name || st.kind)}: ${why}.`,
+          `⏹️ <b>PROP: ${escapeHtml(sym)}</b> ${prev.direction === 'LONG' ? '(cumpărare)' : '(vânzare)'} · ${escapeHtml(who)}: ${why}.`,
           `Rezultat estimat: <b>${r >= 0 ? '+' : ''}${r.toFixed(2)}R ≈ ${money(pnl)}</b>.`,
           progressLine(acct, rules)
         ].join('\n'));
@@ -225,6 +228,13 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
 
       if (!position || acct.positions[key] || skippedHere) continue;
 
+      // Traderii de pe bancă nu deschid poziții noi (pozițiile deja deschise le închid normal)
+      if (benched.has(key)) {
+        acct.skipped[key] = position.openedAt;
+        report.events.push({ sym, strategy: st.kind, event: 'SKIP', reason: 'BANCĂ' });
+        continue;
+      }
+
       // 2. Semnal nou: doar dacă s-a deschis pe ULTIMA lumânare, proaspăt închisă (nu intrăm în tranzacții deja începute)
       const onLastBar = position.openedAt >= lastBar.timestamp + DAY_MS - SAME_POS_MS / 2;
       if (firstRun || stale || !onLastBar) {
@@ -233,7 +243,7 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
       }
       const openRisk = Object.values(acct.positions).reduce((s, p) => s + p.riskUsd, 0);
       const d = decide(
-        { initial: acct.initial, balance: acct.balance, dayStartBalance: acct.dayStart, openRisk, highestEod: acct.highestEod, phaseTarget: phaseTarget(acct, rules) },
+        { initial: acct.initial, balance: acct.balance, dayStartBalance: acct.dayStart, openRisk, highestEod: acct.highestEod, phaseTarget: phaseTarget(acct, rules), tradingDays: acct.tradingDays.length },
         rules,
         { riskPct: desk.riskPct, safety: desk.safety, maxOpen: desk.maxOpen, openCount: Object.keys(acct.positions).length }
       );
@@ -258,7 +268,7 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
       const pts = stopDist / inst.pipSize;
       await notify([
         `📈 <b>SEMNAL PROP: ${escapeHtml(sym)}</b> ${long ? '🟢 CUMPĂRĂ (Buy)' : '🔴 VINDE (Sell)'} la prețul pieței, ACUM`,
-        `🧠 Strategia: ${escapeHtml(st.name || st.kind)}`,
+        `🧠 Trader: ${escapeHtml(who)}`,
         `📦 Lot: <b>${lot.lots.toFixed(2)}</b> (risc ${money(lot.actualRiskUsd)} = ${(lot.actualRiskUsd / acct.initial * 100).toFixed(2)}% din cont)`,
         `🛑 Stop loss: la <b>${pts.toFixed(inst.pipSize >= 1 ? 0 : 1)} ${inst.category === 'FX' ? 'pips' : 'puncte'}</b> ${long ? 'SUB' : 'PESTE'} prețul tău de intrare`,
         `📍 Preț de referință (închiderea de azi): ${fmtPx(position.entry, inst)} → stop ≈ ${fmtPx(position.stop, inst)}`,

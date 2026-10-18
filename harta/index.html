@@ -1,0 +1,452 @@
+<!-- Generat din harta/sala.html (aceeași pagină, publicată și în claude.ai). Deschide fișierul în browser sau activează GitHub Pages. -->
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>Sala APEX</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: o sală de tranzacționare pe trei fusuri orare (Asia-Pacific → Europa → SUA), în ordinea în care se închid bursele într-o zi; deasupra contul, dedesubt personalul și scenariile. */
+:root {
+  --bg: #f3f5f8; --panel: #ffffff; --ink: #142030; --muted: #5b6878; --line: #dde3ea;
+  --accent: #2f5bd3; --accent-soft: #e6ecfb;
+  --pull: #2f5bd3; --down: #9a4fd0;
+  --ok: #1f8a5b; --ok-soft: #e3f4ec; --warn: #b7791f; --warn-soft: #fbf0dc; --bad: #c2413a; --bad-soft: #fbe6e4;
+  --p1: #c9d3e3; --p2: #8aa3d6; --funded: #1f8a5b; --failed: #c2413a;
+  --display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d131a; --panel: #151e28; --ink: #e5ecf3; --muted: #93a1b1; --line: #263342;
+  --accent: #86a6ff; --accent-soft: #1c2a47; --pull: #86a6ff; --down: #c79af0;
+  --ok: #4cc58f; --ok-soft: #12302a; --warn: #e3ad52; --warn-soft: #33270f; --bad: #f07a72; --bad-soft: #3a1b1a;
+  --p1: #34435a; --p2: #5874b3; --funded: #4cc58f; --failed: #f07a72; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0d131a; --panel: #151e28; --ink: #e5ecf3; --muted: #93a1b1; --line: #263342;
+  --accent: #86a6ff; --accent-soft: #1c2a47; --pull: #86a6ff; --down: #c79af0;
+  --ok: #4cc58f; --ok-soft: #12302a; --warn: #e3ad52; --warn-soft: #33270f; --bad: #f07a72; --bad-soft: #3a1b1a;
+  --p1: #34435a; --p2: #5874b3; --funded: #4cc58f; --failed: #f07a72; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45 }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px }
+h1, h2, h3 { margin: 0; text-wrap: balance }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(30px, 5vw, 44px); letter-spacing: -0.01em }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 600 }
+.num { font-variant-numeric: tabular-nums; font-family: var(--mono) }
+.muted { color: var(--muted) }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px }
+.live { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel) }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted) }
+.live[data-mode="live"] .dot { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft) }
+.live[data-mode="snap"] .dot { background: var(--warn) }
+.notice { padding: 12px 14px; border-radius: 10px; background: var(--warn-soft); color: var(--ink); border: 1px solid var(--line) }
+
+/* contul */
+.account { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0 }
+.stat .big { font-family: var(--display); font-size: 30px; line-height: 1.1 }
+.stat .lbl { font-size: 12px; color: var(--muted) }
+.bar { height: 8px; border-radius: 6px; background: var(--line); overflow: hidden }
+.bar > i { display: block; height: 100%; background: var(--accent); width: 0 }
+
+/* harta */
+.floor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px }
+@media (max-width: 960px) { .floor { grid-template-columns: 1fr } }
+.region { display: grid; gap: 10px; align-content: start; min-width: 0 }
+.region-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; padding-bottom: 6px; border-bottom: 1px solid var(--line) }
+.region-head h3 { font-family: var(--display); font-weight: 400; font-size: 24px }
+.desk { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px }
+.desk-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap }
+.desk-head b { font-size: 15px }
+.mkt { font-size: 11.5px; padding: 3px 8px; border-radius: 999px; background: var(--line); color: var(--ink); white-space: nowrap }
+.mkt[data-open="1"] { background: var(--ok-soft); color: var(--ok) }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+@media (max-width: 420px) { .pair { grid-template-columns: 1fr } }
+.trader { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: grid; gap: 6px; min-width: 0 }
+.trader[data-status="BANCĂ"] { opacity: .72; border-style: dashed }
+.trader[data-status="POZIȚIE"] { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok) }
+.who { display: flex; gap: 8px; align-items: center; min-width: 0 }
+.avatar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; color: #fff; background: var(--pull) }
+.trader[data-strategy="down"] .avatar { background: var(--down) }
+.who .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.who .st { font-size: 11.5px; color: var(--muted) }
+.pill { justify-self: start; font-size: 11px; font-weight: 600; letter-spacing: .03em; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent) }
+.trader[data-status="BANCĂ"] .pill { background: var(--warn-soft); color: var(--warn) }
+.trader[data-status="POZIȚIE"] .pill { background: var(--ok-soft); color: var(--ok) }
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; font-size: 12px }
+.kv dt { color: var(--muted); min-width: 0 } .kv dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap }
+.pos { color: var(--ok) } .neg { color: var(--bad) }
+.why { font-size: 11.5px; color: var(--muted) }
+
+/* personalul */
+.staff { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px }
+.staff .stat p { margin: 0; font-size: 12.5px; color: var(--muted) }
+.staff .now { font-size: 13px }
+
+/* scenarii */
+.scen { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px }
+@media (max-width: 960px) { .scen { grid-template-columns: 1fr } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0 }
+.card p { margin: 0 }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted) }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px }
+svg text { fill: var(--muted); font-family: var(--body); font-size: 11px }
+.tbl { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 13px }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap }
+th { color: var(--muted); font-weight: 600; font-size: 12px }
+td.r, th.r { text-align: right }
+tr.best td { background: var(--accent-soft) }
+footer { font-size: 12px; color: var(--muted); max-width: 75ch }
+@media (prefers-reduced-motion: no-preference) { .bar > i { transition: width .6s ease } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Sala APEX</h1>
+      <div class="muted" id="sub">Echipa de traderi pe indici, în timp real</div>
+    </div>
+    <span class="live" id="live" data-mode="loading"><span class="dot"></span><span id="liveText">Se încarcă…</span></span>
+  </header>
+
+  <div class="notice" id="notice" hidden></div>
+
+  <section aria-labelledby="h-acct" style="display:grid;gap:12px">
+    <h2 id="h-acct">Contul de examen</h2>
+    <div class="account" id="account"></div>
+  </section>
+
+  <section aria-labelledby="h-floor" style="display:grid;gap:12px">
+    <h2 id="h-floor">Harta echipei · 20 de traderi, 10 burse</h2>
+    <div class="floor" id="floor"></div>
+  </section>
+
+  <section aria-labelledby="h-staff" style="display:grid;gap:12px">
+    <h2 id="h-staff">Personalul</h2>
+    <div class="staff" id="staff"></div>
+  </section>
+
+  <section aria-labelledby="h-scen" style="display:grid;gap:12px">
+    <h2 id="h-scen">Scenariul · cont de 10.000 $</h2>
+    <div class="scen">
+      <div class="card" id="month"></div>
+      <div class="card" id="journey"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-exam" style="display:grid;gap:12px">
+    <h2 id="h-exam">Firmele, simulate pe istoria reală</h2>
+    <div class="card tbl" id="exam"></div>
+  </section>
+
+  <footer id="foot">Cifrele vin din testele pe date nevăzute (2003–2026), cu execuție prudentă (intrare a doua zi). Sunt medii istorice, nu promisiuni. Maximul pe care îl poți pierde este taxa examenului.</footer>
+</div>
+
+<script>
+(function () {
+  const REPO = 'https://raw.githubusercontent.com/galeaserban028-a11y/quant-analytics/main/';
+  const SOURCES = {
+    team: [REPO + 'data/research/team.json', 'team.json', '../data/research/team.json'],
+    state: [REPO + 'state/live_state.json', 'live_state.json', '../state/live_state.json']
+  };
+  // Programul burselor (constante de referință): fus, deschidere, închidere oficială
+  const EXCH = {
+    JP225: { tz: 'Asia/Tokyo', open: '09:00', close: '15:30', city: 'Tokyo' },
+    AUS200: { tz: 'Australia/Sydney', open: '10:00', close: '16:12', city: 'Sydney' },
+    GER40: { tz: 'Europe/Berlin', open: '09:00', close: '17:30', city: 'Frankfurt' },
+    EU50: { tz: 'Europe/Berlin', open: '09:00', close: '17:30', city: 'Frankfurt' },
+    FRA40: { tz: 'Europe/Paris', open: '09:00', close: '17:30', city: 'Paris' },
+    UK100: { tz: 'Europe/London', open: '08:00', close: '16:30', city: 'Londra' },
+    US30: { tz: 'America/New_York', open: '09:30', close: '16:00', city: 'New York' },
+    NAS100: { tz: 'America/New_York', open: '09:30', close: '16:00', city: 'New York' },
+    SPX500: { tz: 'America/New_York', open: '09:30', close: '16:00', city: 'New York' },
+    US2000: { tz: 'America/New_York', open: '09:30', close: '16:00', city: 'New York' }
+  };
+  const REGIONS = [
+    { name: 'Asia-Pacific', tz: 'Asia/Tokyo', syms: ['JP225', 'AUS200'] },
+    { name: 'Europa', tz: 'Europe/Berlin', syms: ['GER40', 'EU50', 'FRA40', 'UK100'] },
+    { name: 'SUA', tz: 'America/New_York', syms: ['US30', 'NAS100', 'SPX500', 'US2000'] }
+  ];
+  const STRAT_ORDER = ['rsi2', 'down'];
+
+  let team = null, state = null, mode = 'loading', loadedAt = null;
+
+  async function fetchFirst(urls) {
+    for (const u of urls) {
+      try {
+        const r = await fetch(u + (u.startsWith('http') ? '?t=' + Date.now() : ''), { cache: 'no-store' });
+        if (r.ok) return { data: await r.json(), live: u.startsWith('http') };
+      } catch (_) { /* încercăm următoarea sursă */ }
+    }
+    return null;
+  }
+
+  // ── timp și fusuri ──
+  function tzParts(t, tz) {
+    const o = {};
+    for (const x of new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short' }).formatToParts(new Date(t))) o[x.type] = x.value;
+    return o;
+  }
+  function tzOffset(t, tz) { const p = tzParts(t, tz); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(t / 1000) * 1000; }
+  function zoned(y, m, d, hh, mm, tz) { const n = Date.UTC(y, m - 1, d, hh, mm); let t = n; for (let k = 0; k < 3; k++) t = n - tzOffset(t, tz); return t; }
+  function todayAt(hhmm, tz, now) { const p = tzParts(now, tz); const [h, m] = hhmm.split(':').map(Number); return zoned(+p.year, +p.month, +p.day, h, m, tz); }
+  const roTime = (t) => new Intl.DateTimeFormat('ro-RO', { timeZone: 'Europe/Bucharest', hour: '2-digit', minute: '2-digit' }).format(new Date(t));
+  const roDateTime = (t) => new Intl.DateTimeFormat('ro-RO', { timeZone: 'Europe/Bucharest', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(t));
+  const localClock = (tz, now) => new Intl.DateTimeFormat('ro-RO', { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(new Date(now));
+  function dur(ms) { const m = Math.max(0, Math.round(ms / 60000)); const h = Math.floor(m / 60); return h ? `${h} h ${m % 60} min` : `${m} min`; }
+  function marketStatus(sym, now) {
+    const e = EXCH[sym];
+    const wd = tzParts(now, e.tz).weekday;
+    const open = todayAt(e.open, e.tz, now), close = todayAt(e.close, e.tz, now);
+    const weekend = wd === 'Sat' || wd === 'Sun';
+    if (!weekend && now >= open && now < close) return { open: true, text: `deschisă · se închide în ${dur(close - now)}`, signalAt: close + 12 * 60000 };
+    if (!weekend && now >= close && now < close + 15 * 60000) return { open: false, text: 'tocmai s-a închis · semnale acum' };
+    return { open: false, text: weekend ? 'închisă (weekend)' : `închisă · semnale la ~${roTime(close + 12 * 60000)}` };
+  }
+
+  // ── formatare ──
+  const el = (tag, attrs = {}, kids = []) => { const n = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === 'text') n.textContent = v; else if (k === 'class') n.className = v; else n.setAttribute(k, v); } for (const c of [].concat(kids)) if (c) n.append(c); return n; };
+  const money = (v) => (v < 0 ? '−' : '') + Math.abs(Math.round(v)).toLocaleString('ro-RO') + ' $';
+  const signed = (v, d = 3) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+  const cls = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
+
+  function kv(pairs) {
+    const dl = el('dl', { class: 'kv' });
+    for (const [k, v, c] of pairs) { dl.append(el('dt', { text: k })); dl.append(el('dd', { text: v, class: c || '' })); }
+    return dl;
+  }
+
+  // ── contul ──
+  function renderAccount() {
+    const box = document.getElementById('account');
+    box.replaceChildren();
+    const acct = state && state.prop;
+    const cfg = team && team.config;
+    const firm = team && team.exam && team.exam.find((x) => x.key === (cfg && cfg.firm));
+    if (!acct || !acct.initialized) {
+      box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Stare' }), el('span', { class: 'big', text: 'În așteptare' }), el('span', { class: 'lbl', text: 'Contul pornește după ce adaugi cheile de Telegram în GitHub. Până atunci echipa e pregătită, dar nu trimite semnale.' })]));
+      if (firm) box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Firma recomandată' }), el('span', { class: 'big', text: firm.name.replace(' 2-Step', '') }), el('span', { class: 'lbl', text: `Risc ${firm.riskPct}% pe tranzacție, max ${firm.maxOpen} poziții · taxă ~${firm.fee} $` })]));
+      return;
+    }
+    const phases = acct.firm === 'FTMO_1STEP' ? [0.10] : (acct.firm === 'FTMO_2STEP' ? [0.10, 0.05] : [0.08, 0.05]);
+    const target = acct.phase < phases.length ? phases[acct.phase] : null;
+    const pnl = acct.balance - acct.initial;
+    const prog = target ? Math.max(0, Math.min(1, pnl / (acct.initial * target))) : 1;
+    const positions = Object.values(acct.positions || {});
+    const openRisk = positions.reduce((s, p) => s + (p.riskUsd || 0), 0);
+    const lostToday = Math.max(0, acct.dayStart - acct.balance);
+    const dailyLeft = acct.initial * 0.05 - lostToday - openRisk;
+    const barI = el('i'); const bar = el('div', { class: 'bar' }, [barI]);
+    box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: target ? `Faza ${acct.phase + 1} din ${phases.length}` : 'Cont finanțat' }), el('span', { class: 'big num', text: money(acct.balance) }), bar, el('span', { class: 'lbl', text: target ? `Țintă ${money(acct.initial * (1 + target))} · progres ${Math.round(prog * 100)}%` : `Profit ${money(pnl)} · se retrage lunar` })]));
+    requestAnimationFrame(() => { barI.style.width = (prog * 100).toFixed(1) + '%'; });
+    box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Poziții deschise' }), el('span', { class: 'big num', text: String(positions.length) }), el('span', { class: 'lbl', text: positions.length ? positions.map((p) => `${p.symbol} (${traderName(p.symbol, p.strategy)})`).join(', ') : 'Niciuna acum' })]));
+    box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Mai poți pierde azi' }), el('span', { class: 'big num', text: money(Math.max(0, dailyLeft)) }), el('span', { class: 'lbl', text: `Risc deschis ${money(openRisk)} · Gardianul folosește doar 70% din limită` })]));
+    const hist = acct.history || [];
+    const totR = hist.reduce((s, h) => s + (h.r || 0), 0);
+    box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Tranzacții închise' }), el('span', { class: 'big num', text: String(hist.length) }), el('span', { class: 'lbl', text: hist.length ? `Total ${signed(totR, 2)}R · ${hist.filter((h) => h.r > 0).length} pe plus` : 'Încă niciuna' })]));
+  }
+
+  function traderName(sym, kind) {
+    const a = team && team.agents.find((x) => x.symbol === sym && x.strategy === kind);
+    return a ? a.name : sym;
+  }
+
+  // ── harta ──
+  function renderFloor(now) {
+    const floor = document.getElementById('floor');
+    floor.replaceChildren();
+    if (!team) return;
+    const acct = state && state.prop;
+    const open = new Set(Object.keys((acct && acct.positions) || {}));
+    const hist = (acct && acct.history) || [];
+    for (const reg of REGIONS) {
+      const col = el('div', { class: 'region' });
+      col.append(el('div', { class: 'region-head' }, [el('h3', { text: reg.name }), el('span', { class: 'muted num', text: localClock(reg.tz, now) + ' ora locală' })]));
+      for (const sym of reg.syms) {
+        const ms = marketStatus(sym, now);
+        const desk = el('div', { class: 'desk' });
+        desk.append(el('div', { class: 'desk-head' }, [el('b', { text: `${sym} · ${EXCH[sym].city}` }), el('span', { class: 'mkt', 'data-open': ms.open ? '1' : '0', text: ms.text })]));
+        const pair = el('div', { class: 'pair' });
+        for (const kind of STRAT_ORDER) {
+          const a = team.agents.find((x) => x.symbol === sym && x.strategy === kind);
+          if (!a) continue;
+          const id = `${sym}|${kind}`;
+          const status = open.has(id) ? 'POZIȚIE' : a.status;
+          const mine = hist.filter((h) => h.sym === sym && h.strategy === kind);
+          const liveR = mine.reduce((s, h) => s + (h.r || 0), 0);
+          const card = el('article', { class: 'trader', 'data-status': status, 'data-strategy': kind });
+          card.append(el('div', { class: 'who' }, [el('span', { class: 'avatar', text: a.name.slice(0, 2) }), el('div', { style: 'min-width:0' }, [el('div', { class: 'nm', text: a.name }), el('div', { class: 'st', text: a.strategyName })])]));
+          card.append(el('span', { class: 'pill', text: status === 'POZIȚIE' ? 'În poziție' : status === 'BANCĂ' ? 'Pe bancă' : 'Lucrează' }));
+          card.append(kv([
+            ['Teste', `${a.record.trades} tranz.`],
+            ['Câștigătoare', `${a.record.winRatePct}%`],
+            ['R / tranz.', signed(a.record.expectancyR), cls(a.record.expectancyR)],
+            ['Ani pe plus', `${a.record.yearsPositive}/${a.record.years}`],
+            ['Live', mine.length ? `${mine.length} · ${signed(liveR, 2)}R` : '—', cls(liveR)]
+          ]));
+          card.append(el('div', { class: 'why', text: a.why }));
+          pair.append(card);
+        }
+        desk.append(pair);
+        col.append(desk);
+      }
+      floor.append(col);
+    }
+  }
+
+  // ── personalul ──
+  function renderStaff(now) {
+    const box = document.getElementById('staff');
+    box.replaceChildren();
+    if (!team) return;
+    const acct = state && state.prop;
+    const fetches = acct && acct.lastFetch ? Object.values(acct.lastFetch) : [];
+    const lastData = fetches.length ? Math.max(...fetches) : null;
+    const benched = team.agents.filter((a) => a.status === 'BANCĂ');
+    const now2 = {
+      guardian: acct && acct.initialized ? `Poziții: ${Object.keys(acct.positions || {}).length} din max ${team.config.maxOpen}. Risc pe tranzacție ${team.config.riskPct}%, plafonat la 70% din limita zilnică.` : `Pregătit: risc ${team.config.riskPct}%, max ${team.config.maxOpen} poziții.`,
+      research: `Ultima școală: ${roDateTime(Date.parse(team.generatedAt))}. Următoarea: ${roDateTime(Date.parse(team.nextSchool))}. Pe bancă acum: ${benched.map((a) => `${a.name} (${a.symbol})`).join(', ') || 'nimeni'}.`,
+      courier: acct && acct.initialized ? 'Conectat la Telegram. Verificarea zilnică vine la ora 9.' : 'Așteaptă cheile de Telegram din GitHub.',
+      accountant: acct && acct.initialized ? `Sold estimat ${money(acct.balance)}; ${(acct.tradingDays || []).length} zile de tranzacționare în faza curentă.` : 'Contul începe la prima rulare cu Telegram conectat.',
+      data: lastData ? `Ultima descărcare: ${roDateTime(lastData)}. Verifică din 5 în 5 minute; descarcă după fiecare închidere.` : 'Verifică din 5 în 5 minute; descarcă după fiecare închidere de bursă.'
+    };
+    for (const s of team.staff) {
+      box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: s.role }), el('span', { class: 'big', text: s.name }), el('p', { text: s.job }), el('span', { class: 'now', text: now2[s.id] || '' })]));
+    }
+  }
+
+  // ── scenarii ──
+  function svgEl(tag, attrs) { const n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; }
+
+  function renderMonth() {
+    const box = document.getElementById('month');
+    box.replaceChildren();
+    const sc = team && team.scenario;
+    if (!sc) return;
+    const m = sc.challengeMonth;
+    box.append(el('h3', { text: 'O lună în examen' }));
+    box.append(el('p', { class: 'muted', text: `Din ${m.months} luni simulate. O lună are de obicei ~${m.tradesMedian} tranzacții (între ${m.tradesP10} și ${m.tradesP90}), pentru că Gardianul ține cel mult o poziție mare deodată.` }));
+    const W = 520, H = 120, pad = 18;
+    const lo = Math.min(m.p10, -500), hi = Math.max(m.p90, 500);
+    const x = (v) => pad + (v - lo) / (hi - lo) * (W - 2 * pad);
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', role: 'img', 'aria-label': 'Distribuția profitului lunar' });
+    svg.append(svgEl('line', { x1: x(0), x2: x(0), y1: 14, y2: 78, stroke: 'var(--line)', 'stroke-width': 2 }));
+    svg.append(svgEl('rect', { x: x(m.p10), y: 40, width: x(m.p90) - x(m.p10), height: 14, rx: 7, fill: 'var(--accent-soft)' }));
+    svg.append(svgEl('rect', { x: x(m.p25), y: 34, width: x(m.p75) - x(m.p25), height: 26, rx: 6, fill: 'var(--p2)' }));
+    svg.append(svgEl('line', { x1: x(m.median), x2: x(m.median), y1: 28, y2: 66, stroke: 'var(--ink)', 'stroke-width': 3 }));
+    const lab = (v, t, y, anchor) => { const tx = svgEl('text', { x: x(v), y, 'text-anchor': anchor || 'middle' }); tx.textContent = t; svg.append(tx); };
+    lab(m.p10, money(m.p10), 96); lab(m.p25, money(m.p25), 112); lab(m.median, 'mediană ' + money(m.median), 22); lab(m.p75, money(m.p75), 112); lab(m.p90, money(m.p90), 96);
+    box.append(el('div', {}, [svg]));
+    box.append(kv([
+      ['Luni pe plus', `${m.positivePct}%`],
+      ['Luna medie', money(m.average), cls(m.average)],
+      ['1 lună din 4 peste', money(m.p75), 'pos'],
+      ['1 lună din 10 peste', money(m.p90), 'pos'],
+      ['1 lună din 4 sub', money(m.p25), 'neg'],
+      ['1 lună din 10 sub', money(m.p10), 'neg']
+    ]));
+    box.append(el('p', { class: 'muted', text: 'Pe contul finanțat lunile arată la fel, iar din cele pe plus îți rămân 80%. Pierderile nu se iartă: o lună proastă trebuie recuperată înainte de următoarea plată.' }));
+  }
+
+  function renderJourney() {
+    const box = document.getElementById('journey');
+    box.replaceChildren();
+    const sc = team && team.scenario;
+    if (!sc || !sc.journey) return;
+    const rows = sc.journey.byMonth;
+    box.append(el('h3', { text: 'Primul an, lună de lună' }));
+    box.append(el('p', { class: 'muted', text: `Unde ajungi, din ${sc.journey.runs} porniri diferite în istorie (${sc.firm}, taxă ~${sc.fee} $).` }));
+    const W = 620, H = 230, L = 34, B = 26, T = 8;
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', role: 'img', 'aria-label': 'Faza în care te afli după fiecare lună' });
+    const bw = (W - L - 8) / rows.length;
+    const y = (p) => T + (H - T - B) * (1 - p / 100);
+    for (const g of [0, 25, 50, 75, 100]) { svg.append(svgEl('line', { x1: L, x2: W - 4, y1: y(g), y2: y(g), stroke: 'var(--line)' })); const t = svgEl('text', { x: L - 6, y: y(g) + 4, 'text-anchor': 'end' }); t.textContent = g + '%'; svg.append(t); }
+    rows.forEach((r, i) => {
+      let acc = 0;
+      const parts = [['failedPct', 'var(--failed)'], ['fundedPct', 'var(--funded)'], ['phase2Pct', 'var(--p2)'], ['phase1Pct', 'var(--p1)']];
+      for (const [k, c] of parts) {
+        const v = (r[k] || 0) + (k === 'failedPct' ? (r.lostFundedPct || 0) : 0);
+        if (v <= 0) continue;
+        svg.append(svgEl('rect', { x: L + i * bw + 3, y: y(acc + v), width: bw - 6, height: y(acc) - y(acc + v), fill: c }));
+        acc += v;
+      }
+      const t = svgEl('text', { x: L + i * bw + bw / 2, y: H - 8, 'text-anchor': 'middle' }); t.textContent = String(r.month); svg.append(t);
+    });
+    box.append(el('div', {}, [svg]));
+    box.append(el('div', { class: 'legend' }, [
+      el('span', {}, [el('i', { style: 'background:var(--p1)' }), 'încă în faza 1']),
+      el('span', {}, [el('i', { style: 'background:var(--p2)' }), 'în faza 2']),
+      el('span', {}, [el('i', { style: 'background:var(--funded)' }), 'cont finanțat']),
+      el('span', {}, [el('i', { style: 'background:var(--failed)' }), 'picat'])
+    ]));
+    const m6 = rows[5], m12 = rows[rows.length - 1];
+    box.append(kv([
+      ['După 6 luni: finanțat', `${m6.fundedPct}%`],
+      ['După 12 luni: finanțat', `${m12.fundedPct}%`],
+      ['După 12 luni: picat', `${(m12.failedPct + (m12.lostFundedPct || 0)).toFixed(1)}%`],
+      ['Încasat în primul an (medie)', money(m12.cumPayoutAvg)],
+      ['Cei mai norocoși 10% încasează', `peste ${money(m12.cumPayoutP90)}`]
+    ]));
+    box.append(el('p', { class: 'muted', text: 'Primul an e de obicei despre trecerea examenului, nu despre bani. Câștigul vine mai ales din contul finanțat, în anii următori.' }));
+  }
+
+  function renderExam() {
+    const box = document.getElementById('exam');
+    box.replaceChildren();
+    if (!team || !team.exam) return;
+    const t = el('table');
+    const hd = el('tr');
+    for (const [h, r] of [['Firmă', 0], ['Risc', 1], ['Trece', 1], ['Pică', 1], ['Timp median', 1], ['Trece în ≤6 luni', 1], ['Taxă', 1], ['Valoare așteptată', 1]]) hd.append(el('th', { text: h, class: r ? 'r' : '' }));
+    t.append(el('thead', {}, [hd]));
+    const tb = el('tbody');
+    team.exam.forEach((e, i) => {
+      const tr = el('tr', { class: i === 0 ? 'best' : '' });
+      const cells = [[e.name, 0], [`${e.riskPct}%`, 1], [`${e.passPct}%`, 1], [`${e.failPct}%`, 1], [`${Math.round(e.medianDaysToPass / 30)} luni`, 1], [`${e.passWithin180Pct}%`, 1], [`${e.fee} $`, 1], [money(e.ev), 1]];
+      for (const [v, r] of cells) tr.append(el('td', { text: v, class: (r ? 'r num' : '') }));
+      tb.append(tr);
+    });
+    t.append(tb);
+    box.append(t);
+  }
+
+  function renderHeader() {
+    const live = document.getElementById('live');
+    live.dataset.mode = mode;
+    const saved = state && state.savedAt ? Date.parse(state.savedAt) : null;
+    document.getElementById('liveText').textContent = mode === 'live'
+      ? `Live · stare salvată ${saved ? roDateTime(saved) : '—'} · reîmprospătare la fiecare minut`
+      : mode === 'snap' ? `Instantaneu din ${roDateTime(Date.parse(team.generatedAt))}` : 'Datele nu s-au încărcat';
+    const n = document.getElementById('notice');
+    if (!team) { n.hidden = false; n.textContent = 'Nu am putut încărca datele echipei. Verifică conexiunea și reîncarcă pagina.'; }
+    else if (!(state && state.prop && state.prop.initialized)) { n.hidden = false; n.textContent = 'Sistemul rulează pe GitHub din 5 în 5 minute, dar nu trimite semnale până nu adaugi cheile de Telegram (TELEGRAM_TOKEN și TELEGRAM_CHAT_ID) în GitHub → Settings → Secrets.'; }
+    else n.hidden = true;
+  }
+
+  function renderAll() {
+    const now = Date.now();
+    renderHeader(); renderAccount(); renderFloor(now); renderStaff(now); renderMonth(); renderJourney(); renderExam();
+  }
+
+  async function load() {
+    const [t, s] = await Promise.all([fetchFirst(SOURCES.team), fetchFirst(SOURCES.state)]);
+    if (t) team = t.data;
+    if (s) state = s.data;
+    mode = t ? ((t.live && (!s || s.live)) ? 'live' : 'snap') : 'error';
+    loadedAt = Date.now();
+    renderAll();
+  }
+
+  load();
+  setInterval(() => { if (mode === 'live') load(); else renderAll(); }, 60000);
+})();
+</script>
+
+</body>
+</html>
