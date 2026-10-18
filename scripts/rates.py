@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Descarcă dobânzile pe termen scurt (lunar, %) pentru cele 8 monede Forex, din FRED (St. Louis Fed, gratuit):
+Descarcă dobânzile de politică monetară (lunar, %) pentru cele 8 monede Forex, de la BIS (Banca Reglementelor
+Internaționale, gratuit; FRED nu răspunde de pe serverele GitHub). Rezervă: FRED.
+Monede:
 USD, EUR, GBP, JPY, AUD, NZD, CAD, CHF. Pentru fiecare monedă încearcă mai multe serii și le lipește (prima are
 prioritate; celelalte completează lunile lipsă), apoi scrie data/fx/rates.csv: month,USD,EUR,...
 
@@ -65,10 +67,42 @@ def splice(series_maps):
     return out
 
 
-def main(out='data/fx/rates.csv', since='2000-01'):
+BIS_AREA = {'USD': 'US', 'EUR': 'XM', 'GBP': 'GB', 'JPY': 'JP', 'AUD': 'AU', 'NZD': 'NZ', 'CAD': 'CA', 'CHF': 'CH'}
+BIS_URL = 'https://stats.bis.org/api/v1/data/WS_CBPOL/M.{}/all?format=csv'
+
+
+def bis_monthly(text):
+    """CSV BIS (coloane TIME_PERIOD, OBS_VALUE) → {YYYY-MM: valoare}."""
+    out = {}
+    rd = csv.DictReader(io.StringIO(text))
+    for row in rd:
+        try:
+            out[row['TIME_PERIOD'][:7]] = float(row['OBS_VALUE'])
+        except (KeyError, ValueError, TypeError):
+            continue
+    return out
+
+
+def fetch_url(url, tries=4):
+    last = None
+    for a in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (apex-quant research)'})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.read().decode('utf-8')
+        except Exception as e:
+            last = e
+            time.sleep(3 * (a + 1))
+    print(f'::warning::{url}: {last}')
+    return ''
+
+
+def main(out='data/fx/rates.csv', since='2000-01', use_fred='0'):
     table = {}
     for cur, ids in SERIES.items():
-        maps = [monthly(fetch(s)) for s in ids]
+        maps = [bis_monthly(fetch_url(BIS_URL.format(BIS_AREA[cur])))]
+        if use_fred == '1':
+            maps += [monthly(fetch(s)) for s in ids]
         table[cur] = {m: v for m, v in splice(maps).items() if m >= since}
         months = sorted(table[cur])
         print(f'::notice::{cur}: {len(months)} luni ({months[0] if months else "-"} → {months[-1] if months else "-"})')

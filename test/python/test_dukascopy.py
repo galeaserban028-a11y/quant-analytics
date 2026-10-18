@@ -56,4 +56,6 @@ import rates as rt
 m = rt.monthly('DATE,VAL\n2024-01-02,5.0\n2024-01-03,5.5\n2024-02-01,.\n2024-02-02,4.0\n')
 assert m == {'2024-01': 5.25, '2024-02': 4.0}, m
 assert rt.splice([{'2024-01': 1.0}, {'2024-01': 9.0, '2024-02': 2.0}]) == {'2024-01': 1.0, '2024-02': 2.0}
+b = rt.bis_monthly('FREQ,REF_AREA,TIME_PERIOD,OBS_VALUE\nM,US,2024-01,5.33\nM,US,2024-02,5.33\nM,US,2024-03,\n')
+assert b == {'2024-01': 5.33, '2024-02': 5.33}, b
 print('OK dobânzi')
