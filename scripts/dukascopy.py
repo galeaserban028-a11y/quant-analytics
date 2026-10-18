@@ -109,6 +109,28 @@ def current_year_days(pair, side, now):
     return to_utc_days(rows)
 
 
+def download_recent(pair, since_y, since_m0, now=None):
+    """Doar lunile recente (pentru actualizarea lunară): lunile încheiate din fișierele cu ore, luna curentă din minute."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    out = {}
+    for side in ('BID', 'ASK'):
+        rows = []
+        y, m0 = since_y, since_m0
+        while (y, m0) < (now.year, now.month - 1):
+            rows += month_hours(pair, y, m0, side)
+            m0 += 1
+            if m0 == 12:
+                y, m0 = y + 1, 0
+        for d in range(1, now.day):
+            rows += day_minutes(pair, now.year, now.month - 1, d, side)
+        out[side] = to_utc_days(rows)
+    days = []
+    for t in sorted(set(out['BID']) & set(out['ASK'])):
+        b, a = out['BID'][t], out['ASK'][t]
+        days.append([t, (b[1] + a[1]) / 2, (b[2] + a[2]) / 2, (b[3] + a[3]) / 2, (b[4] + a[4]) / 2, max(0.0, a[4] - b[4])])
+    return merge_sundays(days)
+
+
 def download_daily(pair, y0, y1):
     """Lumânări zilnice Dukascopy (zi UTC), mid = media bid/ask, spread = ask − bid la închidere.
     Fragmentul de duminică seara se lipește de luni (piața Forex se deschide duminică seara)."""
@@ -284,6 +306,7 @@ def main(argv=None):
     ap.add_argument('--from', dest='y0', type=int, default=2003)
     ap.add_argument('--to', dest='y1', type=int, default=dt.datetime.now(dt.timezone.utc).year)
     ap.add_argument('--out', default='data/fx/dk')
+    ap.add_argument('--since', default='', help='YYYY-MM: descarcă doar de la luna aceasta încoace (implică --merge)')
     ap.add_argument('--merge', action='store_true', help='lipește anii descărcați peste fișierul existent (pentru actualizarea lunară)')
     ap.add_argument('--tf', default='d1', choices=['d1', 'h1'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
     a = ap.parse_args(argv)
@@ -293,8 +316,16 @@ def main(argv=None):
         t0 = time.time()
         try:
             if a.tf == 'd1':
-                d1 = download_daily(p, a.y0, a.y1)
-                if len(d1) < 250:
+                if a.since:
+                    sy, sm = (int(x) for x in a.since.split('-'))
+                    d1 = download_recent(p, sy, sm - 1)
+                    a.merge = True
+                    if not d1:
+                        print(f'::warning::{p}: nimic nou de la {a.since}')
+                        continue
+                else:
+                    d1 = download_daily(p, a.y0, a.y1)
+                if len(d1) < 250 and not a.since:
                     print(f'::error::{p}: prea puține zile ({len(d1)})')
                     continue
                 dec = 3 if p.endswith('JPY') else 5

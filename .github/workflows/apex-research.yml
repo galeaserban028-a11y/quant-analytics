@@ -30,8 +30,8 @@ jobs:
         run: |
           node --test
           python3 test/python/test_dukascopy.py
-      - name: Date noi (anul trecut și anul curent, lipite peste istoric)
-        run: python3 scripts/dukascopy.py --all --from $(( $(date -u +%Y) - 1 )) --out data/fx/dk --merge || true
+      - name: Date noi (luna trecută și luna curentă, lipite peste istoric)
+        run: python3 scripts/dukascopy.py --all --since $(date -u -d "$(date -u +%Y-%m-01) -1 month" +%Y-%m) --out data/fx/dk || true
       - name: Viața agenților și elita
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
