@@ -52,19 +52,34 @@ def parse_bi5(raw, period_start_s, pair):
     return out
 
 
-def fetch(url, tries=5):
+def fetch(url, tries=4):
+    last = None
     for a in range(tries):
         try:
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (apex-quant research)'})
-            with urllib.request.urlopen(req, timeout=30) as r:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36', 'Accept': '*/*'})
+            with urllib.request.urlopen(req, timeout=20) as r:
                 return r.read()
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 return b''
-            time.sleep(1.5 * (a + 1))
-        except Exception:
-            time.sleep(1.5 * (a + 1))
-    raise RuntimeError(f'nu am putut descărca {url}')
+            last = f'HTTP {e.code}'
+        except Exception as e:
+            last = f'{type(e).__name__}: {e}'
+        time.sleep(1.0 * (a + 1))
+    raise RuntimeError(f'nu am putut descărca {url} ({last})')
+
+
+def diagnose(pair='EURUSD'):
+    """O singură cerere de probă, raportată ca adnotare GitHub (vizibilă fără log)."""
+    url = f'{BASE}/{pair}/2024/00/BID_candles_hour_1.bi5'
+    try:
+        raw = fetch(url, tries=2)
+        rows = parse_bi5(raw, int(dt.datetime(2024, 1, 1, tzinfo=dt.timezone.utc).timestamp()), pair)
+        print(f'::notice::Dukascopy test {url}: {len(raw)} octeți, {len(rows)} lumânări, prima {rows[0] if rows else None}')
+        return True
+    except Exception as e:
+        print(f'::error::Dukascopy test {url}: {e}')
+        return False
 
 
 def month_hours(pair, year, month0, side):
@@ -172,6 +187,8 @@ def main(argv=None):
     ap.add_argument('--out', default='data/fx/dk')
     a = ap.parse_args(argv)
     pairs = PAIRS if a.all else [p.strip().upper() for p in a.pairs.split(',') if p.strip()]
+    if not diagnose(pairs[0] if pairs else 'EURUSD'):
+        return 1
     ok = 0
     for p in pairs:
         t0 = time.time()
@@ -186,11 +203,11 @@ def main(argv=None):
             write_csv_gz(os.path.join(a.out, 'h4', f'{p}.csv.gz'), h4, dec + 1)
             first = dt.datetime.fromtimestamp(hours[0][0], dt.timezone.utc).date()
             last = dt.datetime.fromtimestamp(hours[-1][0], dt.timezone.utc).date()
-            print(f'{p}: {len(hours)} ore → {len(d1)} zile, {len(h4)} lumânări H4 ({first} → {last}) în {time.time() - t0:.0f}s')
+            print(f'::notice::{p}: {len(hours)} ore → {len(d1)} zile, {len(h4)} lumânări H4 ({first} → {last}) în {time.time() - t0:.0f}s')
             ok += 1
         except Exception as e:
-            print(f'{p}: EROARE {e}')
-    print(f'Gata: {ok}/{len(pairs)}')
+            print(f'::error::{p}: {e}')
+    print(f'::notice::Gata: {ok}/{len(pairs)} perechi descărcate')
     return 0 if ok else 1
 
 
