@@ -1,1 +1,18 @@
-{}
+{
+  "activeTrades": {},
+  "closedTrades": [],
+  "riskLedger": {
+    "dailyDate": "2026-10-18",
+    "slCountBySymbol": {}
+  },
+  "lockouts": {},
+  "trend": {
+    "positions": {},
+    "skipped": {},
+    "lastAsOf": {}
+  },
+  "prop": null,
+  "fx": null,
+  "fxVirtual": null,
+  "savedAt": "2026-10-18T21:54:25.405Z"
+}
