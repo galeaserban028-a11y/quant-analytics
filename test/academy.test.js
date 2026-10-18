@@ -81,6 +81,10 @@ test('viața agenților: populația rămâne 300, fiecare nou-născut trece admi
   assert.ok(res.agents.length > 120, 'au existat pensionări și nașteri');
   assert.ok(res.agents.every((a) => a.entrance.n >= RULES.entranceMinTrades && a.entrance.E > 0));
   assert.ok(res.agents.filter((a) => a.parentId).every((a) => a.generation >= 2));
+  // diversitate: nicio familie peste 35%, nicio pereche peste 15% (+1 pentru rotunjire)
+  const fam = {}, pr = {};
+  for (const a of alive) { fam[a.genome.family] = (fam[a.genome.family] || 0) + 1; pr[a.genome.pair] = (pr[a.genome.pair] || 0) + 1; }
+  assert.ok(Math.max(...Object.values(fam)) <= 0.35 * 120 + 1, JSON.stringify(fam));
   const elite = new Set(res.agents.filter((a) => a.eliteQuarters > 0).map((a) => a.id));
   assert.ok(res.companyTrades.every((t) => elite.has(t.agentId)));
   // o singură poziție pe pereche în același timp

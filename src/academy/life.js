@@ -27,7 +27,8 @@ const RULES = {
   eliteMinTrades: 30, eliteT: 2.0, eliteLast12Min: -0.05,
   seniorMinTrades: 20, seniorT: 1.0,
   entranceYears: 3, entranceMinTrades: 10,
-  retireAfterDays: 730, retireMinTrades: 20, retireT: -1.5, retireIdleDays: 4 * 365
+  retireAfterDays: 730, retireMinTrades: 20, retireT: -1.5, retireIdleDays: 4 * 365,
+  maxFamilyShare: 0.35, maxPairShare: 0.15 // diversitate: nicio „specie” nu poate acapara populația
 };
 
 function forwardStats(trades, from, to, last12From) {
@@ -89,9 +90,17 @@ function runAcademy(data, instruments, opts) {
 
   const agents = [];
   let nextId = 1;
+  const crowded = (g) => {
+    const alive = agents.filter((a) => !a.retiredAt);
+    const fam = alive.filter((a) => a.genome.family === g.family).length;
+    const pr = alive.filter((a) => a.genome.pair === g.pair).length;
+    const pairCap = Math.max(R.maxPairShare, 1.5 / pairs.length); // cu puține perechi, plafonul crește ca populația să încapă
+    return fam >= R.maxFamilyShare * size || pr >= pairCap * size;
+  };
   const birth = (T, parent) => {
-    for (let attempt = 0; attempt < 40; attempt++) {
+    for (let attempt = 0; attempt < 60; attempt++) {
       const g = parent && attempt < 25 ? mutate(parent.genome, r, pairs) : randomGenome(r, pairs);
+      if (crowded(g)) continue;
       const ent = passesEntrance(g, T);
       if (!ent) continue;
       const a = {
