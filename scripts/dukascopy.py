@@ -80,6 +80,35 @@ def year_days(pair, year, side):
     return parse_bi5(fetch(url), start, pair)
 
 
+def day_minutes(pair, y, m0, d, side):
+    start = int(dt.datetime(y, m0 + 1, d, tzinfo=dt.timezone.utc).timestamp())
+    url = f'{BASE}/{pair}/{y}/{m0:02d}/{d:02d}/{side}_candles_min_1.bi5'
+    return parse_bi5(fetch(url), start, pair)
+
+
+def to_utc_days(rows):
+    """Lumânări mai mici (ore/minute) → lumânări zilnice UTC, în același format ca fișierele anuale."""
+    days = {}
+    for (t, o, h, l, c, v) in sorted(rows):
+        k = t - t % 86400
+        if k not in days:
+            days[k] = [k, o, h, l, c, v]
+        else:
+            x = days[k]
+            x[2] = max(x[2], h); x[3] = min(x[3], l); x[4] = c; x[5] += v
+    return {k: tuple(v) for k, v in days.items()}
+
+
+def current_year_days(pair, side, now):
+    """Anul curent nu are încă fișier anual: lunile trecute din fișierele lunare cu ore, luna curentă zi cu zi."""
+    rows = []
+    for m0 in range(now.month - 1):
+        rows += month_hours(pair, now.year, m0, side)
+    for d in range(1, now.day):
+        rows += day_minutes(pair, now.year, now.month - 1, d, side)
+    return to_utc_days(rows)
+
+
 def download_daily(pair, y0, y1):
     """Lumânări zilnice Dukascopy (zi UTC), mid = media bid/ask, spread = ask − bid la închidere.
     Fragmentul de duminică seara se lipește de luni (piața Forex se deschide duminică seara)."""
@@ -92,6 +121,10 @@ def download_daily(pair, y0, y1):
             store = bid if futs[f] == 'BID' else ask
             for r in f.result():
                 store[r[0]] = r
+    if y1 >= now.year:
+        for side, store in (('BID', bid), ('ASK', ask)):
+            for k, r in current_year_days(pair, side, now).items():
+                store.setdefault(k, r)
     days = []
     for t in sorted(set(bid) & set(ask)):
         b, a = bid[t], ask[t]

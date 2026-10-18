@@ -1,7 +1,6 @@
-# O dată pe lună: re-descarcă istoricul zilnic Forex/aur/indici, refă walk-forward-ul Departamentului Prop,
-# re-simulează examenele și alege firma + riscul. Dacă avantajul a dispărut, departamentul se DEZACTIVEAZĂ
-# automat (nu mai primești semnale). Rezultatul vine și pe Telegram.
-name: APEX cercetare lunară
+# Școala lunară a Academiei Forex: aduce ultimele date Dukascopy, rulează viața celor 300 de agenți (3 rulări
+# independente), decide elita și dacă Academia are voie să trimită semnale. Rezultatul vine și pe Telegram.
+name: APEX școala lunară (Academia Forex)
 
 on:
   schedule:
@@ -16,28 +15,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  research:
+  school:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Teste
-        run: node --test
-      - name: Școala lunară a echipei (walk-forward, bancă, scenarii)
+        run: |
+          node --test
+          python3 test/python/test_dukascopy.py
+      - name: Date noi (anul trecut și anul curent, lipite peste istoric)
+        run: python3 scripts/dukascopy.py --all --from $(( $(date -u +%Y) - 1 )) --out data/fx/dk --merge || true
+      - name: Viața agenților și elita
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           LIVE_TELEGRAM: '1'
-        run: node src/research/propRun.js --refresh --apply
+        run: node src/research/academyRun.js --apply
       - name: Salvează rezultatele
         run: |
           git config user.name "apex-bot"
           git config user.email "apex-bot@users.noreply.github.com"
-          git add config/promotions.json data/research/RAPORT_PROP.md data/research/prop_report.json data/research/team.json data/fx/d1
+          git add config/promotions.json data/research/academy.json data/research/RAPORT_ACADEMIE.md data/fx/dk
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "cercetare lunară $(date -u +%Y-%m)"
+          git commit -m "școala lunară $(date -u +%Y-%m)"
           git pull --rebase --autostash
           git push

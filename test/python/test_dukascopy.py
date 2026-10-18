@@ -42,4 +42,10 @@ old = [(1, 1, 1, 1, 1, 0), (2, 1, 1, 1, 1, 0), (3, 1, 1, 1, 1, 0)]
 new = [(3, 2, 2, 2, 2, 0), (4, 2, 2, 2, 2, 0)]
 assert d.merge_rows(old, new) == [(1, 1, 1, 1, 1, 0), (2, 1, 1, 1, 1, 0), (3, 2, 2, 2, 2, 0), (4, 2, 2, 2, 2, 0)]
 assert d.merge_rows(old, []) == old
-print('OK parser, zile Forex, agregare, duminici, actualizare', len(dd), len(h4))
+# 6) ore/minute → zile UTC
+base = day(2026, 10, 14)
+rows = [(base + 3600 * h, 1.0 + h / 100, 1.01 + h / 100, 0.99 + h / 100, 1.005 + h / 100, 1.0) for h in range(24)] + [(base + 86400, 2, 2, 2, 2, 1.0)]
+u = d.to_utc_days(rows)
+assert sorted(u) == [base, base + 86400]
+assert u[base][1] == 1.0 and u[base][4] == 1.005 + 23 / 100 and u[base][2] == 1.01 + 23 / 100 and u[base][3] == 0.99
+print('OK parser, zile Forex, agregare, duminici, actualizare, an curent', len(dd), len(h4))
