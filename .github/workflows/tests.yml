@@ -17,3 +17,4 @@ jobs:
         with:
           node-version: 20
       - run: node --test
+      - run: python3 test/python/test_dukascopy.py

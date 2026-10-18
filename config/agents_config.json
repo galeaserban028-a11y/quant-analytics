@@ -608,7 +608,8 @@
     ]
   },
   "userDisabledDesks": [
-    "trendDesk"
+    "trendDesk",
+    "propDesk"
   ],
-  "_userDisabledDesks_note": "Crypto (trendDesk) e oprit la cererea ta: tranzacționezi doar Forex pe prop firms. Șterge \"trendDesk\" din listă ca să-l reactivezi."
+  "_userDisabledDesks_note": "Oprite la cererea ta: crypto (trendDesk) și indicii (propDesk). Tranzacționezi doar Forex: semnalele vin de la Academia Forex, doar după ce agenții trec testele."
 }

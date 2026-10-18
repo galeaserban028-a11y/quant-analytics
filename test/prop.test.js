@@ -449,10 +449,11 @@ test('live: ziua firmei se resetează în fusul ei orar; identitatea pozițiilor
   for (const r of Object.values(PROP_RULES)) assert.ok(r.resetTz && dayKeyIn(t, r.resetTz));
 });
 
-test('config: crypto dezactivat, departamentul Prop activ cu parametri validi', () => {
+test('config: crypto și indicii opriți la cererea utilizatorului; configurația Prop rămâne validă', () => {
   const c = loadConfig();
   assert.equal(c.trendDesk.enabled, false);
-  assert.equal(c.propDesk.enabled, true);
+  assert.equal(c.propDesk.enabled, false, 'indicii sunt opriți (userDisabledDesks)');
+  assert.ok(c.userDisabledDesks.includes('propDesk'));
   assert.ok(PROP_RULES[c.propDesk.firm]);
   assert.ok(c.propDesk.riskPct > 0 && c.propDesk.riskPct <= 4);
   assert.ok(Array.isArray(c.propDesk.strategies) && c.propDesk.strategies.length >= 1);

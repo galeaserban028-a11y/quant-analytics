@@ -1,0 +1,46 @@
+# Descarcă istoricul Forex de la Dukascopy (bid/ask reale, din 2003) și îl salvează ca lumânări zilnice și H4.
+name: APEX date Forex (Dukascopy)
+
+on:
+  workflow_dispatch:
+    inputs:
+      pairs:
+        description: 'Perechi separate prin virgulă (gol = toate cele 26)'
+        required: false
+        default: ''
+      from:
+        description: 'Anul de început'
+        required: false
+        default: '2003'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apex-state
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Teste descărcător
+        run: python3 test/python/test_dukascopy.py
+      - name: Descarcă
+        run: |
+          if [ -n "${{ github.event.inputs.pairs }}" ]; then P="--pairs ${{ github.event.inputs.pairs }}"; else P="--all"; fi
+          python3 scripts/dukascopy.py $P --from ${{ github.event.inputs.from || '2003' }} --out data/fx/dk
+      - name: Salvează
+        run: |
+          git config user.name "apex-bot"
+          git config user.email "apex-bot@users.noreply.github.com"
+          git add data/fx/dk
+          if git diff --cached --quiet; then echo "Nimic nou."; exit 0; fi
+          git commit -m "date Forex Dukascopy $(date -u +%Y-%m-%d)"
+          git pull --rebase --autostash
+          git push

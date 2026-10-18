@@ -1,0 +1,34 @@
+"""Teste pentru descărcătorul Dukascopy (fără internet): formatul .bi5, ziua Forex de la 17:00 New York, agregarea."""
+import sys, lzma, struct, datetime as dt
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'scripts'))
+import dukascopy as d
+# 1) parser: două lumânări EURUSD
+start = int(dt.datetime(2024, 3, 1, tzinfo=dt.timezone.utc).timestamp())
+raw = b''.join(struct.pack('>iiiiif', t, o, c, l, h, 1.0) for (t, o, c, l, h) in [(0, 108000, 108050, 107950, 108100), (3600, 108050, 108020, 108000, 108080)])
+rows = d.parse_bi5(lzma.compress(raw, format=lzma.FORMAT_ALONE), start, 'EURUSD')
+assert rows[0] == (start, 1.08, 1.081, 1.0795, 1.0805, 1.0), rows[0]
+assert rows[1][0] == start + 3600
+assert d.parse_bi5(b'', start, 'EURUSD') == []
+assert abs(d.parse_bi5(lzma.compress(struct.pack('>iiiiif', 0, 150123, 150200, 150000, 150300, 0), format=lzma.FORMAT_ALONE), start, 'USDJPY')[0][1] - 150.123) < 1e-9
+# 2) ziua Forex: închidere 17:00 NY (vara 21:00 UTC, iarna 22:00 UTC)
+ts = lambda y, m, dd, h: int(dt.datetime(y, m, dd, h, tzinfo=dt.timezone.utc).timestamp())
+assert d.fx_day_key(ts(2024, 7, 15, 20)) == dt.date(2024, 7, 15)   # 16:00 NY → luni
+assert d.fx_day_key(ts(2024, 7, 15, 21)) == dt.date(2024, 7, 16)   # 17:00 NY → marți
+assert d.fx_day_key(ts(2024, 1, 15, 21)) == dt.date(2024, 1, 15)   # iarna 16:00 NY
+assert d.fx_day_key(ts(2024, 7, 14, 22)) == dt.date(2024, 7, 15)   # duminică seara → luni
+assert d.session_close_utc(dt.date(2024, 7, 15)) == ts(2024, 7, 15, 21)
+assert d.session_close_utc(dt.date(2024, 1, 15)) == ts(2024, 1, 15, 22)
+# 3) agregare: o săptămână de ore sintetice
+hours = []
+t = ts(2024, 7, 14, 21)  # duminică 17:00 NY
+while t < ts(2024, 7, 19, 21):
+    hours.append((t, 1.0, 1.01, 0.99, 1.0 + (t % 7) / 1000, 0.0001))
+    t += 3600
+dd = d.to_daily(hours)
+assert len(dd) == 5, len(dd)   # luni..vineri
+assert dd[0][0] == (ts(2024, 7, 15, 21) - 86400) * 1000   # timestamp + 24h = închiderea de luni
+assert all(r[2] >= max(r[1], r[4]) and r[3] <= min(r[1], r[4]) for r in dd)
+h4 = d.to_h4(hours)
+assert len(h4) == 30, len(h4)
+print('OK parser, zile Forex, agregare', len(dd), len(h4))
