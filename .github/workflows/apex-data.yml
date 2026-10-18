@@ -1,0 +1,38 @@
+# Descarcă istoricul zilnic pentru instrumente noi (pornit manual sau de cercetare).
+name: APEX date
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: 'Simboluri separate prin spațiu (gol = doar cele lipsă, --all = toate)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apex-state
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Descarcă
+        run: node src/research/fetchDaily.js ${{ github.event.inputs.symbols }}
+      - name: Salvează
+        run: |
+          git config user.name "apex-bot"
+          git config user.email "apex-bot@users.noreply.github.com"
+          git add data/fx/d1
+          if git diff --cached --quiet; then echo "Nimic nou."; exit 0; fi
+          git commit -m "date zilnice noi $(date -u +%Y-%m-%d)"
+          git pull --rebase --autostash
+          git push

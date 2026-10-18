@@ -168,4 +168,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch((err) => { console.error(err); process.exitCode = 1; });
-module.exports = { chooseRisk, GRID };
+module.exports = { chooseRisk, GRID, loadDaily, D1_DIR };
