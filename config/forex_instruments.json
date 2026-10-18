@@ -180,7 +180,9 @@
     "swapRatePct": 5,
     "contractSize": 1,
     "yahoo": "^DJI",
-    "stooq": "^dji"
+    "stooq": "^dji",
+    "closeTz": "America/New_York",
+    "closeTime": "16:00"
   },
   "NAS100": {
     "category": "INDEX",
@@ -193,7 +195,9 @@
     "swapRatePct": 5,
     "contractSize": 1,
     "yahoo": "^NDX",
-    "stooq": "^ndx"
+    "stooq": "^ndx",
+    "closeTz": "America/New_York",
+    "closeTime": "16:00"
   },
   "SPX500": {
     "category": "INDEX",
@@ -206,7 +210,9 @@
     "swapRatePct": 5,
     "contractSize": 1,
     "yahoo": "^GSPC",
-    "stooq": "^spx"
+    "stooq": "^spx",
+    "closeTz": "America/New_York",
+    "closeTime": "16:00"
   },
   "GER40": {
     "category": "INDEX",
@@ -219,7 +225,9 @@
     "swapRatePct": 5,
     "contractSize": 1,
     "yahoo": "^GDAXI",
-    "stooq": "^dax"
+    "stooq": "^dax",
+    "closeTz": "Europe/Berlin",
+    "closeTime": "17:30"
   },
   "EURAUD": {
     "category": "FX",
@@ -415,7 +423,9 @@
     "contractSize": 1,
     "sessionHours": 9,
     "yahoo": "^FTSE",
-    "stooq": "^ukx"
+    "stooq": "^ukx",
+    "closeTz": "Europe/London",
+    "closeTime": "16:30"
   },
   "FRA40": {
     "category": "INDEX",
@@ -429,7 +439,9 @@
     "contractSize": 1,
     "sessionHours": 9,
     "yahoo": "^FCHI",
-    "stooq": "^cac"
+    "stooq": "^cac",
+    "closeTz": "Europe/Paris",
+    "closeTime": "17:30"
   },
   "EU50": {
     "category": "INDEX",
@@ -443,7 +455,9 @@
     "contractSize": 1,
     "sessionHours": 9,
     "yahoo": "^STOXX50E",
-    "stooq": "^sx5e"
+    "stooq": "^sx5e",
+    "closeTz": "Europe/Berlin",
+    "closeTime": "17:30"
   },
   "JP225": {
     "category": "INDEX",
@@ -457,7 +471,9 @@
     "contractSize": 1,
     "sessionHours": 7,
     "yahoo": "^N225",
-    "stooq": "^nkx"
+    "stooq": "^nkx",
+    "closeTz": "Asia/Tokyo",
+    "closeTime": "15:30"
   },
   "AUS200": {
     "category": "INDEX",
@@ -471,7 +487,9 @@
     "contractSize": 1,
     "sessionHours": 6.5,
     "yahoo": "^AXJO",
-    "stooq": "^aor"
+    "stooq": "^aor",
+    "closeTz": "Australia/Sydney",
+    "closeTime": "16:12"
   },
   "US2000": {
     "category": "INDEX",
@@ -485,7 +503,9 @@
     "contractSize": 1,
     "sessionHours": 7,
     "yahoo": "^RUT",
-    "stooq": "^rut"
+    "stooq": "^rut",
+    "closeTz": "America/New_York",
+    "closeTime": "16:00"
   },
   "XAGUSD": {
     "category": "METAL",
@@ -515,5 +535,6 @@
     "yahoo": "CL=F",
     "stooq": "cl.f",
     "note": "futures continue: salturi la rulare; tratat cu prudență"
-  }
+  },
+  "_closeTz_note": "closeTz/closeTime: ora oficială de închidere a bursei (lumânarea zilnică e considerată închisă la +10 minute)."
 }

@@ -1,31 +1,29 @@
-# Raport — Departamentul PROP (Forex, aur, indici; grafic zilnic)
+# Raport — Departamentul PROP (indici, grafic zilnic, 2 strategii)
 
-Generat: 2026-10-18T10:35:01.030Z · 17 instrumente · walk-forward anual (antrenare 3 ani → test 1 an)
+Generat: 2026-10-18T11:26:10.423Z · 10 indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere
 
-## 1. Are strategia avantaj real? (out-of-sample)
+## 1. Strategiile (out-of-sample)
 
-- **2209 tranzacții**, **65.4% câștigătoare**, **0.034R** pe tranzacție (IC95% 0.010 … 0.057), profit factor 1.17
-- Nivel de validare: **LIVE**
-- Ani de test pozitivi: 18 din 24
-- Portofoliu la risc 1%/tranzacție: 2.14% pe an, scădere maximă 30.68%
+| Strategie | Tranzacții | Câștigătoare | R / tranzacție (IC95%) | Ani pe plus | Nivel |
+|---|---|---|---|---|---|
+| Pullback RSI(2) | 2228 | 64.5% | 0.037 (0.009 … 0.062) | 14/24 | **LIVE** |
+| 3 zile de scădere | 1514 | 66.3% | 0.055 (0.025 … 0.085) | 16/24 | **LIVE** |
+| **Portofoliu** | 3742 | 65.2% | 0.044 | – | **LIVE** |
 
-## 2. Șansele la examen (simulare pe istoria reală, 510 date de start diferite, orizont 3 ani, apoi 12 luni pe contul finanțat)
+Portofoliu la risc 1%/tranzacție (fără reguli prop): 1.21% pe an, scădere maximă 33.85%.
 
-| Firmă | Risc ales | Trece (interval) | Pică | Neterminat în 3 ani | Zile mediane | Taxă ~10k | Valoare așteptată/încercare |
-|---|---|---|---|---|---|---|---|
-| The5ers High Stakes 2-Step | 3% (siguranță 0.7) | **46.9%** (39–51%) | 0.2% | 52.9% | 369 | 95$ | 198$ |
-| FundedNext Stellar 2-Step | 3% (siguranță 0.8) | **45.2%** (39.6–47.6%) | 2.5% | 52.3% | 348 | 99$ | 192$ |
-| FTMO 1-Step | 2.5% (siguranță 0.7) | **49.9%** (44.9–55.7%) | 0.2% | 49.9% | 388 | 150$ | 103$ |
-| FTMO 2-Step (Swing) | 3% (siguranță 0.7) | **42.9%** (34.1–47.3%) | 0.2% | 56.9% | 424 | 170$ | 68$ |
+Respinse după testare: Forex (date zilnice nealiniate; pierde cu execuție realistă), IBS (≈0 pe indici), Double Seven (prea slab), sfârșit de lună (≈0 după costuri).
 
-**Recomandare:** The5ers High Stakes 2-Step, risc 3% pe tranzacție, cu Gardianul Prop activ.
+## 2. Șansele la examen (511 date de start, orizont 3 ani, apoi 12 luni pe contul finanțat)
 
-## 3. Ce înseamnă pe înțeles
+| Firmă | Risc | Trece | Pică | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |
+|---|---|---|---|---|---|---|---|---|
+| The5ers High Stakes 2-Step | 4% (siguranță 0.7, max 3 poz.) | **52.4%** | 3.8% | 306 | 12.2% | 31.3% | 95$ | 308$ |
+| FundedNext Stellar 2-Step | 4% (siguranță 0.7, max 3 poz.) | **46.7%** | 3.8% | 314 | 9.3% | 27.3% | 99$ | 258$ |
+| FTMO 2-Step (Swing) | 4% (siguranță 0.7, max 3 poz.) | **45.2%** | 4.3% | 355 | 6.5% | 24.1% | 170$ | 165$ |
+| FTMO 1-Step | 4% (siguranță 0.7, max 3 poz.) | **54.1%** | 4.4% | 374 | 7.6% | 26.3% | 150$ | 146$ |
 
-- Strategia are un avantaj mic, dar real și stabil. Cele mai bune rezultate le dă pe indici (US30, SPX500, NAS100).
-- Gardianul aproape elimină picarea examenului din cauza limitelor. Prețul e viteza: trecerea durează de obicei luni, nu săptămâni.
-- Nicio firmă nu are limită de timp pe fazele de examen (FTMO, FundedNext), așa că încetineala nu te costă bani în plus.
-- **Taxa examenului e singurul risc**: nu poți pierde mai mult decât ea. Începe pe contul GRATUIT de probă și plătește doar după ce vezi că semnalele merg.
+**Recomandare:** The5ers High Stakes 2-Step, risc 4% pe tranzacție, Gardianul Prop activ.
 
 ## Configurația propusă
 
@@ -33,37 +31,50 @@ Generat: 2026-10-18T10:35:01.030Z · 17 instrumente · walk-forward anual (antre
 {
   "enabled": true,
   "firm": "THE5ERS_HIGH_STAKES",
-  "riskPct": 3,
+  "riskPct": 4,
   "safety": 0.7,
-  "maxOpen": 5,
-  "params": {
-    "trendLen": 200,
-    "entryRsi": 5,
-    "exitLen": 3,
-    "stopAtr": 2,
-    "maxDays": 10,
-    "allowShort": true
-  },
+  "maxOpen": 3,
+  "strategies": [
+    {
+      "kind": "rsi2",
+      "name": "Pullback RSI(2)",
+      "params": {
+        "kind": "rsi2",
+        "trendLen": 200,
+        "entryRsi": 20,
+        "exitLen": 5,
+        "stopAtr": 2,
+        "maxDays": 10,
+        "allowShort": false
+      }
+    },
+    {
+      "kind": "down",
+      "name": "3 zile de scădere",
+      "params": {
+        "kind": "down",
+        "trendLen": 200,
+        "nDays": 3,
+        "exitLen": 5,
+        "stopAtr": 2,
+        "maxDays": 10,
+        "allowShort": false
+      }
+    }
+  ],
   "symbols": [
-    "EURUSD",
-    "GBPUSD",
-    "AUDUSD",
-    "NZDUSD",
-    "USDJPY",
-    "USDCAD",
-    "USDCHF",
-    "EURJPY",
-    "GBPJPY",
-    "AUDJPY",
-    "EURGBP",
-    "EURCHF",
-    "XAUUSD",
     "US30",
     "NAS100",
     "SPX500",
-    "GER40"
+    "GER40",
+    "UK100",
+    "FRA40",
+    "EU50",
+    "JP225",
+    "AUS200",
+    "US2000"
   ]
 }
 ```
 
-Limitări: date zilnice gratuite (Yahoo); aurul din contracte futures; intrare la închiderea zilei; capitalul flotant intraday nu e modelat (Gardianul rezervă riscul complet al pozițiilor deschise); regulile firmelor se schimbă, deci verifică-le înainte de cumpărare.
+Limitări: date zilnice gratuite (Yahoo, de bursă pentru indici); capitalul flotant intraday nu e modelat (Gardianul rezervă riscul complet al pozițiilor deschise); regulile firmelor se schimbă, deci verifică-le înainte de cumpărare. Dacă intri imediat după mesaj (la ~10 minute după închidere), rezultatele sunt de obicei mai bune decât estimarea prudentă de aici.

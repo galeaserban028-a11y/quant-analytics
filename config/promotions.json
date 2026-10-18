@@ -65,66 +65,79 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-18T10:35:01.031Z",
+    "generatedAt": "2026-10-18T11:26:10.425Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
-      "trades": 2209,
-      "wins": 1444,
-      "losses": 765,
-      "winRatePct": 65.4,
-      "avgWinR": 0.361,
-      "avgLossR": 0.584,
-      "expectancyR": 0.034,
+      "trades": 3742,
+      "wins": 2440,
+      "losses": 1302,
+      "winRatePct": 65.2,
+      "avgWinR": 0.42,
+      "avgLossR": 0.661,
+      "expectancyR": 0.044,
       "expectancyCI95": [
-        0.01,
-        0.057
+        0.025,
+        0.065
       ],
-      "tStat": 2.84,
-      "totalR": 74.7,
-      "profitFactor": 1.17,
-      "maxDrawdownR": 35.39,
-      "maxLosingStreak": 11,
+      "tStat": 4.33,
+      "totalR": 164.68,
+      "profitFactor": 1.19,
+      "maxDrawdownR": 41.31,
+      "maxLosingStreak": 14,
       "outcomes": {
-        "TARGET": 1802,
-        "STOP": 325,
-        "TIME": 57,
-        "END_OF_DATA": 25
+        "STOP": 672,
+        "TARGET": 2987,
+        "TIME": 23,
+        "END_OF_DATA": 60
       }
     },
     "overrides": {
       "propDesk": {
         "enabled": true,
         "firm": "THE5ERS_HIGH_STAKES",
-        "riskPct": 3,
+        "riskPct": 4,
         "safety": 0.7,
-        "maxOpen": 5,
-        "params": {
-          "trendLen": 200,
-          "entryRsi": 5,
-          "exitLen": 3,
-          "stopAtr": 2,
-          "maxDays": 10,
-          "allowShort": true
-        },
+        "maxOpen": 3,
+        "strategies": [
+          {
+            "kind": "rsi2",
+            "name": "Pullback RSI(2)",
+            "params": {
+              "kind": "rsi2",
+              "trendLen": 200,
+              "entryRsi": 20,
+              "exitLen": 5,
+              "stopAtr": 2,
+              "maxDays": 10,
+              "allowShort": false
+            }
+          },
+          {
+            "kind": "down",
+            "name": "3 zile de scădere",
+            "params": {
+              "kind": "down",
+              "trendLen": 200,
+              "nDays": 3,
+              "exitLen": 5,
+              "stopAtr": 2,
+              "maxDays": 10,
+              "allowShort": false
+            }
+          }
+        ],
         "symbols": [
-          "EURUSD",
-          "GBPUSD",
-          "AUDUSD",
-          "NZDUSD",
-          "USDJPY",
-          "USDCAD",
-          "USDCHF",
-          "EURJPY",
-          "GBPJPY",
-          "AUDJPY",
-          "EURGBP",
-          "EURCHF",
-          "XAUUSD",
           "US30",
           "NAS100",
           "SPX500",
-          "GER40"
+          "GER40",
+          "UK100",
+          "FRA40",
+          "EU50",
+          "JP225",
+          "AUS200",
+          "US2000"
         ]
       }
     }

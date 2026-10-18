@@ -1,421 +1,873 @@
 {
   "level": "LIVE",
-  "oos": {
-    "trades": 2209,
-    "wins": 1444,
-    "losses": 765,
-    "winRatePct": 65.4,
-    "avgWinR": 0.361,
-    "avgLossR": 0.584,
-    "expectancyR": 0.034,
-    "expectancyCI95": [
-      0.01,
-      0.057
-    ],
-    "tStat": 2.84,
-    "totalR": 74.7,
-    "profitFactor": 1.17,
-    "maxDrawdownR": 35.39,
-    "maxLosingStreak": 11,
-    "outcomes": {
-      "TARGET": 1802,
-      "STOP": 325,
-      "TIME": 57,
-      "END_OF_DATA": 25
+  "strategies": {
+    "rsi2": {
+      "level": "LIVE",
+      "oos": {
+        "trades": 2228,
+        "wins": 1436,
+        "losses": 792,
+        "winRatePct": 64.5,
+        "avgWinR": 0.431,
+        "avgLossR": 0.678,
+        "expectancyR": 0.037,
+        "expectancyCI95": [
+          0.009,
+          0.062
+        ],
+        "tStat": 2.73,
+        "totalR": 81.78,
+        "profitFactor": 1.15,
+        "maxDrawdownR": 41.31,
+        "maxLosingStreak": 14,
+        "outcomes": {
+          "STOP": 425,
+          "TARGET": 1753,
+          "TIME": 14,
+          "END_OF_DATA": 36
+        }
+      },
+      "params": {
+        "kind": "rsi2",
+        "trendLen": 200,
+        "entryRsi": 20,
+        "exitLen": 5,
+        "stopAtr": 2,
+        "maxDays": 10,
+        "allowShort": false
+      },
+      "folds": [
+        {
+          "test": "2003-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 10,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.198,
+          "n": 74
+        },
+        {
+          "test": "2004-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 10,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.008,
+          "n": 50
+        },
+        {
+          "test": "2005-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.099,
+          "n": 127
+        },
+        {
+          "test": "2006-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 10,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.054,
+          "n": 66
+        },
+        {
+          "test": "2007-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.066,
+          "n": 132
+        },
+        {
+          "test": "2008-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 20,
+            "exitLen": 3,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.108,
+          "n": 202
+        },
+        {
+          "test": "2009-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 5,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.203,
+          "n": 58
+        },
+        {
+          "test": "2010-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 10,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": -0.064,
+          "n": 88
+        },
+        {
+          "test": "2011-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 20,
+            "exitLen": 3,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.054,
+          "n": 117
+        },
+        {
+          "test": "2012-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.084,
+          "n": 144
+        },
+        {
+          "test": "2013-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 5,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.035,
+          "n": 30
+        },
+        {
+          "test": "2014-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 10,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.079,
+          "n": 76
+        },
+        {
+          "test": "2015-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.05,
+          "n": 113
+        },
+        {
+          "test": "2016-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 10,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.057,
+          "n": 64
+        },
+        {
+          "test": "2017-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 5,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.19,
+          "n": 49
+        },
+        {
+          "test": "2018-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.169,
+          "n": 87
+        },
+        {
+          "test": "2019-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 20,
+            "exitLen": 3,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.024,
+          "n": 150
+        },
+        {
+          "test": "2020-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 5,
+            "exitLen": 3,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.026,
+          "n": 38
+        },
+        {
+          "test": "2021-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.1,
+          "n": 197
+        },
+        {
+          "test": "2022-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.143,
+          "n": 32
+        },
+        {
+          "test": "2023-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 5,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.165,
+          "n": 49
+        },
+        {
+          "test": "2024-01-03",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 100,
+            "entryRsi": 10,
+            "exitLen": 3,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.07,
+          "n": 93
+        },
+        {
+          "test": "2025-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 10,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.095,
+          "n": 77
+        },
+        {
+          "test": "2026-01-02",
+          "params": {
+            "kind": "rsi2",
+            "trendLen": 200,
+            "entryRsi": 20,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.013,
+          "n": 115
+        }
+      ]
+    },
+    "down": {
+      "level": "LIVE",
+      "oos": {
+        "trades": 1514,
+        "wins": 1004,
+        "losses": 510,
+        "winRatePct": 66.3,
+        "avgWinR": 0.405,
+        "avgLossR": 0.634,
+        "expectancyR": 0.055,
+        "expectancyCI95": [
+          0.025,
+          0.085
+        ],
+        "tStat": 3.53,
+        "totalR": 82.9,
+        "profitFactor": 1.26,
+        "maxDrawdownR": 18.55,
+        "maxLosingStreak": 10,
+        "outcomes": {
+          "TARGET": 1234,
+          "STOP": 247,
+          "TIME": 9,
+          "END_OF_DATA": 24
+        }
+      },
+      "params": {
+        "kind": "down",
+        "trendLen": 200,
+        "nDays": 3,
+        "exitLen": 5,
+        "stopAtr": 2,
+        "maxDays": 10,
+        "allowShort": false
+      },
+      "folds": [
+        {
+          "test": "2003-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.115,
+          "n": 73
+        },
+        {
+          "test": "2004-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 4,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": -0.205,
+          "n": 29
+        },
+        {
+          "test": "2005-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.079,
+          "n": 70
+        },
+        {
+          "test": "2006-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.017,
+          "n": 60
+        },
+        {
+          "test": "2007-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 3,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.06,
+          "n": 48
+        },
+        {
+          "test": "2008-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.154,
+          "n": 98
+        },
+        {
+          "test": "2009-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 4,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": 0.229,
+          "n": 41
+        },
+        {
+          "test": "2010-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 4,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": -0.061,
+          "n": 40
+        },
+        {
+          "test": "2011-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.207,
+          "n": 51
+        },
+        {
+          "test": "2012-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.116,
+          "n": 99
+        },
+        {
+          "test": "2013-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.198,
+          "n": 93
+        },
+        {
+          "test": "2014-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.074,
+          "n": 68
+        },
+        {
+          "test": "2015-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.031,
+          "n": 47
+        },
+        {
+          "test": "2016-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 4,
+            "exitLen": 3,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.093,
+          "n": 21
+        },
+        {
+          "test": "2017-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 4,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.138,
+          "n": 39
+        },
+        {
+          "test": "2018-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": -0.128,
+          "n": 84
+        },
+        {
+          "test": "2019-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 3,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.105,
+          "n": 67
+        },
+        {
+          "test": "2020-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 3,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.07,
+          "n": 67
+        },
+        {
+          "test": "2021-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 3,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.03,
+          "n": 82
+        },
+        {
+          "test": "2022-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 100,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.095,
+          "n": 39
+        },
+        {
+          "test": "2023-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": -0.019,
+          "n": 103
+        },
+        {
+          "test": "2024-01-03",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 4,
+            "exitLen": 3,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": true
+          },
+          "oos": -0.091,
+          "n": 41
+        },
+        {
+          "test": "2025-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": 0.052,
+          "n": 79
+        },
+        {
+          "test": "2026-01-02",
+          "params": {
+            "kind": "down",
+            "trendLen": 200,
+            "nDays": 3,
+            "exitLen": 5,
+            "stopAtr": 2,
+            "maxDays": 10,
+            "allowShort": false
+          },
+          "oos": -0.04,
+          "n": 75
+        }
+      ]
     }
   },
-  "folds": [
-    {
-      "test": "2003-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 10,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.271,
-      "n": 46
-    },
-    {
-      "test": "2004-01-03",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 10,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.036,
-      "n": 43
-    },
-    {
-      "test": "2005-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 20,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.011,
-      "n": 148
-    },
-    {
-      "test": "2006-01-02",
-      "params": {
-        "trendLen": 100,
-        "entryRsi": 10,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.114,
-      "n": 100
-    },
-    {
-      "test": "2007-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 10,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.013,
-      "n": 108
-    },
-    {
-      "test": "2008-01-03",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.174,
-      "n": 68
-    },
-    {
-      "test": "2009-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.249,
-      "n": 91
-    },
-    {
-      "test": "2010-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.105,
-      "n": 79
-    },
-    {
-      "test": "2011-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.037,
-      "n": 79
-    },
-    {
-      "test": "2012-01-03",
-      "params": {
-        "trendLen": 100,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.046,
-      "n": 57
-    },
-    {
-      "test": "2013-01-02",
-      "params": {
-        "trendLen": 100,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": -0.006,
-      "n": 61
-    },
-    {
-      "test": "2014-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 20,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.004,
-      "n": 195
-    },
-    {
-      "test": "2015-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 20,
-        "exitLen": 3,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": -0.018,
-      "n": 146
-    },
-    {
-      "test": "2016-01-03",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 3,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.098,
-      "n": 41
-    },
-    {
-      "test": "2017-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": 0.158,
-      "n": 44
-    },
-    {
-      "test": "2018-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 3,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": -0.113,
-      "n": 35
-    },
-    {
-      "test": "2019-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 20,
-        "exitLen": 3,
-        "stopAtr": 3,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": -0.054,
-      "n": 269
-    },
-    {
-      "test": "2020-01-03",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 3,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.054,
-      "n": 79
-    },
-    {
-      "test": "2021-01-02",
-      "params": {
-        "trendLen": 100,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.024,
-      "n": 75
-    },
-    {
-      "test": "2022-01-02",
-      "params": {
-        "trendLen": 100,
-        "entryRsi": 20,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": false
-      },
-      "oos": -0.082,
-      "n": 153
-    },
-    {
-      "test": "2023-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 5,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.045,
-      "n": 77
-    },
-    {
-      "test": "2024-01-03",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 3,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.004,
-      "n": 80
-    },
-    {
-      "test": "2025-01-02",
-      "params": {
-        "trendLen": 100,
-        "entryRsi": 5,
-        "exitLen": 3,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": 0.144,
-      "n": 77
-    },
-    {
-      "test": "2026-01-02",
-      "params": {
-        "trendLen": 200,
-        "entryRsi": 5,
-        "exitLen": 3,
-        "stopAtr": 2,
-        "maxDays": 10,
-        "allowShort": true
-      },
-      "oos": -0.009,
-      "n": 58
+  "combined": {
+    "trades": 3742,
+    "wins": 2440,
+    "losses": 1302,
+    "winRatePct": 65.2,
+    "avgWinR": 0.42,
+    "avgLossR": 0.661,
+    "expectancyR": 0.044,
+    "expectancyCI95": [
+      0.025,
+      0.065
+    ],
+    "tStat": 4.33,
+    "totalR": 164.68,
+    "profitFactor": 1.19,
+    "maxDrawdownR": 41.31,
+    "maxLosingStreak": 14,
+    "outcomes": {
+      "STOP": 672,
+      "TARGET": 2987,
+      "TIME": 23,
+      "END_OF_DATA": 60
     }
-  ],
+  },
   "ranking": [
     {
       "key": "THE5ERS_HIGH_STAKES",
       "safety": 0.7,
+      "maxOpen": 3,
       "rules": "The5ers High Stakes 2-Step",
-      "riskPct": 3,
-      "attempts": 510,
-      "passPct": 46.9,
-      "failPct": 0.2,
-      "timeoutPct": 52.9,
-      "medianDaysToPass": 369,
-      "fundedSurvivalPct": 94.9,
-      "avgPayoutFirstMonths": 624,
-      "expectedValuePerAttempt": 198,
+      "riskPct": 4,
+      "attempts": 511,
+      "passPct": 52.4,
+      "failPct": 3.8,
+      "timeoutPct": 43.8,
+      "medianDaysToPass": 306,
+      "passWithin90Pct": 2.1,
+      "passWithin180Pct": 12.2,
+      "passWithin365Pct": 31.3,
+      "fundedSurvivalPct": 98.5,
+      "avgPayoutFirstMonths": 766,
+      "expectedValuePerAttempt": 308,
       "fee": 95,
       "passPctRange": [
-        39,
-        51
+        49.5,
+        56.4
       ],
       "orderSeeds": 8
     },
     {
       "key": "FUNDEDNEXT_STELLAR_2STEP",
-      "safety": 0.8,
+      "safety": 0.7,
+      "maxOpen": 3,
       "rules": "FundedNext Stellar 2-Step",
-      "riskPct": 3,
-      "attempts": 510,
-      "passPct": 45.2,
-      "failPct": 2.5,
-      "timeoutPct": 52.3,
-      "medianDaysToPass": 348,
-      "fundedSurvivalPct": 92.5,
-      "avgPayoutFirstMonths": 645,
-      "expectedValuePerAttempt": 192,
+      "riskPct": 4,
+      "attempts": 511,
+      "passPct": 46.7,
+      "failPct": 3.8,
+      "timeoutPct": 49.5,
+      "medianDaysToPass": 314,
+      "passWithin90Pct": 0.8,
+      "passWithin180Pct": 9.3,
+      "passWithin365Pct": 27.3,
+      "fundedSurvivalPct": 98.3,
+      "avgPayoutFirstMonths": 764,
+      "expectedValuePerAttempt": 258,
       "fee": 99,
       "passPctRange": [
-        39.6,
-        47.6
-      ],
-      "orderSeeds": 8
-    },
-    {
-      "key": "FTMO_1STEP",
-      "safety": 0.7,
-      "rules": "FTMO 1-Step",
-      "riskPct": 2.5,
-      "attempts": 510,
-      "passPct": 49.9,
-      "failPct": 0.2,
-      "timeoutPct": 49.9,
-      "medianDaysToPass": 388,
-      "fundedSurvivalPct": 99.3,
-      "avgPayoutFirstMonths": 504,
-      "expectedValuePerAttempt": 103,
-      "fee": 150,
-      "passPctRange": [
-        44.9,
-        55.7
+        41.5,
+        49.3
       ],
       "orderSeeds": 8
     },
     {
       "key": "FTMO_2STEP",
       "safety": 0.7,
+      "maxOpen": 3,
       "rules": "FTMO 2-Step (Swing)",
-      "riskPct": 3,
-      "attempts": 510,
-      "passPct": 42.9,
-      "failPct": 0.2,
-      "timeoutPct": 56.9,
-      "medianDaysToPass": 424,
-      "fundedSurvivalPct": 92.9,
-      "avgPayoutFirstMonths": 552,
-      "expectedValuePerAttempt": 68,
+      "riskPct": 4,
+      "attempts": 511,
+      "passPct": 45.2,
+      "failPct": 4.3,
+      "timeoutPct": 50.5,
+      "medianDaysToPass": 355,
+      "passWithin90Pct": 0.5,
+      "passWithin180Pct": 6.5,
+      "passWithin365Pct": 24.1,
+      "fundedSurvivalPct": 100,
+      "avgPayoutFirstMonths": 739,
+      "expectedValuePerAttempt": 165,
       "fee": 170,
       "passPctRange": [
-        34.1,
-        47.3
+        40.5,
+        49.5
+      ],
+      "orderSeeds": 8
+    },
+    {
+      "key": "FTMO_1STEP",
+      "safety": 0.7,
+      "maxOpen": 3,
+      "rules": "FTMO 1-Step",
+      "riskPct": 4,
+      "attempts": 511,
+      "passPct": 54.1,
+      "failPct": 4.4,
+      "timeoutPct": 41.5,
+      "medianDaysToPass": 374,
+      "passWithin90Pct": 0.8,
+      "passWithin180Pct": 7.6,
+      "passWithin365Pct": 26.3,
+      "fundedSurvivalPct": 100,
+      "avgPayoutFirstMonths": 548,
+      "expectedValuePerAttempt": 146,
+      "fee": 150,
+      "passPctRange": [
+        48.3,
+        58.9
       ],
       "orderSeeds": 8
     }
@@ -423,80 +875,93 @@
   "proposed": {
     "enabled": true,
     "firm": "THE5ERS_HIGH_STAKES",
-    "riskPct": 3,
+    "riskPct": 4,
     "safety": 0.7,
-    "maxOpen": 5,
-    "params": {
-      "trendLen": 200,
-      "entryRsi": 5,
-      "exitLen": 3,
-      "stopAtr": 2,
-      "maxDays": 10,
-      "allowShort": true
-    },
+    "maxOpen": 3,
+    "strategies": [
+      {
+        "kind": "rsi2",
+        "name": "Pullback RSI(2)",
+        "params": {
+          "kind": "rsi2",
+          "trendLen": 200,
+          "entryRsi": 20,
+          "exitLen": 5,
+          "stopAtr": 2,
+          "maxDays": 10,
+          "allowShort": false
+        }
+      },
+      {
+        "kind": "down",
+        "name": "3 zile de scădere",
+        "params": {
+          "kind": "down",
+          "trendLen": 200,
+          "nDays": 3,
+          "exitLen": 5,
+          "stopAtr": 2,
+          "maxDays": 10,
+          "allowShort": false
+        }
+      }
+    ],
     "symbols": [
-      "EURUSD",
-      "GBPUSD",
-      "AUDUSD",
-      "NZDUSD",
-      "USDJPY",
-      "USDCAD",
-      "USDCHF",
-      "EURJPY",
-      "GBPJPY",
-      "AUDJPY",
-      "EURGBP",
-      "EURCHF",
-      "XAUUSD",
       "US30",
       "NAS100",
       "SPX500",
-      "GER40"
+      "GER40",
+      "UK100",
+      "FRA40",
+      "EU50",
+      "JP225",
+      "AUS200",
+      "US2000"
     ]
   },
   "portfolio": {
     "startEquity": 10000,
-    "endEquity": 16484.01,
-    "totalReturnPct": 64.84,
-    "cagrPct": 2.14,
-    "maxDrawdownPct": 30.68,
-    "sharpeMonthly": 0.33,
+    "endEquity": 13264.61,
+    "totalReturnPct": 32.65,
+    "cagrPct": 1.21,
+    "maxDrawdownPct": 33.85,
+    "sharpeMonthly": 0.17,
     "months": 283,
-    "avgMonthlyPct": 0.2,
+    "avgMonthlyPct": 0.14,
     "medianMonthlyPct": 0,
-    "positiveMonthsPct": 49.8,
-    "worstMonthPct": -8.46,
-    "bestMonthPct": 6.54,
+    "positiveMonthsPct": 49.1,
+    "worstMonthPct": -9.06,
+    "bestMonthPct": 7.75,
     "yearly": {
-      "2003": 12.5,
-      "2004": 1.5,
-      "2005": 2.1,
-      "2006": 10.2,
-      "2007": -1.8,
-      "2008": 11.8,
-      "2009": 17.4,
-      "2010": 4.9,
-      "2011": 3.7,
-      "2012": 2.3,
-      "2013": 0,
-      "2014": -2.3,
-      "2015": -7.1,
-      "2016": 4.7,
-      "2017": 4.4,
-      "2018": -4.3,
-      "2019": -9.8,
-      "2020": 2.6,
-      "2021": 0.8,
-      "2022": -11.7,
-      "2023": 3.4,
-      "2024": 0.7,
-      "2025": 11.2,
-      "2026": -1
+      "2003": 5.7,
+      "2004": -4.3,
+      "2005": 7.2,
+      "2006": 4.4,
+      "2007": -1.1,
+      "2008": 20.1,
+      "2009": 10.4,
+      "2010": -11.7,
+      "2011": -3.4,
+      "2012": 4.2,
+      "2013": 17.9,
+      "2014": 5.1,
+      "2015": -13,
+      "2016": -4.7,
+      "2017": 11,
+      "2018": -11.3,
+      "2019": -1.6,
+      "2020": 6.4,
+      "2021": 10.6,
+      "2022": -2.3,
+      "2023": -6.6,
+      "2024": -2.1,
+      "2025": 6.9,
+      "2026": -10.2
     },
     "riskPct": 1,
     "maxOpen": 5,
     "maxOpenRiskPct": 5,
-    "tradesTaken": 1950,
-    "tradesSkipped": 254
+    "tradesTaken": 2394,
+    "tradesSkipped": 1348
   }
 }

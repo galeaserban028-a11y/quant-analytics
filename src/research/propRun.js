@@ -1,14 +1,19 @@
 'use strict';
 
 /**
- * Cercetare pentru DEPARTAMENTUL PROP (Forex / aur / indici, zilnic):
- *  1) walk-forward anual al strategiei Pullback (antrenare 3 ani → test anul următor);
- *  2) simulatorul de examen pe tranzacțiile out-of-sample, pentru fiecare firmă și nivel de risc;
- *  3) alege riscul cu cea mai mare șansă de trecere, cu condiția ca șansa de a PICA să fie ≤ 5%.
+ * Cercetare pentru DEPARTAMENTUL PROP (indici, grafic zilnic), mai multe strategii:
+ *  1) walk-forward anual pentru FIECARE strategie candidată (antrenare 3 ani → test anul următor);
+ *     validarea folosește execuția PRUDENTĂ: intrare/ieșire a doua zi la deschidere (cum execută un om dimineața);
+ *  2) intră în portofoliu doar strategiile cu nivel de validare LIVE/DEMO;
+ *  3) simulatorul de examen pe tranzacțiile out-of-sample combinate, pentru fiecare firmă și nivel de risc;
+ *  4) alege riscul cu cea mai bună valoare așteptată, cu condiția ca șansa de a PICA să fie ≤ 5%.
  *
  *   npm run research:prop                → folosește data/fx/d1/*.csv (le descarcă dacă lipsesc)
  *   npm run research:prop -- --refresh   → re-descarcă istoricul zilnic (Yahoo, din 2000)
  *   npm run research:prop -- --apply     → activează departamentul DOAR dacă trece validarea
+ *
+ * De ce doar indici: datele zilnice gratuite pentru Forex (Yahoo) au închiderea nealiniată cu maximul/minimul zilei
+ * (verificat pe lumânări reconstruite din date orare), iar Forex-ul pierde cu execuție realistă. Indicii au date de bursă.
  */
 const fs = require('fs');
 const path = require('path');
@@ -16,26 +21,47 @@ const { loadCsv, DATA_DIR } = require('../backtest/dataLoader');
 const { cleanSpikes, normalizeCandles } = require('../core/candles');
 const { getJson } = require('../data/http');
 const { parseYahooChart, validOhlc } = require('../data/dailySources');
-const mr = require('../strategies/meanRevDesk');
+const lab = require('../strategies/dailyLab');
 const { trendWalkForward } = require('./trendResearch');
 const { validationLevel } = require('./walkforward');
 const { simulateChallenges } = require('../prop/challengeSim');
 const { PROP_RULES } = require('../prop/rules');
 const { portfolioSim } = require('./portfolio');
+const { computeMetrics } = require('../backtest/metrics');
 const { writePromotionSection } = require('../config');
 const { sendTelegram } = require('../notify/telegram');
 
 const D1_DIR = path.join(DATA_DIR, 'fx', 'd1');
 const INSTRUMENTS = require('../../config/forex_instruments.json');
 const DAY = 864e5;
+const UNIVERSE = ['INDEX'];
 
-const GRID = (() => {
-  const g = [];
-  for (const trendLen of [100, 200]) for (const entryRsi of [5, 10, 20]) for (const exitLen of [3, 5]) for (const stopAtr of [2, 3, 4]) for (const allowShort of [false, true]) {
-    g.push({ trendLen, entryRsi, exitLen, stopAtr, maxDays: 10, allowShort });
+/** Strategiile candidate și grilele lor (alegerea parametrilor se face DOAR pe anii de antrenare). */
+const STRATEGIES = {
+  rsi2: {
+    name: 'Pullback RSI(2)',
+    grid: (() => {
+      const g = [];
+      for (const trendLen of [100, 200]) for (const entryRsi of [5, 10, 20]) for (const exitLen of [3, 5]) for (const stopAtr of [2, 3, 4]) for (const allowShort of [false, true]) {
+        g.push({ kind: 'rsi2', trendLen, entryRsi, exitLen, stopAtr, maxDays: 10, allowShort });
+      }
+      return g;
+    })()
+  },
+  down: {
+    name: '3 zile de scădere',
+    grid: (() => {
+      const g = [];
+      for (const trendLen of [100, 200]) for (const nDays of [3, 4]) for (const exitLen of [3, 5]) for (const stopAtr of [2, 3]) for (const allowShort of [false, true]) {
+        g.push({ kind: 'down', trendLen, nDays, exitLen, stopAtr, maxDays: 10, allowShort });
+      }
+      return g;
+    })()
   }
-  return g;
-})();
+};
+// Respinse după testare (păstrate în raport ca să nu le mai încercăm orbește): IBS (0 pe indici; „miracolul” de pe Forex
+// era un defect de date), Double Seven (prea slab pentru examen), efectul de sfârșit de lună (≈0 după costuri).
+const GRID = STRATEGIES.rsi2.grid; // compatibilitate
 
 function parseArgs(argv) {
   const a = {};
@@ -70,79 +96,98 @@ async function downloadDaily(file, inst) {
 
 const fmt = (v, d = 3) => (v === null || v === undefined || !Number.isFinite(v) ? '–' : Number(v).toFixed(d));
 
-function chooseRisk(trades, rules) {
+/** Alege riscul: cea mai bună valoare așteptată, cu P(pică) ≤ 5%. */
+function chooseRisk(trades, rules, opts = {}) {
   const table = [];
-  for (const riskPct of [1, 1.5, 2, 2.5, 3]) {
-    for (const safety of [0.7, 0.8, 0.9]) {
-      const r = simulateChallenges(trades, rules, { riskPct, safety, maxOpen: 5 }, { horizonDays: 1095, fundedMonths: 12, stepDays: 14 }); // EV = P(trece) × plăți în primele 12 luni − taxa
-      if (r) table.push(Object.assign({ safety }, r));
+  for (const riskPct of opts.risks || [2, 3, 4]) {
+    for (const safety of opts.safeties || [0.6, 0.7]) {
+      for (const maxOpen of opts.maxOpens || [3, 5]) {
+        const r = simulateChallenges(trades, rules, { riskPct, safety, maxOpen }, { horizonDays: 1095, fundedMonths: 12, stepDays: 14, orderSeeds: opts.orderSeeds || 8 }); // EV = P(trece) × plăți în primele 12 luni − taxa
+        if (r) table.push(Object.assign({ safety, maxOpen }, r));
+      }
     }
   }
-  const ok = table.filter((r) => r.failPct <= 5);
-  const best = (ok.length ? ok : table).slice().sort((a, b) => b.passPct - a.passPct || a.failPct - b.failPct)[0];
-  return { best, table };
+  return { best: pickBest(table), table };
 }
+
+/** Cea mai bună valoare așteptată dintre variantele cu P(pică) ≤ 5% (dacă nu există niciuna: dintre toate). */
+function pickBest(table, maxFailPct = 5) {
+  const ok = table.filter((r) => r.failPct <= maxFailPct);
+  return (ok.length ? ok : table).slice().sort((a, b) => b.expectedValuePerAttempt - a.expectedValuePerAttempt || a.failPct - b.failPct)[0];
+}
+
+/** Simulatorul folosit în validare: execuție prudentă (a doua zi la deschidere). */
+const prudentSim = (data, inst, params, o) => lab.simulate(data, inst, params, Object.assign({}, o, { execution: 'nextOpen' }));
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const data = {};
   for (const [s, inst] of Object.entries(INSTRUMENTS)) {
-    if (s.startsWith('_')) continue;
+    if (s.startsWith('_') || !UNIVERSE.includes(inst.category)) continue;
     try {
       const c = await loadDaily(s, inst, Boolean(args.refresh));
       if (c.length > 1500) data[s] = c; else console.log(`  ${s}: prea puține date (${c.length})`);
     } catch (err) { console.log(`  ${s}: ${err.message}`); }
   }
-  if (Object.keys(data).length < 5) { console.log('Prea puține instrumente cu date.'); process.exitCode = 1; return; }
+  if (Object.keys(data).length < 4) { console.log('Prea puține instrumente cu date.'); process.exitCode = 1; return; }
 
-  const wf = trendWalkForward(data, INSTRUMENTS, { simulate: mr.simulate, barMs: DAY, trainYears: 3, grid: GRID, minTrades: 40, fixedParams: mr.DEFAULT_PARAMS, log: (m) => console.log(m.slice(0, 180)) });
-  const level = validationLevel(wf.oosSelected, { expectancyR: 0 });
-  const port = portfolioSim(wf.oosSelectedTrades, { riskPct: 1, maxOpen: 5, maxOpenRiskPct: 5 });
+  const results = {};
+  for (const [kind, st] of Object.entries(STRATEGIES)) {
+    console.log(`\n== ${st.name} ==`);
+    const wf = trendWalkForward(data, INSTRUMENTS, { simulate: prudentSim, barMs: DAY, trainYears: 3, grid: st.grid, minTrades: 40, fixedParams: st.grid[0], log: (m) => console.log(m.slice(0, 200)) });
+    const level = validationLevel(wf.oosSelected, { expectancyR: 0 });
+    results[kind] = { name: st.name, wf, level, params: wf.latest ? wf.latest.params : st.grid[0] };
+    console.log(`${st.name}: OOS ${wf.oosSelected.trades} tranzacții, E=${fmt(wf.oosSelected.expectancyR)}R (IC95% ${fmt(wf.oosSelected.expectancyCI95[0])} … ${fmt(wf.oosSelected.expectancyCI95[1])}) → ${level}`);
+  }
+  const accepted = Object.entries(results).filter(([, r]) => r.level !== 'NIMIC');
+  const trades = accepted.flatMap(([, r]) => r.wf.oosSelectedTrades);
+  const combined = computeMetrics(trades);
+  const level = accepted.length ? validationLevel(combined, { expectancyR: 0 }) : 'NIMIC';
+  const port = trades.length ? portfolioSim(trades, { riskPct: 1, maxOpen: 5, maxOpenRiskPct: 5 }) : null;
 
   const firms = {};
-  for (const [key, rules] of Object.entries(PROP_RULES)) firms[key] = chooseRisk(wf.oosSelectedTrades, rules);
-  const ranking = Object.entries(firms).map(([k, v]) => ({ key: k, ...v.best })).sort((a, b) => b.expectedValuePerAttempt - a.expectedValuePerAttempt || b.passPct - a.passPct); // taxa contează: ordonăm după valoarea așteptată
-  const top = ranking[0];
-  const params = wf.latest ? wf.latest.params : mr.DEFAULT_PARAMS;
+  if (trades.length) for (const [key, rules] of Object.entries(PROP_RULES)) firms[key] = chooseRisk(trades, rules);
+  const ranking = Object.entries(firms).map(([k, v]) => ({ key: k, ...v.best })).sort((a, b) => b.expectedValuePerAttempt - a.expectedValuePerAttempt || b.passPct - a.passPct);
+  const top = ranking[0] || {};
   const proposed = {
     enabled: level !== 'NIMIC',
     firm: top.key,
     riskPct: top.riskPct,
     safety: top.safety,
-    maxOpen: 5,
-    params,
+    maxOpen: top.maxOpen,
+    strategies: accepted.map(([kind, r]) => ({ kind, name: r.name, params: r.params })),
     symbols: Object.keys(data)
   };
 
-  console.log(`\nOOS: ${wf.oosSelected.trades} tranzacții, E=${fmt(wf.oosSelected.expectancyR)}R (IC95% ${fmt(wf.oosSelected.expectancyCI95[0])} … ${fmt(wf.oosSelected.expectancyCI95[1])}), win rate ${wf.oosSelected.winRatePct}% → ${level}`);
-  for (const r of ranking) console.log(`  ${r.rules.padEnd(28)} risc ${r.riskPct}% (siguranță ${r.safety}): trece ${r.passPct}% | pică ${r.failPct}% | zile mediane ${r.medianDaysToPass} | EV ${r.expectedValuePerAttempt}$`);
+  console.log(`\nPortofoliu: ${combined.trades} tranzacții, E=${fmt(combined.expectancyR)}R → ${level}`);
+  for (const r of ranking) console.log(`  ${r.rules.padEnd(28)} risc ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poziții): trece ${r.passPct}% | pică ${r.failPct}% | zile mediane ${r.medianDaysToPass} | ≤6 luni ${r.passWithin180Pct}% | EV ${r.expectedValuePerAttempt}$`);
 
   const L = [];
-  L.push('# Raport — Departamentul PROP (Forex, aur, indici; grafic zilnic)');
+  L.push('# Raport — Departamentul PROP (indici, grafic zilnic, 2 strategii)');
   L.push('');
-  L.push(`Generat: ${new Date().toISOString()} · ${Object.keys(data).length} instrumente · walk-forward anual (antrenare 3 ani → test 1 an)`);
+  L.push(`Generat: ${new Date().toISOString()} · ${Object.keys(data).length} indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere`);
   L.push('');
-  L.push('## 1. Are strategia avantaj real? (out-of-sample)');
+  L.push('## 1. Strategiile (out-of-sample)');
   L.push('');
-  L.push(`- **${wf.oosSelected.trades} tranzacții**, **${wf.oosSelected.winRatePct}% câștigătoare**, **${fmt(wf.oosSelected.expectancyR)}R** pe tranzacție (IC95% ${fmt(wf.oosSelected.expectancyCI95[0])} … ${fmt(wf.oosSelected.expectancyCI95[1])}), profit factor ${wf.oosSelected.profitFactor}`);
-  L.push(`- Nivel de validare: **${level}**`);
-  L.push(`- Ani de test pozitivi: ${wf.folds.filter((f) => f.oosSelected.expectancyR > 0).length} din ${wf.folds.length}`);
-  L.push(`- Portofoliu la risc 1%/tranzacție: ${port.cagrPct}% pe an, scădere maximă ${port.maxDrawdownPct}%`);
+  L.push('| Strategie | Tranzacții | Câștigătoare | R / tranzacție (IC95%) | Ani pe plus | Nivel |');
+  L.push('|---|---|---|---|---|---|');
+  for (const r of Object.values(results)) {
+    const o = r.wf.oosSelected;
+    L.push(`| ${r.name} | ${o.trades} | ${o.winRatePct}% | ${fmt(o.expectancyR)} (${fmt(o.expectancyCI95[0])} … ${fmt(o.expectancyCI95[1])}) | ${r.wf.folds.filter((f) => f.oosSelected.expectancyR > 0).length}/${r.wf.folds.length} | **${r.level}** |`);
+  }
+  L.push(`| **Portofoliu** | ${combined.trades} | ${combined.winRatePct}% | ${fmt(combined.expectancyR)} | – | **${level}** |`);
   L.push('');
-  L.push(`## 2. Șansele la examen (simulare pe istoria reală, ${top.attempts} date de start diferite, orizont 3 ani, apoi 12 luni pe contul finanțat)`);
+  if (port) L.push(`Portofoliu la risc 1%/tranzacție (fără reguli prop): ${port.cagrPct}% pe an, scădere maximă ${port.maxDrawdownPct}%.`);
   L.push('');
-  L.push('| Firmă | Risc ales | Trece (interval) | Pică | Neterminat în 3 ani | Zile mediane | Taxă ~10k | Valoare așteptată/încercare |');
-  L.push('|---|---|---|---|---|---|---|---|');
-  for (const r of ranking) L.push(`| ${r.rules} | ${r.riskPct}% (siguranță ${r.safety}) | **${r.passPct}%** (${(r.passPctRange || []).join('–')}%) | ${r.failPct}% | ${r.timeoutPct}% | ${r.medianDaysToPass ?? '–'} | ${r.fee}$ | ${r.expectedValuePerAttempt}$ |`);
+  L.push('Respinse după testare: Forex (date zilnice nealiniate; pierde cu execuție realistă), IBS (≈0 pe indici), Double Seven (prea slab), sfârșit de lună (≈0 după costuri).');
   L.push('');
-  L.push(`**Recomandare:** ${top.rules}, risc ${top.riskPct}% pe tranzacție, cu Gardianul Prop activ.`);
+  L.push(`## 2. Șansele la examen (${top.attempts || 0} date de start, orizont 3 ani, apoi 12 luni pe contul finanțat)`);
   L.push('');
-  L.push('## 3. Ce înseamnă pe înțeles');
+  L.push('| Firmă | Risc | Trece | Pică | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |');
+  L.push('|---|---|---|---|---|---|---|---|---|');
+  for (const r of ranking) L.push(`| ${r.rules} | ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poz.) | **${r.passPct}%** | ${r.failPct}% | ${r.medianDaysToPass ?? '–'} | ${r.passWithin180Pct}% | ${r.passWithin365Pct}% | ${r.fee}$ | ${r.expectedValuePerAttempt}$ |`);
   L.push('');
-  L.push('- Strategia are un avantaj mic, dar real și stabil. Cele mai bune rezultate le dă pe indici (US30, SPX500, NAS100).');
-  L.push('- Gardianul aproape elimină picarea examenului din cauza limitelor. Prețul e viteza: trecerea durează de obicei luni, nu săptămâni.');
-  L.push('- Nicio firmă nu are limită de timp pe fazele de examen (FTMO, FundedNext), așa că încetineala nu te costă bani în plus.');
-  L.push('- **Taxa examenului e singurul risc**: nu poți pierde mai mult decât ea. Începe pe contul GRATUIT de probă și plătește doar după ce vezi că semnalele merg.');
+  if (top.rules) L.push(`**Recomandare:** ${top.rules}, risc ${top.riskPct}% pe tranzacție, Gardianul Prop activ.`);
   L.push('');
   L.push('## Configurația propusă');
   L.push('');
@@ -150,22 +195,27 @@ async function main() {
   L.push(JSON.stringify(proposed, null, 2));
   L.push('```');
   L.push('');
-  L.push('Limitări: date zilnice gratuite (Yahoo); aurul din contracte futures; intrare la închiderea zilei; capitalul flotant intraday nu e modelat (Gardianul rezervă riscul complet al pozițiilor deschise); regulile firmelor se schimbă, deci verifică-le înainte de cumpărare.');
+  L.push('Limitări: date zilnice gratuite (Yahoo, de bursă pentru indici); capitalul flotant intraday nu e modelat (Gardianul rezervă riscul complet al pozițiilor deschise); regulile firmelor se schimbă, deci verifică-le înainte de cumpărare. Dacă intri imediat după mesaj (la ~10 minute după închidere), rezultatele sunt de obicei mai bune decât estimarea prudentă de aici.');
 
   const outDir = path.join(DATA_DIR, 'research');
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, 'RAPORT_PROP.md'), L.join('\n'));
-  fs.writeFileSync(path.join(outDir, 'prop_report.json'), JSON.stringify({ level, oos: wf.oosSelected, folds: wf.folds.map((f) => ({ test: f.testFrom, params: f.chosen, oos: f.oosSelected.expectancyR, n: f.oosSelected.trades })), ranking, proposed, portfolio: Object.assign({}, port, { monthly: undefined }) }, null, 2));
+  fs.writeFileSync(path.join(outDir, 'prop_report.json'), JSON.stringify({
+    level,
+    strategies: Object.fromEntries(Object.entries(results).map(([k, r]) => [k, { level: r.level, oos: r.wf.oosSelected, params: r.params, folds: r.wf.folds.map((f) => ({ test: f.testFrom, params: f.chosen, oos: f.oosSelected.expectancyR, n: f.oosSelected.trades })) }])),
+    combined, ranking, proposed,
+    portfolio: port ? Object.assign({}, port, { monthly: undefined }) : null
+  }, null, 2));
   console.log('Raport: data/research/RAPORT_PROP.md');
 
-  if (process.env.LIVE_TELEGRAM === '1') {
-    await sendTelegram(`🔬 <b>APEX: cercetarea lunară (Departamentul Prop)</b>\nOut-of-sample: ${wf.oosSelected.trades} tranzacții, ${wf.oosSelected.winRatePct}% câștigătoare, ${fmt(wf.oosSelected.expectancyR)}R/tranzacție → <b>${level}</b>.\nRecomandare: ${top.rules}, risc ${top.riskPct}%: trece ${top.passPct}%, pică ${top.failPct}% (simulat).`, { enabled: true });
+  if (process.env.LIVE_TELEGRAM === '1' && top.rules) {
+    await sendTelegram(`🔬 <b>APEX: cercetarea lunară (Departamentul Prop)</b>\n${accepted.map(([, r]) => `${r.name}: ${fmt(r.wf.oosSelected.expectancyR)}R/tranzacție → ${r.level}`).join('\n')}\nRecomandare: ${top.rules}, risc ${top.riskPct}%: trece ${top.passPct}%, pică ${top.failPct}% (simulat, execuție prudentă).`, { enabled: true });
   }
   if (args.apply) {
-    writePromotionSection('prop', { generatedAt: new Date().toISOString(), level, validatedOOS: level !== 'NIMIC', oos: wf.oosSelected, overrides: { propDesk: proposed } });
+    writePromotionSection('prop', { generatedAt: new Date().toISOString(), level, validatedOOS: level !== 'NIMIC', oos: combined, overrides: { propDesk: proposed } });
     console.log(level !== 'NIMIC' ? `Departamentul Prop ACTIVAT (nivel ${level}).` : 'Departamentul Prop DEZACTIVAT: nu trece validarea.');
   }
 }
 
 if (require.main === module) main().catch((err) => { console.error(err); process.exitCode = 1; });
-module.exports = { chooseRisk, GRID, loadDaily, D1_DIR };
+module.exports = { chooseRisk, pickBest, GRID, STRATEGIES, loadDaily, D1_DIR, prudentSim };

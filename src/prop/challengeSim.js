@@ -106,6 +106,9 @@ function simulateChallenges(trades, rules, cfg, opts = {}) {
     failPct: Number(avg('failPct').toFixed(1)),
     timeoutPct: Number(avg('timeoutPct').toFixed(1)),
     medianDaysToPass: Math.round(avg('medianDaysToPass')) || null,
+    passWithin90Pct: Number(avg('passWithin90Pct').toFixed(1)),
+    passWithin180Pct: Number(avg('passWithin180Pct').toFixed(1)),
+    passWithin365Pct: Number(avg('passWithin365Pct').toFixed(1)),
     avgPayoutFirstMonths: Math.round(avg('avgPayoutFirstMonths')),
     expectedValuePerAttempt: Math.round(avg('expectedValuePerAttempt')),
     orderSeeds: ok.length
@@ -170,6 +173,10 @@ function simulateOnce(trades, rules, cfg, opts, seed) {
     failPct: Number((fail.length / Math.max(1, n) * 100).toFixed(1)),
     timeoutPct: Number(((n - pass.length - fail.length) / Math.max(1, n) * 100).toFixed(1)),
     medianDaysToPass: pass.length ? Math.round(med(pass.map((r) => r.daysToFinish))) : null,
+    // cât de repede: procent din TOATE încercările care trec în ≤ 90 / 180 / 365 de zile
+    passWithin90Pct: Number((pass.filter((r) => r.daysToFinish <= 90).length / Math.max(1, n) * 100).toFixed(1)),
+    passWithin180Pct: Number((pass.filter((r) => r.daysToFinish <= 180).length / Math.max(1, n) * 100).toFixed(1)),
+    passWithin365Pct: Number((pass.filter((r) => r.daysToFinish <= 365).length / Math.max(1, n) * 100).toFixed(1)),
     fundedSurvivalPct: pass.length ? Number((pass.filter((r) => r.funded.survived).length / pass.length * 100).toFixed(1)) : null,
     avgPayoutFirstMonths: Math.round(avgPayout),
     expectedValuePerAttempt: Math.round(ev),

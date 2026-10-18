@@ -18,7 +18,9 @@ const { lotsFor, quoteToUsd } = require('../src/prop/lots');
 const ds = require('../src/data/dailySources');
 const { cleanSpikes } = require('../src/core/candles');
 const { rng } = require('../src/backtest/metrics');
-const { runPropCycle, propSummary, dayKeyIn, samePos } = require('../src/propLive');
+const { runPropCycle, propSummary, dayKeyIn, samePos, shouldFetch, deskStrategies } = require('../src/propLive');
+const lab = require('../src/strategies/dailyLab');
+const { chooseRisk, pickBest, STRATEGIES } = require('../src/research/propRun');
 const MarketStateBus = require('../src/core/MarketStateBus');
 const { loadConfig } = require('../src/config');
 const INSTR = require('../config/forex_instruments.json');
@@ -291,9 +293,12 @@ test('date: parserele Yahoo/Stooq, filtrul OHLC invalid și regula lumânării �
   const bar = { timestamp: Date.UTC(2026, 9, 16, 13, 30) }; // US30: sesiunea începe 13:30 UTC
   assert.equal(ds.closedDaily([bar], INSTR.US30, Date.UTC(2026, 9, 16, 19)).length, 0);
   assert.equal(ds.closedDaily([bar], INSTR.US30, Date.UTC(2026, 9, 16, 21)).length, 1);
-  const sbar = { timestamp: Date.UTC(2026, 9, 16) }; // Stooq: data la miezul nopții ⇒ închisă după 24h
-  assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 16, 21), 'stooq').length, 0);
-  assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 17, 0, 1), 'stooq').length, 1);
+  const sbar = { timestamp: Date.UTC(2026, 9, 16) }; // Stooq: data la miezul nopții UTC ⇒ ziua bursei = data UTC
+  assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 16, 20, 5), 'stooq').length, 0);
+  assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 16, 20, 15), 'stooq').length, 1);
+  // instrument fără program de bursă (Forex): regula de 24h pentru Stooq
+  assert.equal(ds.closedDaily([sbar], INSTR.EURUSD, Date.UTC(2026, 9, 16, 21), 'stooq').length, 0);
+  assert.equal(ds.closedDaily([sbar], INSTR.EURUSD, Date.UTC(2026, 9, 17, 0, 1), 'stooq').length, 1);
   assert.equal(ds.sessionHours(INSTR.EURUSD), 24);
   assert.equal(ds.sessionHours(INSTR.GER40), 9);
 });
@@ -311,7 +316,8 @@ test('date: cleanSpikes taie doar fitilele absurde, lumânările normale rămân
 
 function liveFixture(snapshotPath = null) {
   const config = loadConfig();
-  config.propDesk = Object.assign({}, config.propDesk, { enabled: true, firm: 'THE5ERS_HIGH_STAKES', accountSize: 10000, riskPct: 3, safety: 0.8, maxOpen: 5, symbols: ['EURUSD'], params: { trendLen: 200, entryRsi: 5, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: true } });
+  config.propDesk = Object.assign({}, config.propDesk, { enabled: true, firm: 'THE5ERS_HIGH_STAKES', accountSize: 10000, riskPct: 3, safety: 0.8, maxOpen: 5, symbols: ['EURUSD'],
+    strategies: [{ kind: 'rsi2', name: 'Pullback RSI(2)', params: { trendLen: 200, entryRsi: 5, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: true } }] });
   const bus = new MarketStateBus(config, { snapshotPath });
   const msgs = [];
   const notify = async (t) => { msgs.push(t); return { sent: true }; };
@@ -443,7 +449,10 @@ test('config: crypto dezactivat, departamentul Prop activ cu parametri validi', 
   assert.equal(c.trendDesk.enabled, false);
   assert.equal(c.propDesk.enabled, true);
   assert.ok(PROP_RULES[c.propDesk.firm]);
-  assert.ok(c.propDesk.riskPct > 0 && c.propDesk.riskPct <= 3);
+  assert.ok(c.propDesk.riskPct > 0 && c.propDesk.riskPct <= 4);
+  assert.ok(Array.isArray(c.propDesk.strategies) && c.propDesk.strategies.length >= 1);
+  for (const st of c.propDesk.strategies) assert.ok(['rsi2', 'down'].includes(st.kind), st.kind);
+  for (const s of c.propDesk.symbols) assert.equal(INSTR[s].category, 'INDEX', `doar indici: ${s}`);
   for (const s of c.propDesk.symbols) assert.ok(INSTR[s], `instrument lipsă: ${s}`);
   for (const [s, i] of Object.entries(INSTR)) {
     if (s.startsWith('_')) continue;
@@ -462,4 +471,170 @@ test('config: un departament oprit de utilizator rămâne oprit chiar dacă cerc
   assert.equal(c.trendDesk.enabled, false);
   assert.equal(c.propDesk.enabled, true);
   fsx.rmSync(dir, { recursive: true, force: true });
+});
+
+
+// ───────────────────────────── Laboratorul de strategii (v2: indici, 2 strategii) ─────────────────────────────
+
+test('laborator: strategia rsi2 din laborator dă EXACT aceleași tranzacții ca Pullback-ul original', () => {
+  const p = { trendLen: 100, entryRsi: 10, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: true };
+  for (const seed of [4, 5]) {
+    const bars = randomWalk(1200, seed, { drift: 0.0002 });
+    assert.deepEqual(lab.simulateBars('X', bars, INSTR.US30, Object.assign({ kind: 'rsi2' }, p)).map((t) => [t.openedAt, t.closedAt, t.resultR, t.outcome]),
+      mr.simulateBars('X', bars, INSTR.US30, p).map((t) => [t.openedAt, t.closedAt, t.resultR, t.outcome]));
+  }
+});
+
+test('laborator: fără look-ahead pentru TOATE strategiile, la închidere și a doua zi la deschidere', () => {
+  const kinds = [
+    { kind: 'rsi2', trendLen: 100, entryRsi: 10, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: true },
+    { kind: 'down', trendLen: 100, nDays: 3, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: true },
+    { kind: 'ibs', trendLen: 0, ibsEntry: 0.2, stopAtr: 2, maxDays: 5, allowShort: true },
+    { kind: 'd7', trendLen: 100, lookback: 7, stopAtr: 2, maxDays: 10, allowShort: true },
+    { kind: 'tom', trendLen: 0, entryDaysBefore: 1, exitDay: 3, stopAtr: 3, maxDays: 12 }
+  ];
+  const bars = randomWalk(1000, 21, { drift: 0.0002 });
+  for (const p of kinds) {
+    for (const execution of ['close', 'nextOpen']) {
+      const full = lab.simulateBars('X', bars, INSTR.US30, p, { execution });
+      const part = lab.simulateBars('X', bars.slice(0, 600), INSTR.US30, p, { execution }).filter((t) => t.outcome !== 'END_OF_DATA');
+      assert.ok(part.length > 3, `${p.kind}: prea puține tranzacții`);
+      assert.deepEqual(part, full.slice(0, part.length), `${p.kind}/${execution}`);
+    }
+  }
+});
+
+test('laborator: execuția „a doua zi” intră la deschiderea zilei următoare, nu la închiderea semnalului', () => {
+  const bars = pullbackSeries();
+  const last = bars[bars.length - 1];
+  bars.push({ timestamp: last.timestamp + DAY, open: last.close + 0.004, high: last.close + 0.03, low: last.close + 0.002, close: last.close + 0.025, volume: 0 });
+  bars.push({ timestamp: last.timestamp + 2 * DAY, open: last.close + 0.026, high: last.close + 0.03, low: last.close + 0.02, close: last.close + 0.027, volume: 0 });
+  const p = { kind: 'rsi2', trendLen: 200, entryRsi: 5, exitLen: 3, stopAtr: 2, maxDays: 10 };
+  const atClose = lab.simulateBars('X', bars, INSTR.US30, p)[0];
+  const nextOpen = lab.simulateBars('X', bars, INSTR.US30, p, { execution: 'nextOpen' })[0];
+  assert.equal(atClose.entry, last.close + INSTR.US30.typicalSpreadPips * INSTR.US30.pipSize);
+  assert.equal(nextOpen.entry, last.close + 0.004 + INSTR.US30.typicalSpreadPips * INSTR.US30.pipSize);
+  assert.equal(nextOpen.openedAt, last.timestamp + DAY);
+  assert.ok(nextOpen.resultR < atClose.resultR, 'intrarea întârziată e mai scumpă aici');
+});
+
+test('laborator: calendarul de sfârșit de lună (zile lucrătoare rămase)', () => {
+  assert.equal(lab.weekdaysLeftInMonth(Date.UTC(2026, 9, 30)), 0); // vineri 30 oct → sâmbătă/duminică/luni e noiembrie? 31 e sâmbătă
+  assert.equal(lab.weekdaysLeftInMonth(Date.UTC(2026, 9, 29)), 1);
+  assert.equal(lab.weekdaysLeftInMonth(Date.UTC(2026, 8, 30)), 0);
+  assert.throws(() => lab.simulateBars('X', randomWalk(300, 1), INSTR.US30, { kind: 'nimic' }), /STRATEGIE_NECUNOSCUTĂ/);
+});
+
+test('date: ora oficială de închidere, cu ora de vară, pentru fiecare bursă', () => {
+  const iso = (t) => new Date(t).toISOString().slice(0, 16);
+  assert.equal(iso(ds.sessionCloseUtc(Date.UTC(2026, 6, 15, 13, 30), INSTR.US30)), '2026-07-15T20:00');
+  assert.equal(iso(ds.sessionCloseUtc(Date.UTC(2026, 0, 15, 14, 30), INSTR.US30)), '2026-01-15T21:00');
+  assert.equal(iso(ds.sessionCloseUtc(Date.UTC(2026, 6, 15, 7, 0), INSTR.GER40)), '2026-07-15T15:30');
+  assert.equal(iso(ds.sessionCloseUtc(Date.UTC(2026, 0, 15, 8, 0), INSTR.GER40)), '2026-01-15T16:30');
+  assert.equal(iso(ds.sessionCloseUtc(Date.UTC(2026, 6, 15, 7, 0), INSTR.UK100)), '2026-07-15T15:30');
+  assert.equal(iso(ds.sessionCloseUtc(Date.UTC(2026, 6, 15, 0, 0), INSTR.JP225)), '2026-07-15T06:30');
+  // Sydney: lumânarea de 16 oct are timestamp 15 oct 23:00 UTC (10:00 ora locală)
+  assert.equal(iso(ds.sessionCloseUtc(Date.UTC(2026, 9, 15, 23, 0), INSTR.AUS200)), '2026-10-16T05:12');
+  for (const [s, i] of Object.entries(INSTR)) if (i && i.category === 'INDEX') assert.ok(i.closeTz && /^\d\d:\d\d$/.test(i.closeTime), s);
+});
+
+test('live: descarcă date doar după închiderea bursei sau o dată pe oră (rulare din 5 în 5 minute)', () => {
+  const acct = { lastFetch: {}, lastBarClose: {} };
+  const close = Date.UTC(2026, 9, 16, 20, 0); // US30, 16 oct (ora de vară NY)
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close), true, 'prima dată mereu');
+  acct.lastFetch.US30 = close - 5 * 60e3;
+  acct.lastBarClose.US30 = close - DAY;
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 5 * 60e3), false, 'înainte de +10 minute');
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 12 * 60e3), true, 'lumânarea nouă e gata');
+  acct.lastFetch.US30 = close + 12 * 60e3;
+  acct.lastBarClose.US30 = close;
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 17 * 60e3), false, 'deja procesată');
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 70 * 60e3), true, 'verificarea orară');
+  acct.lastBarClose.US30 = close - DAY; // Yahoo încă nu a actualizat: mai încercăm la fiecare rulare în fereastră
+  acct.lastFetch.US30 = close + 12 * 60e3;
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 17 * 60e3), true);
+});
+
+test('live: două strategii pe același indice → două poziții separate, lot GER40 cu conversie EUR→USD', async () => {
+  const { config, bus, msgs, notify } = liveFixture();
+  config.propDesk.symbols = ['GER40'];
+  config.propDesk.strategies = [
+    { kind: 'rsi2', name: 'Pullback RSI(2)', params: { trendLen: 200, entryRsi: 2, exitLen: 3, stopAtr: 2, maxDays: 10 } }, // RSI ≈ 9 → 3 → 1,4: pragul 2 se atinge abia în ziua 3
+    { kind: 'down', name: '3 zile de scădere', params: { trendLen: 200, nDays: 3, exitLen: 3, stopAtr: 2, maxDays: 10 } }
+  ];
+  // trend ascendent, apoi 3 zile de scădere (declanșează ambele strategii); prețuri ca la DAX
+  const base = pullbackSeries().map((b) => ({ timestamp: b.timestamp + 7 * 3600e3, open: b.open * 15000, high: b.high * 15000, low: b.low * 15000, close: b.close * 15000, volume: 0 }));
+  const lastB = base[base.length - 1];
+  const third = { timestamp: lastB.timestamp + DAY, open: lastB.close, high: lastB.close + 10, low: lastB.close - 160, close: lastB.close - 150, volume: 0 };
+  const bars = base.concat([third]);
+  const eur = Array.from({ length: 5 }, (_, k) => ({ timestamp: T0 + k * DAY, open: 1.1, high: 1.1, low: 1.1, close: 1.1, volume: 0 }));
+  const fetch = async (sym, inst, n) => (sym === 'EURUSD' ? { candles: eur } : { candles: (fetch.n || bars).map((b) => Object.assign({}, b)) });
+  fetch.n = bars.slice(0, -2);
+  const closeLast = ds.sessionCloseUtc(third.timestamp, INSTR.GER40);
+  await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast - 2 * DAY + 20 * 60e3, env: {} });
+  assert.equal(bus.state.prop.initialized, true);
+  fetch.n = bars;
+  const r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast + 15 * 60e3, env: {} });
+  const entries = r.events.filter((e) => e.event === 'ENTRY');
+  assert.equal(entries.length, 2, JSON.stringify(r.events));
+  assert.deepEqual(Object.keys(bus.state.prop.positions).sort(), ['GER40|down', 'GER40|rsi2']);
+  assert.ok(msgs.some((m) => /Strategia: 3 zile de scădere/.test(m)));
+  assert.ok(msgs.some((m) => /puncte<\/b> SUB/.test(m)));
+  const totalRisk = Object.values(bus.state.prop.positions).reduce((s, p) => s + p.riskUsd, 0);
+  assert.ok(totalRisk <= 10000 * 0.05 * 0.8 + 1e-6, 'Gardianul împarte bugetul zilnic între poziții');
+  assert.equal(bus.state.prop.fxRates.EURUSD, 1.1);
+});
+
+test('cercetare: alegerea riscului respectă pragul de 5% șanse de a pica; strategiile candidate sunt definite', () => {
+  const r = rng(3);
+  const trades = dailyTrades(900, () => (r() < 0.6 ? 0.8 : -1), ['A', 'B', 'C']);
+  const { best, table } = chooseRisk(trades, PROP_RULES.THE5ERS_HIGH_STAKES, { risks: [2, 6], safeties: [0.7, 0.95], maxOpens: [3], orderSeeds: 2 });
+  assert.ok(table.length === 4);
+  if (table.some((x) => x.failPct <= 5)) assert.ok(best.failPct <= 5);
+  assert.deepEqual(Object.keys(STRATEGIES).sort(), ['down', 'rsi2']);
+  for (const st of Object.values(STRATEGIES)) assert.ok(st.grid.length >= 16 && st.grid.every((p) => p.stopAtr > 0));
+  assert.equal(deskStrategies({ params: { trendLen: 200 } })[0].kind, 'rsi2', 'compatibil cu configurația veche');
+});
+
+test('cercetare: nu alege niciodată o variantă cu peste 5% șanse de a pica, chiar dacă are valoare așteptată mai mare', () => {
+  const t = [{ riskPct: 6, failPct: 12, expectedValuePerAttempt: 900 }, { riskPct: 3, failPct: 4, expectedValuePerAttempt: 300 }, { riskPct: 2, failPct: 1, expectedValuePerAttempt: 200 }];
+  assert.equal(pickBest(t).riskPct, 3);
+  assert.equal(pickBest([{ riskPct: 6, failPct: 12, expectedValuePerAttempt: 900 }, { riskPct: 5, failPct: 9, expectedValuePerAttempt: 950 }]).riskPct, 5, 'fără variante sigure: cea mai bună dintre toate');
+});
+
+test('laborator: „3 zile de scădere” cere scăderi stricte; zile egale nu declanșează', () => {
+  const up = Array.from({ length: 260 }, (_, i) => ({ timestamp: T0 + i * DAY, open: 100 + i * 0.1, high: 100.5 + i * 0.1, low: 99.5 + i * 0.1, close: 100 + i * 0.1, volume: 0 }));
+  const mk = (closes) => up.concat(closes.map((c, k) => ({ timestamp: T0 + (260 + k) * DAY, open: c, high: c + 0.5, low: c - 0.5, close: c, volume: 0 })));
+  const p = { kind: 'down', trendLen: 200, nDays: 3, exitLen: 3, stopAtr: 3, maxDays: 10 };
+  const last = up[up.length - 1].close;
+  assert.ok(lab.liveState('X', mk([last - 0.3, last - 0.6, last - 0.9]), INSTR.US30, p).position, 'trei scăderi ⇒ semnal');
+  assert.equal(lab.liveState('X', mk([last - 0.3, last - 0.3, last - 0.6]), INSTR.US30, p).position, null, 'o zi egală ⇒ fără semnal');
+});
+
+test('laborator: Pullback iese când închiderea trece de media scurtă de AZI (inclusiv ziua curentă)', () => {
+  // după intrare, ziua următoare închide peste media pe 3 zile calculată cu ea inclusă, dar sub media de ieri
+  const bars = pullbackSeries();
+  const L = bars[bars.length - 1].close; // ultimele închideri: L+0.02 (ziua 0), L+0.01, L
+  const p = { kind: 'rsi2', trendLen: 200, entryRsi: 5, exitLen: 3, stopAtr: 4, maxDays: 10 };
+  // SMA3 azi cu x: (L+0.01 + L + x)/3 < x ⇔ x > L+0.005; SMA3 de ieri = L+0.01 ⇒ x = L+0.007 iese doar cu media de azi
+  const x = L + 0.007;
+  const nb = bars.concat([{ timestamp: bars[bars.length - 1].timestamp + DAY, open: L, high: x + 0.0005, low: L - 0.0005, close: x, volume: 0 }]);
+  const st = lab.liveState('X', nb, INSTR.EURUSD, p);
+  assert.equal(st.position, null);
+  assert.equal(st.lastClosed.outcome, 'TARGET');
+});
+
+test('live: un semnal început cu o zi înainte (ratat) nu e trimis ca intrare nouă', async () => {
+  const { config, bus, msgs, notify } = liveFixture();
+  const bars = pullbackSeries(); // semnal pe ultima lumânare
+  const last = bars[bars.length - 1];
+  // ziua următoare: tot sub media scurtă (poziția rămâne deschisă), fără stop
+  const more = bars.concat([{ timestamp: last.timestamp + DAY, open: last.close, high: last.close + 0.001, low: last.close - 0.002, close: last.close - 0.001, volume: 0 }]);
+  const tMore = more[more.length - 1].timestamp + DAY;
+  await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars.slice(0, -1)), now: tMore - 2 * DAY + 3600e3, env: {} });
+  // sistemul „a dormit” peste ziua semnalului și vede direct ziua următoare
+  const r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(more), now: tMore + 3600e3, env: {} });
+  assert.deepEqual(r.events, []);
+  assert.equal(msgs.length, 1, 'doar mesajul de pornire');
+  assert.equal(Object.keys(bus.state.prop.positions).length, 0);
 });

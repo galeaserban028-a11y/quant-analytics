@@ -556,37 +556,50 @@
     "enabled": false,
     "firm": "THE5ERS_HIGH_STAKES",
     "accountSize": 10000,
-    "riskPct": 3,
-    "safety": 0.8,
-    "maxOpen": 5,
-    "params": {
-      "trendLen": 200,
-      "entryRsi": 5,
-      "exitLen": 3,
-      "stopAtr": 2,
-      "maxDays": 10,
-      "allowShort": true
-    },
+    "riskPct": 4,
+    "safety": 0.7,
+    "maxOpen": 3,
     "symbols": [
-      "EURUSD",
-      "GBPUSD",
-      "AUDUSD",
-      "NZDUSD",
-      "USDJPY",
-      "USDCAD",
-      "USDCHF",
-      "EURJPY",
-      "GBPJPY",
-      "AUDJPY",
-      "EURGBP",
-      "EURCHF",
-      "XAUUSD",
       "US30",
       "NAS100",
       "SPX500",
-      "GER40"
+      "GER40",
+      "UK100",
+      "FRA40",
+      "EU50",
+      "JP225",
+      "AUS200",
+      "US2000"
     ],
-    "note": "Se activează doar dacă trece validarea out-of-sample (npm run research:prop -- --apply)."
+    "note": "Se activează doar dacă trece validarea out-of-sample (npm run research:prop -- --apply).",
+    "strategies": [
+      {
+        "kind": "rsi2",
+        "name": "Pullback RSI(2)",
+        "params": {
+          "kind": "rsi2",
+          "trendLen": 200,
+          "entryRsi": 20,
+          "exitLen": 5,
+          "stopAtr": 2,
+          "maxDays": 10,
+          "allowShort": false
+        }
+      },
+      {
+        "kind": "down",
+        "name": "3 zile de scădere",
+        "params": {
+          "kind": "down",
+          "trendLen": 200,
+          "nDays": 3,
+          "exitLen": 5,
+          "stopAtr": 2,
+          "maxDays": 10,
+          "allowShort": false
+        }
+      }
+    ]
   },
   "userDisabledDesks": [
     "trendDesk"

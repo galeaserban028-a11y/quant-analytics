@@ -2,12 +2,12 @@
 
 /**
  * Rulare UNICĂ (pentru planificatoare: GitHub Actions, Task Scheduler, cron):
- * face un ciclu al Departamentului Trend, salvează starea și se oprește.
- * Rulat la fiecare oră, acoperă fiecare lumânare H4 nou închisă.
+ * face un ciclu al Departamentului Prop (și Trend, dacă e activ), salvează starea și se oprește.
+ * Rulat din 5 în 5 minute: datele se descarcă doar imediat după închiderea burselor și, în rest, o dată pe oră.
  *
  * În plus:
  *  - mesaj zilnic de verificare („sunt viu”) la ora 9 (ora României);
- *  - alertă dacă datele lipsesc 3 rulări la rând, și mesaj la revenire.
+ *  - alertă dacă datele lipsesc de peste 2 ore, și mesaj la revenire.
  *
  * Variabile: TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, LIVE_TELEGRAM=1, ACCOUNT_EQUITY (opțional), STATE_PATH (opțional)
  */
@@ -66,8 +66,9 @@ async function main() {
   if (propOn) {
     const pr = await runPropCycle({ config, instruments: FX_INSTRUMENTS, bus, notify, now });
     reports.prop = pr;
-    nErr += Object.keys(pr.errors || {}).length;
-    nSym += (config.propDesk.symbols || []).length;
+    const symErr = Object.keys(pr.errors || {}).filter((k) => !k.startsWith('fx:')).length;
+    nErr += symErr;
+    nSym += (pr.fetched || []).length + symErr; // doar instrumentele încercate la această rulare
     console.log(`${new Date(now).toISOString()} | PROP | ${JSON.stringify(pr.account)} | evenimente: ${JSON.stringify(pr.events)} | erori: ${Object.keys(pr.errors || {}).length}`);
     if (Object.keys(pr.errors || {}).length) console.log('erori prop:', JSON.stringify(pr.errors));
   }
@@ -79,14 +80,15 @@ async function main() {
     console.log(`${new Date(now).toISOString()} | TREND | poziții: ${report.openPositions.join(', ') || 'niciuna'} | evenimente: ${JSON.stringify(report.updated)}`);
   }
 
-  // Alertă de date (persistată între rulări)
-  const allFailed = nErr > 0 && nErr >= nSym;
-  st.failStreak = allFailed ? (st.failStreak || 0) + 1 : 0;
-  if (st.failStreak >= 3 && !st.outageNotified) {
+  // Alertă de date (persistată între rulări). Rulăm des, deci alerta e pe durată: date lipsă de cel puțin 2 ore.
+  const attempted = nSym > 0;
+  const allFailed = attempted && nErr >= nSym;
+  if (attempted) st.failSince = allFailed ? (st.failSince || now) : null;
+  if (st.failSince && now - st.failSince >= 2 * 3600e3 && !st.outageNotified) {
     st.outageNotified = true;
-    await notify('⚠️ <b>APEX QUANT</b>: datele de piață sunt indisponibile de 3 rulări la rând (~3 ore). Pozițiile NU sunt urmărite până revin datele. Verifică manual stopurile.');
+    await notify('⚠️ <b>APEX QUANT</b>: datele de piață sunt indisponibile de peste 2 ore. Pozițiile NU sunt urmărite până revin datele. Verifică manual stopurile.');
   }
-  if (!allFailed && st.outageNotified) {
+  if (attempted && !allFailed && st.outageNotified) {
     st.outageNotified = false;
     await notify('✅ <b>APEX QUANT</b>: datele de piață au revenit, monitorizarea continuă.');
   }

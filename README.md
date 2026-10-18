@@ -1,37 +1,41 @@
-# APEX QUANT v2: semnale Forex pentru examene de prop firm, evaluate onest
+# APEX QUANT v2: semnale pe indici pentru examene de prop firm, evaluate onest
 
-Fiecare departament își câștigă locul **doar prin rezultate out-of-sample**, adică pe date pe care nu le-a văzut la optimizare. Nimic nu e „85% win rate” inventat.
+Fiecare strategie își câștigă locul **doar prin rezultate out-of-sample**, adică pe date pe care nu le-a văzut la optimizare, și cu **execuție prudentă** (intrare a doua zi la deschidere, ca un om care execută dimineața). Nimic nu e „85% win rate” inventat.
 
 ## Starea companiei (la 18 octombrie 2026)
 
-| Departament | Ce face | Validare out-of-sample | Status |
+| Departament / strategie | Ce face | Validare out-of-sample (execuție prudentă) | Status |
 |---|---|---|---|
-| **Prop (Pullback zilnic)** | RSI(2) în direcția trendului de 200 de zile, pe 12 perechi Forex + aur + 4 indici; stop obligatoriu; Gardian pentru regulile firmei | **LIVE**: +0,034R/tranzacție, IC95% [+0,010 … +0,057], 2.209 tranzacții, 2003–2026, 65% câștigătoare, 18 din 24 de ani pe plus | ✅ **ACTIV** |
-| Trend H4 crypto | Donchian + trailing ATR, 10 monede | LIVE (+0,24R) | ⏹️ Oprit la cererea ta (`userDisabledDesks`) |
-| Trend zilnic Forex | Același motor de trend, pe Forex | **NIMIC**: −0,08R | ❌ Respins |
-| SMC M15 | Liquidity sweep, OB, FVG | **NIMIC**: −0,09R | ⏸️ În observație |
+| **Prop · Pullback RSI(2)** | Cumpără o scădere bruscă (RSI pe 2 zile < 20) într-un indice aflat peste media de 200 de zile; iese peste media de 5 zile | **LIVE**: +0,037R/tranzacție, IC95% [+0,009 … +0,062], 2.228 tranzacții, 2003–2026 | ✅ **ACTIV** |
+| **Prop · 3 zile de scădere** | Cumpără după 3 închideri la rând mai mici, peste media de 200 de zile; iese peste media de 5 zile | **LIVE**: +0,055R/tranzacție, IC95% [+0,025 … +0,085], 1.514 tranzacții | ✅ **ACTIV** |
+| Forex (orice strategie zilnică) | — | Respins: datele zilnice gratuite au închiderea nealiniată (verificat pe date orare); cu execuție realistă pierde (−0,034R) | ❌ |
+| IBS, Double Seven, sfârșit de lună | — | Respinse: ≈0 pe indici sau prea slabe pentru examen | ❌ |
+| Trend H4 crypto | Donchian + trailing ATR | LIVE (+0,24R) | ⏹️ Oprit la cererea ta (`userDisabledDesks`) |
 
-Raportul complet: `data/research/RAPORT_PROP.md`.
+Instrumente: **US30, NAS100, SPX500, US2000, GER40, UK100, FRA40, EU50, JP225, AUS200**. Raportul complet: `data/research/RAPORT_PROP.md`.
 
-### Șansele la examen (simulare pe tranzacțiile out-of-sample, cont 10.000 $)
+### Șansele la examen (simulare pe tranzacțiile out-of-sample, cont 10.000 $, execuție prudentă)
 
-| Firmă | Risc ales | Trece în ≤3 ani | Pică | Timp median până trece | Taxă | Valoare așteptată / încercare* |
-|---|---|---|---|---|---|---|
-| **The5ers High Stakes** (recomandat) | 3% | **~47%** | ~0,2% | ~1 an | ~95 $ | ~+198 $ |
-| FundedNext Stellar 2-Step | 3% | ~45% | ~2,5% | ~11 luni | ~99 $ | ~+192 $ |
-| FTMO 1-Step | 2,5% | ~50% | ~0,2% | ~13 luni | ~150 $ | ~+103 $ |
-| FTMO 2-Step | 3% | ~43% | ~0,2% | ~14 luni | ~170 $ | ~+68 $ |
+| Firmă | Risc ales | Trece | Pică | Timp median | Trece în ≤6 luni | Taxă | Valoare așteptată / încercare* |
+|---|---|---|---|---|---|---|---|
+| **The5ers High Stakes** (recomandat) | 4%, max 3 poziții | **~52%** | ~3,8% | **~10 luni** | ~12% | ~95 $ | ~+308 $ |
+| FundedNext Stellar 2-Step | 4%, max 3 poziții | ~47% | ~3,8% | ~10 luni | ~9% | ~99 $ | ~+258 $ |
+| FTMO 2-Step | 4%, max 3 poziții | ~45% | ~4,3% | ~12 luni | ~7% | ~170 $ | ~+165 $ |
+| FTMO 1-Step | 4%, max 3 poziții | ~54% | ~4,4% | ~12 luni | ~8% | ~150 $ | ~+146 $ |
 
 \* plățile din primele 12 luni pe contul finanțat × șansa de a trece − taxa. Medie istorică, **nu** promisiune.
 
-Pe înțeles: avantajul e mic, dar real. Gardianul aproape elimină picarea examenului (nu lasă niciodată riscul deschis să depășească limitele), iar prețul e viteza: trecerea durează de obicei luni. **Maximul pe care îl poți pierde este taxa examenului.**
+Față de versiunea anterioară (Forex + indici, o strategie), măsurat la fel de prudent: trecerea crește de la ~43% la ~52%, timpul median scade de la ~18 la ~10 luni, iar șansa de a trece în 6 luni crește de la ~2,5% la ~12%. Riscul mai mare pe tranzacție NU accelerează examenul (Gardianul împarte bugetul zilnic între poziții), de aceea viteza vine din strategii și instrumente, nu din risc.
+
+**Maximul pe care îl poți pierde este taxa examenului.**
 
 ## Funcționare non-stop (GitHub Actions, gratuit)
 
 | Automatizare | Când | Ce face |
 |---|---|---|
-| **APEX live (Prop Forex)** | în fiecare oră | după închiderea zilnică: semnal nou cu **lot exact** și **stop în pips/puncte**, mesaj de închidere, fază trecută, alerte la limite; verificare zilnică la ora 9 |
-| **APEX cercetare lunară** | pe 1 ale lunii | re-descarcă istoricul, refă walk-forward-ul, re-simulează examenele; oprește departamentul dacă avantajul dispare |
+| **APEX live (Prop indici)** | din 5 în 5 minute | la ~10–15 minute după închiderea fiecărei burse: semnal nou cu **lot exact** și **stop în puncte**, mesaj de închidere, fază trecută, alerte la limite; verificare zilnică la ora 9. Datele se descarcă doar după închideri (și o dată pe oră) |
+| **APEX cercetare lunară** | pe 1 ale lunii | re-descarcă istoricul, refă walk-forward-ul fiecărei strategii, re-simulează examenele; oprește strategiile al căror avantaj dispare |
+| **APEX date** | manual | descarcă istoricul zilnic pentru instrumente noi |
 | **Teste** | la fiecare modificare de cod | rulează toate testele |
 
 Configurare o singură dată, în GitHub → repo → **Settings → Secrets and variables → Actions**:
@@ -40,7 +44,7 @@ Configurare o singură dată, în GitHub → repo → **Settings → Secrets and
 
 Starea contului urmărit se salvează în `state/live_state.json`. Pornire manuală: **Actions → APEX live → Run workflow**.
 
-**Important:** sistemul trimite SEMNALE. Tranzacțiile le deschizi și le închizi tu, în platforma firmei (MT5 / cTrader), după mesaje.
+**Important:** sistemul trimite SEMNALE. Tranzacțiile le deschizi și le închizi tu, în platforma firmei (MT5 / cTrader), după mesaje. Intră cât mai repede după mesaj: estimările de mai sus presupun că intri abia a doua zi; dacă intri imediat, de obicei iese mai bine.
 
 ## Pornire rapidă (pe calculator)
 
@@ -62,7 +66,7 @@ Ca să trimită pe Telegram, pune `LIVE_TELEGRAM=1` în `.env`. Opțional, `ACCO
 | Comandă | Ce face |
 |---|---|
 | `npm run live` | Compania live: Trend H4 (activ) + SMC M15 (doar dacă e validat; `OBSERVE_SMC=1` îl afișează în consolă) |
-| `npm run research:prop` | Cercetarea Forex/prop: walk-forward, simularea examenelor la 4 firme, alegerea riscului. `--refresh` re-descarcă istoricul, `--apply` activează departamentul doar dacă trece validarea |
+| `npm run research:prop` | Cercetarea prop (indici, 2 strategii): walk-forward cu execuție prudentă, simularea examenelor la 4 firme, alegerea riscului. `--refresh` re-descarcă istoricul, `--apply` activează departamentul doar dacă trece validarea |
 | `npm run research:trend` | Walk-forward pentru Trend. Adaugă `--refresh` ca să re-descarce istoricul de pe Binance și `--apply` ca să activeze departamentul (doar dacă trece validarea) |
 | `npm run research` | Laboratorul SMC: tranzacții-umbră, evaluarea fiecărui agent, promovări, walk-forward. `--apply` aplică promovările doar dacă trec validarea |
 | `npm run backtest` | Backtest SMC (`--symbols BTCUSD,ETHUSD --days 365 --spread 2`) |
@@ -122,7 +126,7 @@ Dacă pe antrenare nu există niciun avantaj, compania **stă pe loc** în perio
 
 ## Testare
 
-`npm test` rulează 99 de teste:
+`npm test` rulează 111 teste:
 - fiecare agent și filtru;
 - formula de scor;
 - managementul pozițiilor (pesimist intrabar, gap-uri, parțial la TP1, trailing);
@@ -133,9 +137,9 @@ Dacă pe antrenare nu există niciun avantaj, compania **stă pe loc** în perio
 - guvernanța promovărilor;
 - ciclul live Trend: intrare, trailing, ieșire, limită de risc;
 - date corupte, persistența stării;
-- **departamentul Prop** (23 de teste): RSI/SMA, lipsa look-ahead-ului, stop obligatoriu, ieșirea după 10 zile, avantaj ~0 pe random walk; Gardianul verificat pe 20.000 de conturi aleatoare (nu permite niciodată un risc care ar putea sparge limita zilnică sau totală); simulatorul de examen (determinist, independent de ordine, contul finanțat poartă pierderile); loturile pentru EURUSD, USDJPY, GER40, aur; sursele Yahoo/Stooq; ciclul live complet: pornire tăcută, semnal cu lot, ieșire, fază trecută, semnale vechi ignorate, schimbarea sursei de date, persistența.
+- **departamentul Prop** (35 de teste): laboratorul de strategii (fără look-ahead pentru toate cele 5 strategii, la închidere și a doua zi; rsi2 identic cu Pullback-ul original; execuția întârziată), ora oficială de închidere a fiecărei burse cu ora de vară, descărcarea doar după închidere, două strategii pe același indice, conversia EUR→USD pentru GER40; RSI/SMA, lipsa look-ahead-ului, stop obligatoriu, ieșirea după 10 zile, avantaj ~0 pe random walk; Gardianul verificat pe 20.000 de conturi aleatoare (nu permite niciodată un risc care ar putea sparge limita zilnică sau totală); simulatorul de examen (determinist, independent de ordine, contul finanțat poartă pierderile); loturile pentru EURUSD, USDJPY, GER40, aur; sursele Yahoo/Stooq; ciclul live complet: pornire tăcută, semnal cu lot, ieșire, fază trecută, semnale vechi ignorate, schimbarea sursei de date, persistența.
 
-Am verificat și că testele chiar prind greșelile (*mutation testing*). Am introdus intenționat 4 bug-uri critice: trailing stop care coboară, look-ahead, ordine optimistă intrabar și puncte macro gratis. Toate au fost prinse. Pentru departamentul Prop am sabotat intenționat 12 linii critice (Gardian, loturi, semnale vechi, ieșirea pe timp, stopul, regula lumânării închise etc.): toate cele 12 au fost prinse de teste.
+Am verificat și că testele chiar prind greșelile (*mutation testing*). Am introdus intenționat 4 bug-uri critice: trailing stop care coboară, look-ahead, ordine optimistă intrabar și puncte macro gratis. Toate au fost prinse. Pentru departamentul Prop am sabotat intenționat 12 linii critice (Gardian, loturi, semnale vechi, ieșirea pe timp, stopul, regula lumânării închise etc.): toate cele 12 au fost prinse de teste. Pentru versiunea pe indici am mai sabotat 12 linii: 11 prinse, iar a 12-a e echivalentă (nu schimbă rezultatul).
 
 ## Structura proiectului
 

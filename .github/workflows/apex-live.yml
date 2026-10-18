@@ -1,13 +1,14 @@
-# Rulează Departamentul Prop (Forex, aur, indici) din oră în oră, non-stop, pe serverele GitHub (gratuit).
+# Rulează Departamentul Prop (indici) din 5 în 5 minute, non-stop, pe serverele GitHub (gratuit pentru repo public).
+# Semnalul ajunge la ~10–15 minute după închiderea fiecărei burse.
 # Trimite pe Telegram doar la evenimente: semnal nou (cu lot și stop), închidere, fază trecută, plus un mesaj zilnic la ora 9.
 # Variabile opționale (Settings → Secrets and variables → Actions → Variables):
 #   PROP_BALANCE = soldul real al contului (dacă diferă de cel estimat), PROP_ACCOUNT_SIZE = mărimea contului (implicit 10000),
 #   PROP_FIRM = FTMO_2STEP | FUNDEDNEXT_STELLAR_2STEP | THE5ERS_HIGH_STAKES | FTMO_1STEP, PROP_PHASE = 1, 2 sau 3 (3 = finanțat)
-name: APEX live (Prop Forex)
+name: APEX live (Prop indici)
 
 on:
   schedule:
-    - cron: '7 * * * *'      # în fiecare oră, la minutul 7 (după închiderea lumânărilor)
+    - cron: '*/5 * * * *'    # din 5 în 5 minute; datele se descarcă doar după închiderea burselor (și o dată pe oră)
   workflow_dispatch: {}       # buton „Run workflow” pentru pornire manuală
 
 permissions:
@@ -20,7 +21,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
