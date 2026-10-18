@@ -133,7 +133,7 @@ Dacă pe antrenare nu există niciun avantaj, compania **stă pe loc** în perio
 - guvernanța promovărilor;
 - ciclul live Trend: intrare, trailing, ieșire, limită de risc;
 - date corupte, persistența stării;
-- **departamentul Prop** (22 de teste): RSI/SMA, lipsa look-ahead-ului, stop obligatoriu, ieșirea după 10 zile, avantaj ~0 pe random walk; Gardianul verificat pe 20.000 de conturi aleatoare (nu permite niciodată un risc care ar putea sparge limita zilnică sau totală); simulatorul de examen (determinist, independent de ordine, contul finanțat poartă pierderile); loturile pentru EURUSD, USDJPY, GER40, aur; sursele Yahoo/Stooq; ciclul live complet: pornire tăcută, semnal cu lot, ieșire, fază trecută, semnale vechi ignorate, schimbarea sursei de date, persistența.
+- **departamentul Prop** (23 de teste): RSI/SMA, lipsa look-ahead-ului, stop obligatoriu, ieșirea după 10 zile, avantaj ~0 pe random walk; Gardianul verificat pe 20.000 de conturi aleatoare (nu permite niciodată un risc care ar putea sparge limita zilnică sau totală); simulatorul de examen (determinist, independent de ordine, contul finanțat poartă pierderile); loturile pentru EURUSD, USDJPY, GER40, aur; sursele Yahoo/Stooq; ciclul live complet: pornire tăcută, semnal cu lot, ieșire, fază trecută, semnale vechi ignorate, schimbarea sursei de date, persistența.
 
 Am verificat și că testele chiar prind greșelile (*mutation testing*). Am introdus intenționat 4 bug-uri critice: trailing stop care coboară, look-ahead, ordine optimistă intrabar și puncte macro gratis. Toate au fost prinse. Pentru departamentul Prop am sabotat intenționat 12 linii critice (Gardian, loturi, semnale vechi, ieșirea pe timp, stopul, regula lumânării închise etc.): toate cele 12 au fost prinse de teste.
 
