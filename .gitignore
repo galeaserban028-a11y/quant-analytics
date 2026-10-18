@@ -4,3 +4,4 @@ data/state_snapshot.json
 data/state_snapshot.json.tmp
 data/cache/
 data/backtest/
+data/fx/h1/
