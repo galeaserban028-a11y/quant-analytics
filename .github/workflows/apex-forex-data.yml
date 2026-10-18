@@ -24,7 +24,7 @@ on:
       parallel:
         description: 'Câte mașini în paralel'
         required: false
-        default: '4'
+        default: '6'
 
 permissions:
   contents: write
@@ -55,10 +55,14 @@ jobs:
         with:
           python-version: '3.12'
       - name: Descarcă ${{ matrix.pair }}
+        env:
+          DK_NO_CURRENT: '1'
         run: |
           M=""; if [ "${{ github.event.inputs.merge }}" = "true" ]; then M="--merge"; fi
           if [ -n "${{ github.event.inputs.since }}" ]; then M="--since ${{ github.event.inputs.since }}"; fi
           python3 scripts/dukascopy.py --pairs ${{ matrix.pair }} --from ${{ github.event.inputs.from || '2003' }} --out data/fx/dk $M
+      - name: Completează anul curent din Yahoo (rapid)
+        run: python3 scripts/yahoo_recent.py --pairs ${{ matrix.pair }} --since $(date -u +%Y)-01-01 --out data/fx/dk || true
       - name: Salvează
         run: |
           git config user.name "apex-bot"

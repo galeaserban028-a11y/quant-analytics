@@ -143,7 +143,7 @@ def download_daily(pair, y0, y1):
             store = bid if futs[f] == 'BID' else ask
             for r in f.result():
                 store[r[0]] = r
-    if y1 >= now.year:
+    if y1 >= now.year and os.environ.get('DK_NO_CURRENT') != '1':  # anul curent se poate completa mai rapid din Yahoo
         for side, store in (('BID', bid), ('ASK', ask)):
             for k, r in current_year_days(pair, side, now).items():
                 store.setdefault(k, r)

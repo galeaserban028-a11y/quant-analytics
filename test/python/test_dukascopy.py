@@ -59,3 +59,17 @@ assert rt.splice([{'2024-01': 1.0}, {'2024-01': 9.0, '2024-02': 2.0}]) == {'2024
 b = rt.bis_monthly('FREQ,REF_AREA,TIME_PERIOD,OBS_VALUE\nM,US,2024-01,5.33\nM,US,2024-02,5.33\nM,US,2024-03,\n')
 assert b == {'2024-01': 5.33, '2024-02': 5.33}, b
 print('OK dobânzi')
+
+# 8) completarea cu Yahoo orar: zile UTC, fără sâmbătă, duminica lipită de luni, fără ziua curentă
+import yahoo_recent as yr
+base_s = day(2026, 10, 11)  # duminică
+hrs = []
+for h in range(24 * 7):
+    t = base_s + h * 3600
+    w = dt.datetime.fromtimestamp(t, dt.timezone.utc)
+    if w.weekday() == 5 or (w.weekday() == 6 and w.hour < 21):
+        continue
+    hrs.append((t, 1.0, 1.01, 0.99, 1.0 + h / 1e4))
+dd = yr.hours_to_days(hrs, day(2026, 10, 16) + 3600)
+assert [dt.datetime.fromtimestamp(x[0] / 1000, dt.timezone.utc).weekday() for x in dd] == [0, 1, 2, 3], dd
+print('OK completare Yahoo')
