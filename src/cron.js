@@ -45,6 +45,12 @@ async function main() {
     return res;
   };
 
+  // Dacă trebuie să trimită pe Telegram dar lipsesc datele, NU avansăm starea (altfel s-ar pierde mesaje)
+  if (LIVE && (!process.env.TELEGRAM_TOKEN || !(process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID))) {
+    console.log('Lipsesc TELEGRAM_TOKEN / TELEGRAM_CHAT_ID (secretele din GitHub). Aștept configurarea; starea rămâne neschimbată.');
+    return;
+  }
+
   if (!(config.trendDesk || {}).enabled) {
     console.log('Departamentul Trend nu este activ (nu a trecut validarea). Nimic de făcut.');
     return;
