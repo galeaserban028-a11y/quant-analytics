@@ -52,28 +52,72 @@ def parse_bi5(raw, period_start_s, pair):
     return out
 
 
-def fetch(url, tries=4):
+PACE_S = 1.5  # Dukascopy limitează cererile rapide (503): mergem încet și reîncercăm cu pauze tot mai lungi
+
+
+def fetch(url, tries=7):
     last = None
     for a in range(tries):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36', 'Accept': '*/*'})
-            with urllib.request.urlopen(req, timeout=20) as r:
-                return r.read()
+            with urllib.request.urlopen(req, timeout=90) as r:
+                data = r.read()
+            time.sleep(PACE_S)
+            return data
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 return b''
             last = f'HTTP {e.code}'
         except Exception as e:
             last = f'{type(e).__name__}: {e}'
-        time.sleep(1.0 * (a + 1))
+        time.sleep(min(120, 5 * 2 ** a))
     raise RuntimeError(f'nu am putut descărca {url} ({last})')
+
+
+def year_days(pair, year, side):
+    start = int(dt.datetime(year, 1, 1, tzinfo=dt.timezone.utc).timestamp())
+    url = f'{BASE}/{pair}/{year}/{side}_candles_day_1.bi5'
+    return parse_bi5(fetch(url), start, pair)
+
+
+def download_daily(pair, y0, y1):
+    """Lumânări zilnice Dukascopy (zi UTC), mid = media bid/ask, spread = ask − bid la închidere.
+    Fragmentul de duminică seara se lipește de luni (piața Forex se deschide duminică seara)."""
+    now = dt.datetime.now(dt.timezone.utc)
+    bid, ask = {}, {}
+    for y in range(y0, min(y1, now.year) + 1):
+        for side, store in (('BID', bid), ('ASK', ask)):
+            for r in year_days(pair, y, side):
+                store[r[0]] = r
+    days = []
+    for t in sorted(set(bid) & set(ask)):
+        b, a = bid[t], ask[t]
+        days.append([t, (b[1] + a[1]) / 2, (b[2] + a[2]) / 2, (b[3] + a[3]) / 2, (b[4] + a[4]) / 2, max(0.0, a[4] - b[4])])
+    return merge_sundays(days)
+
+
+def merge_sundays(days):
+    out = []
+    pending = None
+    for d in days:
+        wd = dt.datetime.fromtimestamp(d[0], dt.timezone.utc).weekday()
+        if wd == 5:
+            continue  # sâmbătă: nu există tranzacționare
+        if wd == 6:
+            pending = d
+            continue
+        if pending and d[0] - pending[0] <= 86400:
+            d = [d[0], pending[1], max(pending[2], d[2]), min(pending[3], d[3]), d[4], d[5]]
+        pending = None
+        out.append(d)
+    return [(d[0] * 1000, d[1], d[2], d[3], d[4], d[5]) for d in out]
 
 
 def diagnose(pair='EURUSD'):
     """O singură cerere de probă, raportată ca adnotare GitHub (vizibilă fără log)."""
-    url = f'{BASE}/{pair}/2024/00/BID_candles_hour_1.bi5'
+    url = f'{BASE}/{pair}/2024/BID_candles_day_1.bi5'
     try:
-        raw = fetch(url, tries=2)
+        raw = fetch(url, tries=5)
         rows = parse_bi5(raw, int(dt.datetime(2024, 1, 1, tzinfo=dt.timezone.utc).timestamp()), pair)
         print(f'::notice::Dukascopy test {url}: {len(raw)} octeți, {len(rows)} lumânări, prima {rows[0] if rows else None}')
         return True
@@ -88,7 +132,7 @@ def month_hours(pair, year, month0, side):
     return parse_bi5(fetch(url), start, pair)
 
 
-def download_pair(pair, y0, y1, workers=8):
+def download_pair(pair, y0, y1, workers=2):
     """Lumânări orare mid (media bid/ask) + spread, pentru toată perioada."""
     now = dt.datetime.now(dt.timezone.utc)
     jobs = []
@@ -185,6 +229,7 @@ def main(argv=None):
     ap.add_argument('--from', dest='y0', type=int, default=2003)
     ap.add_argument('--to', dest='y1', type=int, default=dt.datetime.now(dt.timezone.utc).year)
     ap.add_argument('--out', default='data/fx/dk')
+    ap.add_argument('--tf', default='d1', choices=['d1', 'h1'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
     a = ap.parse_args(argv)
     pairs = PAIRS if a.all else [p.strip().upper() for p in a.pairs.split(',') if p.strip()]
     if not diagnose(pairs[0] if pairs else 'EURUSD'):
@@ -193,6 +238,18 @@ def main(argv=None):
     for p in pairs:
         t0 = time.time()
         try:
+            if a.tf == 'd1':
+                d1 = download_daily(p, a.y0, a.y1)
+                if len(d1) < 250:
+                    print(f'::error::{p}: prea puține zile ({len(d1)})')
+                    continue
+                dec = 3 if p.endswith('JPY') else 5
+                write_csv_gz(os.path.join(a.out, 'd1', f'{p}.csv.gz'), d1, dec + 1)
+                first = dt.datetime.fromtimestamp(d1[0][0] / 1000, dt.timezone.utc).date()
+                last = dt.datetime.fromtimestamp(d1[-1][0] / 1000, dt.timezone.utc).date()
+                print(f'::notice::{p}: {len(d1)} zile ({first} → {last}) în {time.time() - t0:.0f}s')
+                ok += 1
+                continue
             hours = download_pair(p, a.y0, a.y1)
             if len(hours) < 1000:
                 print(f'{p}: prea puține date ({len(hours)} ore)')

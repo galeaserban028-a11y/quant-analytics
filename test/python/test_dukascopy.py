@@ -31,4 +31,10 @@ assert dd[0][0] == (ts(2024, 7, 15, 21) - 86400) * 1000   # timestamp + 24h = î
 assert all(r[2] >= max(r[1], r[4]) and r[3] <= min(r[1], r[4]) for r in dd)
 h4 = d.to_h4(hours)
 assert len(h4) == 30, len(h4)
-print('OK parser, zile Forex, agregare', len(dd), len(h4))
+# 4) zilele Dukascopy (UTC): duminica se lipește de luni, sâmbăta dispare
+day = lambda y, m, dd_: int(dt.datetime(y, m, dd_, tzinfo=dt.timezone.utc).timestamp())
+raw_days = [[day(2024, 7, 13), 1, 1, 1, 1, 0], [day(2024, 7, 14), 1.0, 1.02, 0.995, 1.01, 0.0001], [day(2024, 7, 15), 1.01, 1.015, 0.99, 1.012, 0.0001], [day(2024, 7, 16), 1.012, 1.02, 1.0, 1.018, 0.0001]]
+m = d.merge_sundays(raw_days)
+assert len(m) == 2, m
+assert m[0][0] == day(2024, 7, 15) * 1000 and m[0][1] == 1.0 and m[0][2] == 1.02 and m[0][3] == 0.99 and m[0][4] == 1.012
+print('OK parser, zile Forex, agregare, duminici', len(dd), len(h4))
