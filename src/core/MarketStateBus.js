@@ -229,6 +229,7 @@ class MarketStateBus {
         riskLedger: this.state.riskLedger,
         lockouts: this.state.lockouts,
         trend: this.state.trend,
+        prop: this.state.prop || null,
         savedAt: new Date(this.now()).toISOString()
       };
       const tmp = `${this.snapshotPath}.tmp`;
@@ -257,6 +258,7 @@ class MarketStateBus {
       if (Array.isArray(parsed.closedTrades)) this.state.closedTrades = parsed.closedTrades.slice(-500);
       if (parsed.riskLedger) this.state.riskLedger = parsed.riskLedger;
       if (parsed.lockouts) this.state.lockouts = parsed.lockouts;
+      if (parsed.prop) this.state.prop = parsed.prop;
       if (parsed.trend && parsed.trend.positions) this.state.trend = Object.assign({ positions: {}, skipped: {}, lastAsOf: {} }, parsed.trend);
       this._checkDailyReset();
     } catch (err) {

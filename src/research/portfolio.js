@@ -63,16 +63,20 @@ function portfolioSim(trades, { riskPct = 0.5, maxOpen = 5, maxOpenRiskPct = 3, 
   events.sort((a, b) => a.at - b.at || (a.type === 'close' ? -1 : 1));
   let eq = startEquity, peak = eq, maxDD = 0;
   const open = new Map(); // idx → sumă riscată
+  const closedEarly = new Set(); // tranzacții cu închidere ≤ deschidere (ex. deschise pe ultima lumânare)
   const taken = [];
   let skipped = 0;
   const monthly = {};
   for (const e of events) {
     const t = trades[e.idx];
     if (e.type === 'open') {
+      if (closedEarly.has(e.idx)) continue;
       const openRisk = Array.from(open.values()).reduce((s, v) => s + v, 0);
       const amt = eq * riskPct / 100;
       if (open.size >= maxOpen || (openRisk + amt) / eq * 100 > maxOpenRiskPct + 1e-9) { skipped += 1; continue; }
       open.set(e.idx, amt);
+    } else if (!open.has(e.idx)) {
+      closedEarly.add(e.idx); // închiderea a venit înaintea deschiderii (durată 0) — nu blocăm un loc pentru totdeauna
     } else if (open.has(e.idx)) {
       const amt = open.get(e.idx);
       open.delete(e.idx);

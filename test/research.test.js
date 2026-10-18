@@ -161,12 +161,22 @@ test('Monte Carlo: determinist și cu percentile ordonate', () => {
 test('config: promovările se aplică DOAR pentru secțiunile validate', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apex-cfg-'));
   const prom = path.join(dir, 'promotions.json');
+  const basePath = path.join(dir, 'base.json');
+  fs.writeFileSync(basePath, JSON.stringify(Object.assign({}, config, { userDisabledDesks: [] })));
   writePromotionSection('trend', { validatedOOS: true, overrides: { trendDesk: { enabled: true } } }, prom);
   writePromotionSection('smc', { validatedOOS: false, overrides: { smcDesk: { enabled: true } } }, prom);
-  const cfg = loadConfig({ promotionsPath: prom });
+  const cfg = loadConfig({ basePath, promotionsPath: prom });
   assert.equal(cfg.trendDesk.enabled, true);
   assert.equal(cfg.smcDesk.enabled, false);
-  assert.equal(loadConfig({ promotionsPath: prom, ignorePromotions: true }).trendDesk.enabled, false);
+  assert.equal(loadConfig({ basePath, promotionsPath: prom, ignorePromotions: true }).trendDesk.enabled, false);
   fs.writeFileSync(prom, '{ stricat');
-  assert.equal(loadConfig({ promotionsPath: prom }).trendDesk.enabled, false, 'fișier corupt ⇒ setările de bază');
+  assert.equal(loadConfig({ basePath, promotionsPath: prom }).trendDesk.enabled, false, 'fișier corupt ⇒ setările de bază');
+});
+
+test('portofoliu: o tranzacție de durată 0 (deschisă și închisă în aceeași clipă) nu blochează locurile (bug găsit)', () => {
+  const t0 = Date.UTC(2025, 0, 1), day = 864e5;
+  const trades = [{ openedAt: t0, closedAt: t0, resultR: 0 }, { openedAt: t0 + day, closedAt: t0 + 2 * day, resultR: 1 }];
+  const p = portfolioSim(trades, { riskPct: 1, maxOpen: 1, maxOpenRiskPct: 10 });
+  assert.equal(p.tradesTaken, 1);
+  assert.equal(p.endEquity, 10100);
 });

@@ -43,7 +43,9 @@ function trendWalkForward(h4BySymbol, instruments, opts = {}) {
   const grid = opts.grid || DEFAULT_TREND_GRID;
   const minTrades = opts.minTrades || 30;
   const log = opts.log || (() => {});
-  const warmMs = 200 * 4 * 3600e3; // destul pentru lookback 160 + ATR
+  const barMs = opts.barMs || 4 * 3600e3;
+  const sim = opts.simulate || simulate; // orice departament cu aceeași interfață (trend, pullback)
+  const warmMs = 220 * barMs; // destul pentru lookback 160–200 + ATR
 
   let start = Infinity, end = -Infinity;
   for (const b of Object.values(h4BySymbol)) { start = Math.min(start, b[0].timestamp); end = Math.max(end, b[b.length - 1].timestamp); }
@@ -58,15 +60,15 @@ function trendWalkForward(h4BySymbol, instruments, opts = {}) {
     const train = sliceBars(h4BySymbol, testStart - trainYears * YEAR, testStart);
     let best = null;
     for (const params of grid) {
-      const m = computeMetrics(simulate(train, instruments, params, { barsAreH4: true }));
+      const m = computeMetrics(sim(train, instruments, params, { barsAreH4: true, barMs }));
       const obj = m.trades >= minTrades ? m.expectancyR * Math.sqrt(m.trades) : -Infinity;
       if (!best || obj > best.obj) best = { obj, params, metrics: m };
     }
     const test = sliceBars(h4BySymbol, testStart - warmMs, testEnd);
-    const optsTest = { barsAreH4: true, tradeFromTs: testStart, tradeUntilTs: testEnd };
-    const fixedTrades = simulate(test, instruments, DEFAULT_PARAMS, optsTest);
+    const optsTest = { barsAreH4: true, barMs, tradeFromTs: testStart, tradeUntilTs: testEnd };
+    const fixedTrades = sim(test, instruments, opts.fixedParams || DEFAULT_PARAMS, optsTest);
     const tradeSelected = best && best.obj > 0;
-    const selTrades = tradeSelected ? simulate(test, instruments, best.params, optsTest) : [];
+    const selTrades = tradeSelected ? sim(test, instruments, best.params, optsTest) : [];
     oosFixed.push(...fixedTrades);
     oosSelected.push(...selTrades);
     const fold = {

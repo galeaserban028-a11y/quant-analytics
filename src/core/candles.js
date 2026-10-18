@@ -16,7 +16,7 @@ function parseCandle(c) {
   if (Array.isArray(c)) {
     const ts = toNum(c[0], 0);
     return {
-      timestamp: ts < 1e12 ? ts * 1000 : ts,
+      timestamp: ts < 1e11 ? ts * 1000 : ts, // secunde < 1e11 (până în anul 5138); milisecunde > 1e11 (după 1973)
       open: toNum(c[1]),
       high: toNum(c[2]),
       low: toNum(c[3]),
@@ -131,6 +131,26 @@ function aggregate(candles, periodMs) {
   return out;
 }
 
+/**
+ * Elimină vârfurile false (date proaste de la furnizor): un fitil mai mare de `k` ori mediana range-urilor
+ * din jur e tăiat la nivelul corpului + mediana. Corpul (open/close) nu se modifică.
+ */
+function cleanSpikes(candles, k = 8, window = 20) {
+  const out = candles.map((c) => Object.assign({}, c));
+  const ranges = out.map((c) => c.high - c.low);
+  for (let i = 0; i < out.length; i++) {
+    const a = Math.max(0, i - window), b = Math.min(out.length, i + window + 1);
+    const neigh = ranges.slice(a, b).filter((_, j) => a + j !== i).sort((x, y) => x - y);
+    const med = neigh.length ? neigh[Math.floor(neigh.length / 2)] : 0;
+    if (!(med > 0)) continue;
+    const c = out[i];
+    const top = Math.max(c.open, c.close), bot = Math.min(c.open, c.close);
+    if (c.high - top > k * med) c.high = top + med;
+    if (bot - c.low > k * med) c.low = bot - med;
+  }
+  return out;
+}
+
 const M15_MS = 15 * 60 * 1000;
 const H1_MS = 60 * 60 * 1000;
 
@@ -144,6 +164,7 @@ module.exports = {
   efficiencyRatio,
   extractSwingStructure,
   aggregate,
+  cleanSpikes,
   M15_MS,
   H1_MS
 };

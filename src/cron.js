@@ -18,6 +18,8 @@ loadEnv(path.join(__dirname, '..', '.env'));
 const { loadConfig } = require('./config');
 const MarketStateBus = require('./core/MarketStateBus');
 const { runTrendCycle } = require('./trendLive');
+const { runPropCycle, propSummary } = require('./propLive');
+const FX_INSTRUMENTS = require('../config/forex_instruments.json');
 const { sendTelegram, roTime } = require('./notify/telegram');
 
 const LIVE = process.env.LIVE_TELEGRAM === '1';
@@ -51,16 +53,31 @@ async function main() {
     return;
   }
 
-  if (!(config.trendDesk || {}).enabled) {
-    console.log('Departamentul Trend nu este activ (nu a trecut validarea). Nimic de făcut.');
+  const trendOn = Boolean((config.trendDesk || {}).enabled);
+  const propOn = Boolean((config.propDesk || {}).enabled);
+  if (!trendOn && !propOn) {
+    console.log('Niciun departament activ (nu au trecut validarea sau au fost dezactivate). Nimic de făcut.');
     return;
   }
 
-  const report = await runTrendCycle({ config, bus, notify, now });
-  const nSym = (config.trendDesk.symbols || []).length;
-  const nErr = Object.keys(report.errors || {}).length;
-  console.log(`${new Date(now).toISOString()} | poziții deschise: ${report.openPositions.join(', ') || 'niciuna'} | evenimente: ${JSON.stringify(report.updated)} | erori: ${nErr}`);
-  if (nErr) console.log('erori:', JSON.stringify(report.errors));
+  // Departamentul PROP (Forex / aur / indici, zilnic)
+  let nErr = 0, nSym = 0;
+  const reports = {};
+  if (propOn) {
+    const pr = await runPropCycle({ config, instruments: FX_INSTRUMENTS, bus, notify, now });
+    reports.prop = pr;
+    nErr += Object.keys(pr.errors || {}).length;
+    nSym += (config.propDesk.symbols || []).length;
+    console.log(`${new Date(now).toISOString()} | PROP | ${JSON.stringify(pr.account)} | evenimente: ${JSON.stringify(pr.events)} | erori: ${Object.keys(pr.errors || {}).length}`);
+    if (Object.keys(pr.errors || {}).length) console.log('erori prop:', JSON.stringify(pr.errors));
+  }
+  // Departamentul TREND crypto (doar dacă e activ)
+  const report = trendOn ? await runTrendCycle({ config, bus, notify, now }) : { openPositions: [], updated: [], errors: {} };
+  if (trendOn) {
+    nErr += Object.keys(report.errors || {}).length;
+    nSym += (config.trendDesk.symbols || []).length;
+    console.log(`${new Date(now).toISOString()} | TREND | poziții: ${report.openPositions.join(', ') || 'niciuna'} | evenimente: ${JSON.stringify(report.updated)}`);
+  }
 
   // Alertă de date (persistată între rulări)
   const allFailed = nErr > 0 && nErr >= nSym;
@@ -76,13 +93,17 @@ async function main() {
 
   // Mesaj zilnic de verificare
   const { hour, date } = roHourAndDate(now);
-  if (hour >= 9 && st.heartbeatDate !== date && st.initialized) {
+  const anyInit = (trendOn && st.initialized) || (propOn && bus.state.prop && bus.state.prop.initialized);
+  if (hour >= 9 && st.heartbeatDate !== date && anyInit) {
     st.heartbeatDate = date;
-    const pos = Object.values(st.positions);
-    const lines = pos.map((p) => `• ${p.symbol} ${p.direction}: intrare ${p.entry.toPrecision(6)}, stop actual ${p.stop.toPrecision(6)} (din ${roTime(p.openedAt)})`);
-    await notify(`☀️ <b>APEX QUANT: verificare zilnică</b>\nSistemul funcționează. Ultima verificare: ${roTime(now)}.\n` +
-      (pos.length ? `Poziții deschise (${pos.length}):\n${lines.join('\n')}` : 'Nicio poziție deschisă. Așteptăm un trend ascendent.') +
-      (nErr ? `\n⚠️ ${nErr}/${nSym} monede fără date la această verificare.` : ''));
+    const parts = [`☀️ <b>APEX QUANT: verificare zilnică</b>\nSistemul funcționează. Ultima verificare: ${roTime(now)}.`];
+    if (propOn) parts.push(propSummary(bus.state.prop, config));
+    if (trendOn) {
+      const pos = Object.values(st.positions);
+      parts.push(pos.length ? `Crypto trend: ${pos.map((p) => `${p.symbol} ${p.direction} (stop ${p.stop.toPrecision(6)})`).join(', ')}` : 'Crypto trend: nicio poziție.');
+    }
+    if (nErr) parts.push(`⚠️ ${nErr}/${nSym} instrumente fără date la această verificare.`);
+    await notify(parts.join('\n\n'));
   }
 
   bus.saveSnapshot();

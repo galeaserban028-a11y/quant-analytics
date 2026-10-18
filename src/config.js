@@ -18,7 +18,7 @@ function applyOverrides(config, overrides) {
   if (overrides.scoringWeights) c.scoringWeights = Object.assign({}, c.scoringWeights, overrides.scoringWeights);
   if (Array.isArray(overrides.advisoryFilters)) c.advisoryFilters = overrides.advisoryFilters.slice();
   if (Array.isArray(overrides.disabledSymbols)) c.disabledSymbols = overrides.disabledSymbols.slice();
-  for (const key of ['executionPolicy', 'regimeFilter', 'smcDesk', 'trendDesk']) {
+  for (const key of ['executionPolicy', 'regimeFilter', 'smcDesk', 'trendDesk', 'propDesk']) {
     if (overrides[key]) c[key] = Object.assign({}, c[key], overrides[key]);
   }
   return c;
@@ -29,17 +29,23 @@ function applyOverrides(config, overrides) {
  * Format promotions.json: { smc: { validatedOOS, level, overrides, ... }, trend: { validatedOOS, level, overrides, ... } }
  * Un departament fără validare out-of-sample rămâne pe setările de bază (implicit: dezactivat).
  */
+/** Departamentele oprite de utilizator rămân oprite chiar dacă cercetarea automată le validează. */
+function applyUserDisabled(cfg) {
+  for (const desk of cfg.userDisabledDesks || []) if (cfg[desk]) cfg[desk] = Object.assign({}, cfg[desk], { enabled: false });
+  return cfg;
+}
+
 function loadConfig({ basePath = BASE_PATH, promotionsPath = PROMOTIONS_PATH, ignorePromotions = false } = {}) {
   let cfg = JSON.parse(fs.readFileSync(basePath, 'utf8'));
-  if (ignorePromotions || !fs.existsSync(promotionsPath)) return cfg;
+  if (ignorePromotions || !fs.existsSync(promotionsPath)) return applyUserDisabled(cfg);
   try {
     const p = JSON.parse(fs.readFileSync(promotionsPath, 'utf8'));
-    for (const section of ['smc', 'trend']) {
+    for (const section of ['smc', 'trend', 'prop']) {
       if (p[section] && p[section].validatedOOS && p[section].overrides) cfg = applyOverrides(cfg, p[section].overrides);
     }
-    return cfg;
+    return applyUserDisabled(cfg);
   } catch (_) {
-    return cfg;
+    return applyUserDisabled(cfg);
   }
 }
 

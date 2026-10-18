@@ -56,6 +56,9 @@ function simulateSymbol(symbol, m15, inst, params = DEFAULT_PARAMS, opts = {}) {
 /** Simulează pe lumânări H4 deja închise (ex. istoric lung descărcat direct pe H4). */
 function simulateBars(symbol, h4, inst, params = DEFAULT_PARAMS, opts = {}) {
   const p = Object.assign({}, DEFAULT_PARAMS, params);
+  const BAR = opts.barMs || H4_MS; // durata unei lumânări (H4 implicit; D1 pentru Forex)
+  // Cost de finanțare (swap) pe an, ca fracție din valoarea nominală; se scade proporțional cu zilele deținute
+  const swapRate = (inst.swapRatePct || 0) / 100;
 
   const spread = (inst.typicalSpreadPips || 0) * inst.pipSize * (opts.spreadMultiplier != null ? opts.spreadMultiplier : 1);
   const from = opts.tradeFromTs || -Infinity;
@@ -72,12 +75,12 @@ function simulateBars(symbol, h4, inst, params = DEFAULT_PARAMS, opts = {}) {
     const stop = dir === 'LONG' ? entry - p.atrMult * atr : entry + p.atrMult * atr;
     const risk = Math.abs(entry - stop);
     const commission = ((inst.commissionPips || 0) * inst.pipSize + (inst.commissionPct || 0) * entry) * costMult;
-    return { symbol, dir, entry, stop, initialStop: stop, risk, best, openedAt: at, costR: commission / risk };
+    return { symbol, dir, entry, stop, initialStop: stop, risk, best, openedAt: at, costR: commission / risk, swapRPerDay: swapRate / 365 * entry / risk };
   };
 
   for (let i = 0; i < h4.length; i++) {
     const bar = h4[i];
-    const closeTime = bar.timestamp + H4_MS;
+    const closeTime = bar.timestamp + BAR;
 
     if (pending && !pos) {
       pos = openPosition(pending.dir, bar.open, pending.atr, bar.timestamp, bar.open);
@@ -133,7 +136,7 @@ function simulateBars(symbol, h4, inst, params = DEFAULT_PARAMS, opts = {}) {
     const last = h4[h4.length - 1];
     // starea exactă a poziției încă deschise (folosită de live)
     Object.defineProperty(trades, 'openPosition', { value: Object.assign({}, pos), enumerable: false });
-    trades.push(close(pos, pos.dir === 'LONG' ? last.close : last.close + spread, 'END_OF_DATA', last.timestamp + H4_MS));
+    trades.push(close(pos, pos.dir === 'LONG' ? last.close : last.close + spread, 'END_OF_DATA', last.timestamp + BAR));
   }
   return trades;
 }
@@ -141,6 +144,9 @@ function simulateBars(symbol, h4, inst, params = DEFAULT_PARAMS, opts = {}) {
 function close(pos, exit, outcome, at) {
   const sign = pos.dir === 'LONG' ? 1 : -1;
   const gross = sign * (exit - pos.entry) / pos.risk;
+  const days = Math.max(0, (at - pos.openedAt) / 864e5);
+  const swapR = (pos.swapRPerDay || 0) * days;
+  pos = Object.assign({}, pos, { costR: (pos.costR || 0) + swapR });
   return {
     symbol: pos.symbol, direction: pos.dir, desk: 'TREND', entry: pos.entry, initialStopLoss: pos.initialStop,
     exitPrice: exit, outcome, openedAt: pos.openedAt, closedAt: at, costR: pos.costR,
@@ -162,19 +168,20 @@ function simulate(dataBySymbol, instruments, params, opts = {}) {
  * simulată e încă deschisă la final, aceea este poziția curentă (cu stopul ei de trailing). Astfel live-ul
  * nu poate diverge de backtest.
  */
-function liveState(symbol, h4, inst, params = DEFAULT_PARAMS) {
-  const trades = simulateBars(symbol, h4, inst, params, {});
+function liveState(symbol, h4, inst, params = DEFAULT_PARAMS, opts = {}) {
+  const BAR = opts.barMs || H4_MS;
+  const trades = simulateBars(symbol, h4, inst, params, opts);
   const last = trades[trades.length - 1];
   const lastBar = h4[h4.length - 1];
   if (last && last.outcome === 'END_OF_DATA' && trades.openPosition) {
     const op = trades.openPosition;
     return {
       position: { symbol, direction: op.dir, entry: op.entry, initialStop: op.initialStop, stop: op.stop, openedAt: op.openedAt },
-      asOf: lastBar ? lastBar.timestamp + H4_MS : null,
+      asOf: lastBar ? lastBar.timestamp + BAR : null,
       lastClosed: trades.length > 1 ? trades[trades.length - 2] : null
     };
   }
-  return { position: null, asOf: lastBar ? lastBar.timestamp + H4_MS : null, lastClosed: last || null };
+  return { position: null, asOf: lastBar ? lastBar.timestamp + BAR : null, lastClosed: last || null };
 }
 
 /** Semnalul curent (pentru live): ce ar face departamentul la închiderea ultimei lumânări H4. */

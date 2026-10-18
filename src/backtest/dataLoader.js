@@ -28,7 +28,7 @@ function loadCsv(file) {
     const rawT = p[idx.t] && p[idx.t].trim();
     let ts = Number(rawT);
     if (!Number.isFinite(ts)) ts = Date.parse(rawT.includes('T') || rawT.endsWith('Z') ? rawT : rawT.replace(' ', 'T') + 'Z');
-    else if (ts < 1e12) ts *= 1000;
+    else if (ts < 1e11) ts *= 1000; // secunde → ms (pragul 1e12 strica datele dinainte de 2001)
     rows.push({ timestamp: ts, open: +p[idx.o], high: +p[idx.h], low: +p[idx.l], close: +p[idx.c], volume: p[idx.v] !== undefined ? +p[idx.v] || 0 : 0 });
   }
   return normalizeCandles(rows);

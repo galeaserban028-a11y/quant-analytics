@@ -103,3 +103,16 @@ test('random walk sintetic este determinist și valid', () => {
   assert.deepEqual(a, b);
   assert.ok(a.every((c) => c.high >= Math.max(c.open, c.close) && c.low <= Math.min(c.open, c.close)));
 });
+
+test('CSV/lumânări: datele dinainte de 2001 în milisecunde NU sunt înmulțite din nou (bug găsit pe istoricul Forex)', () => {
+  const { parseCandle } = require('../src/core/candles');
+  const ts2000 = Date.UTC(2000, 0, 3); // 946857600000 < 1e12
+  assert.equal(parseCandle([ts2000, 1, 2, 0.5, 1.5, 0]).timestamp, ts2000);
+  assert.equal(parseCandle([ts2000 / 1000, 1, 2, 0.5, 1.5, 0]).timestamp, ts2000);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'apex-csv2-'));
+  const f = path.join(dir, 'X.csv');
+  fs.writeFileSync(f, `timestamp,open,high,low,close\n${ts2000},1,2,0.5,1.5\n${ts2000 / 1000 + 86400},1,2,0.5,1.5\n`);
+  const c = loadCsv(f);
+  assert.equal(c[0].timestamp, ts2000);
+  assert.equal(c[1].timestamp, ts2000 + 864e5);
+});

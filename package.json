@@ -1,8 +1,8 @@
 {
   "name": "apex-quant",
   "version": "2.0.0",
-  "description": "Companie de trading algoritmic cu departamente evaluate out-of-sample: Trend H4 (validat) și SMC M15 (în observație). Backtest onest, walk-forward, evaluarea agenților, semnale Telegram.",
-  "main": "src/live.js",
+  "description": "Semnale Forex/aur/indici pentru examene de prop firm: strategie validată out-of-sample, Gardian pentru regulile firmei, simulator de examen, semnale Telegram cu lot exact.",
+  "main": "src/cron.js",
   "private": true,
   "engines": {
     "node": ">=18"
@@ -16,7 +16,8 @@
     "backtest:synthetic": "node src/backtest/run.js --synthetic --days 120 --seeds 5",
     "research": "node src/research/run.js",
     "research:trend": "node src/research/trendRun.js",
-    "test": "node --test"
+    "test": "node --test",
+    "research:prop": "node src/research/propRun.js"
   },
   "dependencies": {}
 }

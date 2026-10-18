@@ -63,5 +63,70 @@
         "note": "Se activează doar dacă trece validarea out-of-sample (npm run research:trend -- --apply)."
       }
     }
+  },
+  "prop": {
+    "generatedAt": "2026-10-18T10:35:01.031Z",
+    "level": "LIVE",
+    "validatedOOS": true,
+    "oos": {
+      "trades": 2209,
+      "wins": 1444,
+      "losses": 765,
+      "winRatePct": 65.4,
+      "avgWinR": 0.361,
+      "avgLossR": 0.584,
+      "expectancyR": 0.034,
+      "expectancyCI95": [
+        0.01,
+        0.057
+      ],
+      "tStat": 2.84,
+      "totalR": 74.7,
+      "profitFactor": 1.17,
+      "maxDrawdownR": 35.39,
+      "maxLosingStreak": 11,
+      "outcomes": {
+        "TARGET": 1802,
+        "STOP": 325,
+        "TIME": 57,
+        "END_OF_DATA": 25
+      }
+    },
+    "overrides": {
+      "propDesk": {
+        "enabled": true,
+        "firm": "THE5ERS_HIGH_STAKES",
+        "riskPct": 3,
+        "safety": 0.7,
+        "maxOpen": 5,
+        "params": {
+          "trendLen": 200,
+          "entryRsi": 5,
+          "exitLen": 3,
+          "stopAtr": 2,
+          "maxDays": 10,
+          "allowShort": true
+        },
+        "symbols": [
+          "EURUSD",
+          "GBPUSD",
+          "AUDUSD",
+          "NZDUSD",
+          "USDJPY",
+          "USDCAD",
+          "USDCHF",
+          "EURJPY",
+          "GBPJPY",
+          "AUDJPY",
+          "EURGBP",
+          "EURCHF",
+          "XAUUSD",
+          "US30",
+          "NAS100",
+          "SPX500",
+          "GER40"
+        ]
+      }
+    }
   }
 }

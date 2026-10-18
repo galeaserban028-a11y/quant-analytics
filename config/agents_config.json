@@ -551,5 +551,45 @@
   "smcDesk": {
     "enabled": false,
     "note": "Departamentul SMC M15 se activează doar dacă trece validarea out-of-sample (npm run research -- --apply)."
-  }
+  },
+  "propDesk": {
+    "enabled": false,
+    "firm": "THE5ERS_HIGH_STAKES",
+    "accountSize": 10000,
+    "riskPct": 3,
+    "safety": 0.8,
+    "maxOpen": 5,
+    "params": {
+      "trendLen": 200,
+      "entryRsi": 5,
+      "exitLen": 3,
+      "stopAtr": 2,
+      "maxDays": 10,
+      "allowShort": true
+    },
+    "symbols": [
+      "EURUSD",
+      "GBPUSD",
+      "AUDUSD",
+      "NZDUSD",
+      "USDJPY",
+      "USDCAD",
+      "USDCHF",
+      "EURJPY",
+      "GBPJPY",
+      "AUDJPY",
+      "EURGBP",
+      "EURCHF",
+      "XAUUSD",
+      "US30",
+      "NAS100",
+      "SPX500",
+      "GER40"
+    ],
+    "note": "Se activează doar dacă trece validarea out-of-sample (npm run research:prop -- --apply)."
+  },
+  "userDisabledDesks": [
+    "trendDesk"
+  ],
+  "_userDisabledDesks_note": "Crypto (trendDesk) e oprit la cererea ta: tranzacționezi doar Forex pe prop firms. Șterge \"trendDesk\" din listă ca să-l reactivezi."
 }
