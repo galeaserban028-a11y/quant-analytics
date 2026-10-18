@@ -1,4 +1,4 @@
-# Diagnostic de rețea pentru sursele de date Forex (rezultatul apare ca adnotări).
+# Diagnostic de rețea pentru sursele de date (rezultatul apare ca adnotări).
 name: APEX diagnostic surse date
 
 on:
@@ -12,14 +12,11 @@ jobs:
       - name: Testează sursele
         run: |
           for u in \
-            "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/BID_candles_hour_1.bi5" \
-            "http://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/BID_candles_hour_1.bi5" \
-            "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/15/BID_candles_min_1.bi5" \
-            "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/BID_candles_day_1.bi5" \
-            "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/15/10h_ticks.bi5" \
-            "https://www.histdata.com/" \
-            "https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?interval=1h&range=5d" \
-            "https://stooq.com/q/d/l/?s=eurusd&i=d" ; do
-            r=$(curl -sS -A "Mozilla/5.0" -o /tmp/x -w "%{http_code} %{size_download}B %{time_total}s" --max-time 60 "$u" 2>&1 | tr '\n' ' ')
-            echo "::notice::$u -> $r"
+            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=IR3TIB01USM156N" \
+            "https://stats.bis.org/api/v1/data/WS_CBPOL/M.US/all?format=csv" \
+            "https://stats.bis.org/api/v2/data/dataflow/BIS/WS_CBPOL/1.0/M.US?format=csv" \
+            "https://data-api.ecb.europa.eu/service/data/FM/M.U2.EUR.4F.KR.DFR.LEV?format=csvdata" \
+            "https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@DF_FINMARK,4.0/USA.M.IR3TIB.PA.....?format=csvfile" ; do
+            r=$(curl -sS -L -A "Mozilla/5.0" -o /tmp/x -w "%{http_code} %{size_download}B %{time_total}s" --max-time 60 "$u" 2>&1 | tr '\n' ' ')
+            echo "::notice::$u -> $r :: $(head -c 160 /tmp/x | tr '\n' ' ')"
           done
