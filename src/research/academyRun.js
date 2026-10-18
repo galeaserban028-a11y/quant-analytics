@@ -28,6 +28,7 @@ const { chooseRisk, rankFirms } = require('./propRun');
 const { monthDistribution, journey } = require('./scenario');
 const { writePromotionSection } = require('../config');
 const { sendTelegram } = require('../notify/telegram');
+const { loadRates } = require('../data/rates');
 
 const DK_DIR = path.join(DATA_DIR, 'fx', 'dk', 'd1');
 const INSTRUMENTS = require('../../config/forex_instruments.json');
@@ -58,7 +59,8 @@ function prudentInstruments(data) {
   return inst;
 }
 
-const prudentSim = (d, i, p, o) => lab.simulate(d, i, p, Object.assign({}, o, { execution: 'nextOpen' }));
+const RATES = loadRates(); // swap real și strategiile carry (null dacă fișierul lipsește: swap fix, carry fără semnale)
+const prudentSim = (d, i, p, o) => lab.simulate(d, i, p, Object.assign({}, o, { execution: 'nextOpen', rates: RATES }));
 
 function loadAll() {
   const data = {};
@@ -80,7 +82,7 @@ async function main() {
   const pairs = Object.keys(data);
   if (pairs.length < 4) { console.log(`Prea puține perechi cu date Dukascopy (${pairs.length}). Rulează workflow-ul „APEX date Forex”.`); process.exitCode = 1; return; }
   const inst = prudentInstruments(data);
-  console.log(`Academia Forex: ${pairs.length} perechi (${pairs.join(', ')})`);
+  console.log(`Academia Forex: ${pairs.length} perechi (${pairs.join(', ')}) · dobânzi: ${RATES ? `${RATES.keys[0]} → ${RATES.keys[RATES.keys.length - 1]}` : 'lipsă (swap fix)'}`);
 
   const runs = SEEDS.map((seed) => {
     const t = Date.now();

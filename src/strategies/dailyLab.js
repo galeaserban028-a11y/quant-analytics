@@ -17,6 +17,7 @@
  */
 const { computeATR } = require('../core/candles');
 const { smaSeries, rsiSeries } = require('./meanRevDesk');
+const { diffAt } = require('../data/rates');
 
 const DAY_MS = 864e5;
 
@@ -34,7 +35,7 @@ function weekdaysLeftInMonth(ts) {
   return n;
 }
 
-function makeRules(bars, p) {
+function makeRules(bars, p, ctx = {}) {
   const closes = bars.map((b) => b.close);
   const smaT = p.trendLen ? smaSeries(closes, p.trendLen) : closes.map(() => NaN);
   const smaX = smaSeries(closes, p.exitLen || 5);
@@ -178,6 +179,22 @@ function makeRules(bars, p) {
         exit(i, pos) { return pos.dir === 'LONG' ? closes[i] >= m[i] : closes[i] <= m[i]; }
       };
     }
+    case 'carry': {
+      // carry: cumpără moneda cu dobânda mai mare (diferență ≥ minDiff puncte procentuale), doar în direcția trendului
+      const diff = (i) => (ctx.diff ? ctx.diff(bars[i].timestamp) : null);
+      const okLong = (i) => { const d = diff(i); return d != null && d >= p.minDiff && (!p.trendLen || above(i)); };
+      const okShort = (i) => { const d = diff(i); return d != null && -d >= p.minDiff && (!p.trendLen || below(i)); };
+      return {
+        warm: Math.max(p.trendLen || 0, 20) + 15,
+        entry(i) {
+          if (!ready(i)) return null;
+          if (okLong(i)) return 'LONG';
+          if (p.allowShort && okShort(i)) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) { return pos.dir === 'LONG' ? !okLong(i) : !okShort(i); }
+      };
+    }
     case 'tom':
       return {
         warm: (p.trendLen || 0) + 15,
@@ -217,7 +234,10 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
   const swapRate = (inst.swapRatePct || 0) / 100;
   const from = opts.tradeFromTs || -Infinity;
   const until = opts.tradeUntilTs || Infinity;
-  const rules = makeRules(bars, p);
+  const fx = inst.category === 'FX' && opts.rates && inst.baseCurrency && inst.quoteCurrency;
+  const rateDiff = fx ? (ts) => diffAt(opts.rates, inst.baseCurrency, inst.quoteCurrency, ts) : null;
+  const rules = makeRules(bars, p, { diff: rateDiff });
+  const SWAP_MARKUP = 1.0; // brokerul ia ~1 punct procentual pe an din swap, în ambele direcții (prudent)
   const trades = [];
   let pos = null;
   const desk = String(p.kind).toUpperCase();
@@ -225,7 +245,12 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
   const finish = (exit, outcome, at) => {
     const sign = pos.dir === 'LONG' ? 1 : -1;
     const days = Math.max(0, (at - pos.openedAt) / DAY_MS);
-    const costR = pos.costR + swapRate / 365 * pos.entry / pos.risk * days;
+    let yearlyPct = swapRate * 100;
+    if (rateDiff) {
+      const d = rateDiff(pos.openedAt);
+      if (d != null) yearlyPct = (pos.dir === 'LONG' ? -d : d) + SWAP_MARKUP; // swap real: plătești sau primești diferența de dobândă
+    }
+    const costR = pos.costR + yearlyPct / 100 / 365 * pos.entry / pos.risk * days;
     trades.push({
       symbol, direction: pos.dir, desk, entry: pos.entry, initialStopLoss: pos.stop, exitPrice: exit,
       outcome, openedAt: pos.openedAt, closedAt: at, costR, resultR: Number((sign * (exit - pos.entry) / pos.risk - costR).toFixed(4))

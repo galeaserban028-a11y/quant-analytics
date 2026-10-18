@@ -208,3 +208,63 @@ test('costuri reale: o zi cu spread mare (știri) costă mai mult; spread-ul mic
   const sum = (ts) => ts.reduce((s, t) => s + t.resultR, 0);
   assert.ok(sum(wide) < sum(base) - 1, 'spread de 10 pips ⇒ rezultate clar mai slabe');
 });
+
+test('dobânzi: fără look-ahead (luna anterioară), swap real (primești sau plătești), strategia carry', () => {
+  const { parseRates, rateAt, diffAt } = require('../src/data/rates');
+  const lines = ['month,USD,EUR,JPY,AUD'];
+  for (let y = 2003; y <= 2008; y++) for (let m = 1; m <= 12; m++) lines.push(`${y}-${String(m).padStart(2, '0')},${y < 2006 ? 1 : 5},2,0.1,6`);
+  const R = parseRates(lines.join('\n'));
+  assert.equal(rateAt(R, 'USD', Date.UTC(2006, 0, 15)), 1, 'în ianuarie 2006 vedem doar decembrie 2005');
+  assert.equal(rateAt(R, 'USD', Date.UTC(2006, 1, 15)), 5);
+  assert.equal(diffAt(R, 'AUD', 'JPY', Date.UTC(2004, 5, 1)).toFixed(1), '5.9');
+  assert.equal(diffAt(R, 'XXX', 'JPY', Date.UTC(2004, 5, 1)), null);
+  // AUDJPY: diferență mare de dobândă ⇒ carry cumpără; swap-ul îi aduce bani, iar vânzarea plătește
+  const bars = walk(1500, 88, 0.0003).map((b) => Object.assign({}, b, { open: b.open * 80, high: b.high * 80, low: b.low * 80, close: b.close * 80 }));
+  const carry = lab.simulateBars('AUDJPY', bars, INSTR.AUDJPY, { kind: 'carry', minDiff: 2, trendLen: 0, stopAtr: 4, maxDays: 250, allowShort: true }, { rates: R });
+  assert.ok(carry.length > 0 && carry.every((t) => t.direction === 'LONG'));
+  assert.ok(carry.some((t) => t.costR < 0), 'swap pozitiv: costul total devine câștig la ținere lungă');
+  assert.equal(lab.simulateBars('AUDJPY', bars, INSTR.AUDJPY, { kind: 'carry', minDiff: 2, trendLen: 0, stopAtr: 4, maxDays: 250 }).length, 0, 'fără dobânzi ⇒ fără semnale carry');
+  const p = { kind: 'mom', lookback: 60, stopAtr: 3, maxDays: 250, allowShort: true };
+  const withR = lab.simulateBars('AUDJPY', bars, INSTR.AUDJPY, p, { rates: R });
+  const longs = withR.filter((t) => t.direction === 'LONG'), shorts = withR.filter((t) => t.direction === 'SHORT');
+  if (longs.length && shorts.length) assert.ok(Math.min(...longs.map((t) => t.costR / Math.max(1, (t.closedAt - t.openedAt) / DAY))) < Math.min(...shorts.map((t) => t.costR / Math.max(1, (t.closedAt - t.openedAt) / DAY))));
+});
+
+test('APEX Capital live: cei 300 tranzacționează zilnic cu bani fictivi — pornire tăcută, intrare proaspătă, ieșire, risc după grad, acasă după pierderi', async () => {
+  const { runVirtualCycle } = require('../src/academy/virtualLive');
+  const bus = new MarketStateBus(loadConfig(), { snapshotPath: null });
+  const params = { trendLen: 200, entryRsi: 5, exitLen: 3, stopAtr: 2, maxDays: 10, allowShort: false };
+  const academy = { generatedAt: '2026-10-01T00:00:00Z', population: [
+    { id: 'A1', name: 'Andrei Popescu', rank: 'ELITĂ', pair: 'EURUSD', family: 'rsi2', params },
+    { id: 'A2', name: 'Maria Ionescu', rank: 'STAGIAR', pair: 'EURUSD', family: 'rsi2', params: Object.assign({}, params, { stopAtr: 3 }) }
+  ] };
+  const bars = [];
+  for (let i = 0; i < 300; i++) { const c = 1 + 0.001 * i; bars.push({ timestamp: T0 + i * DAY, open: c - 0.001, high: c + 0.002, low: c - 0.003, close: c, volume: 0 }); }
+  for (let k = 0; k < 2; k++) { const p = bars[bars.length - 1].close; bars.push({ timestamp: bars[bars.length - 1].timestamp + DAY, open: p, high: p + 0.001, low: p - 0.011, close: p - 0.01, volume: 0 }); }
+  const feed = (b) => async () => ({ candles: b.map((x) => Object.assign({}, x)) });
+  const tLast = bars[bars.length - 1].timestamp + DAY;
+  let r = await runVirtualCycle({ academy, instruments: INSTR, bus, fetch: feed(bars.slice(0, -1)), now: tLast - DAY + 3600e3 });
+  assert.equal(r.opened, 0, 'prima rulare: nu intră în tranzacții deja începute');
+  assert.equal(bus.state.fxVirtual.initialized, true);
+  r = await runVirtualCycle({ academy, instruments: INSTR, bus, fetch: feed(bars), now: tLast + 3600e3 });
+  assert.equal(r.opened, 2);
+  const pos = bus.state.fxVirtual.positions;
+  assert.ok(Math.abs(pos.A1.risk / 1e6 - 0.003) < 1e-9 && Math.abs(pos.A2.risk / 1e6 - 0.0005) < 1e-9, 'risc după grad: elită 0,30%, stagiar 0,05%');
+  // aceeași zi, verificată din nou peste 10 minute: nimic nou (o descărcare pe oră)
+  r = await runVirtualCycle({ academy, instruments: INSTR, bus, fetch: feed(bars), now: tLast + 3600e3 + 600e3 });
+  assert.deepEqual(r.fetched, []);
+  // revenire puternică ⇒ ambele ies cu profit; capitalul fictiv crește
+  const L = bars[bars.length - 1];
+  const up = bars.concat([{ timestamp: L.timestamp + DAY, open: L.close, high: L.close + 0.03, low: L.close - 0.001, close: L.close + 0.025, volume: 0 }]);
+  r = await runVirtualCycle({ academy, instruments: INSTR, bus, fetch: feed(up), now: tLast + DAY + 3600e3 });
+  assert.equal(r.closed, 2);
+  const book = bus.state.fxVirtual;
+  assert.ok(book.equity > 1e6);
+  assert.ok(book.agents.A1.pnl > book.agents.A2.pnl, 'elita câștigă mai mulți bani pe același semnal');
+  assert.equal(book.journal.length, 2);
+  // limita trader-ului: după pierderi mari stă acasă; o școală nouă îl readuce
+  book.recent.A2 = [{ at: tLast + DAY, r: -9 }];
+  book.sentHome.A2 = tLast + DAY;
+  await runVirtualCycle({ academy: Object.assign({}, academy, { generatedAt: '2026-11-01T00:00:00Z' }), instruments: INSTR, bus, fetch: feed(up), now: tLast + DAY + 3 * 3600e3 });
+  assert.deepEqual(book.sentHome, {}, 'școala nouă: toți revin la lucru');
+});

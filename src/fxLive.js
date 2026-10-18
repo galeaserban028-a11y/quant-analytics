@@ -10,6 +10,7 @@
 const { getJson } = require('./data/http');
 const { parseYahooChart, validOhlc } = require('./data/dailySources');
 const { runPropCycle } = require('./propLive');
+const { loadRates } = require('./data/rates');
 
 const DAY = 864e5;
 
@@ -63,7 +64,7 @@ async function runFxCycle({ config, instruments, bus, notify, fetch, now = Date.
   if (!fx.enabled) return { skipped: 'ACADEMIA_OPRITĂ' };
   if (!(fx.elite || []).length) return { skipped: 'NICIUN_AGENT_ELITĂ' };
   const cfg = Object.assign({}, config, { fxLive: eliteToDesk(fx) });
-  return runPropCycle({ config: cfg, instruments, bus, notify, fetch: fetch || ((sym, inst) => fetchFxDaily(inst, { now })), now, env, deskKey: 'fxLive', stateKey: 'fx', label: 'APEX FOREX' });
+  return runPropCycle({ config: cfg, instruments, bus, notify, fetch: fetch || ((sym, inst) => fetchFxDaily(inst, { now })), now, env, deskKey: 'fxLive', stateKey: 'fx', label: 'APEX FOREX', simOpts: { rates: loadRates() } });
 }
 
 module.exports = { runFxCycle, hoursToUtcDays, fetchFxDaily, eliteToDesk };

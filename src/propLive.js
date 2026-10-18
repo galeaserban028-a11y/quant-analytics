@@ -128,7 +128,7 @@ function shouldFetch(acct, sym, inst, now) {
  * @param {number} [p.now]
  * @param {object} [p.env] suprascrieri: PROP_BALANCE, PROP_ACCOUNT_SIZE, PROP_FIRM, PROP_PHASE
  */
-async function runPropCycle({ config, instruments, bus, notify, fetch, now = Date.now(), env = process.env, deskKey = 'propDesk', stateKey = 'prop', label = 'APEX PROP' }) {
+async function runPropCycle({ config, instruments, bus, notify, fetch, now = Date.now(), env = process.env, deskKey = 'propDesk', stateKey = 'prop', label = 'APEX PROP', simOpts = {} }) {
   const desk = Object.assign({}, config[deskKey] || {});
   if (!desk.enabled) return { skipped: 'PROP_DESK_DISABLED' };
   if (env.PROP_FIRM && PROP_RULES[env.PROP_FIRM]) desk.firm = env.PROP_FIRM;
@@ -204,7 +204,7 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
       const key = st.id ? `${sym}|${st.id}` : `${sym}|${st.kind}`;
       const who = st.who || `${nameFor(st.kind, sym)} (${st.name || st.kind})`;
       const params = Object.assign({ kind: st.kind }, st.params);
-      const { position, lastClosed } = lab.liveState(sym, candles, inst, params, { barMs: DAY_MS });
+      const { position, lastClosed } = lab.liveState(sym, candles, inst, params, Object.assign({ barMs: DAY_MS }, simOpts));
       const prev = acct.positions[key];
 
       // 1. Ieșire

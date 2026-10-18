@@ -14,6 +14,7 @@ const FAMILIES = {
   bb: { name: 'Bandă Bollinger', style: 'revenire', space: { len: [10, 20, 30], k: [1.5, 2, 2.5], trendLen: [0, 200], stopAtr: [2, 3, 4], maxDays: [10, 20], allowShort: [false, true] } },
   mom: { name: 'Momentum', style: 'trend', space: { lookback: [20, 40, 60, 90, 120, 180, 250], stopAtr: [2, 3, 4, 5], maxDays: [250], allowShort: [true] } },
   donch: { name: 'Breakout Donchian', style: 'trend', space: { entryLen: [20, 40, 55, 80, 100], exitLen: [10, 20, 30], stopAtr: [2, 3, 4, 5], maxDays: [250], allowShort: [true] } },
+  carry: { name: 'Carry (dobânzi)', style: 'dobânzi', space: { minDiff: [0.5, 1, 2, 3], trendLen: [0, 50, 100, 200], stopAtr: [3, 4, 5], maxDays: [250], allowShort: [true] } },
   macross: { name: 'Încrucișare de medii', style: 'trend', space: { fast: [10, 20, 50], slow: [50, 100, 200], stopAtr: [2, 3, 4, 5], maxDays: [250], allowShort: [true] } }
 };
 
@@ -87,6 +88,7 @@ function describe(g) {
     case 'mom': return `în direcția mișcării pe ${p.lookback} zile; iese când se întoarce`;
     case 'donch': return `breakout la extrema de ${p.entryLen} zile; iese la extrema opusă de ${p.exitLen} zile`;
     case 'macross': return `media de ${p.fast} zile peste/sub media de ${p.slow} zile`;
+    case 'carry': return `ține moneda cu dobânda mai mare (diferență ≥ ${p.minDiff} puncte)${p.trendLen ? ` doar în trendul de ${p.trendLen} zile` : ''}; primește swap`;
     default: return g.family;
   }
 }

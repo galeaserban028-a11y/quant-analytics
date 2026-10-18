@@ -231,6 +231,7 @@ class MarketStateBus {
         trend: this.state.trend,
         prop: this.state.prop || null,
         fx: this.state.fx || null,
+        fxVirtual: this.state.fxVirtual || null,
         savedAt: new Date(this.now()).toISOString()
       };
       // Rulăm des (din 5 în 5 minute): dacă nimic nu s-a schimbat în afară de oră, nu rescriem fișierul (evită commit-uri inutile)
@@ -269,6 +270,7 @@ class MarketStateBus {
       if (parsed.lockouts) this.state.lockouts = parsed.lockouts;
       if (parsed.prop) this.state.prop = parsed.prop;
       if (parsed.fx) this.state.fx = parsed.fx;
+      if (parsed.fxVirtual) this.state.fxVirtual = parsed.fxVirtual;
       if (parsed.trend && parsed.trend.positions) this.state.trend = Object.assign({ positions: {}, skipped: {}, lastAsOf: {} }, parsed.trend);
       this._checkDailyReset();
     } catch (err) {

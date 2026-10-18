@@ -192,7 +192,13 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
   function kv(pairs) { const dl = el('dl', { class: 'kv' }); for (const [k, v, c] of pairs) { dl.append(el('dt', { text: k })); dl.append(el('dd', { text: v, class: c || '' })); } return dl; }
 
   function fxState() { return state && state.fx; }
-  function openAgents() { const s = fxState(); return new Set(Object.values((s && s.positions) || {}).map((p) => p.agent).filter(Boolean)); }
+  function vBook() { return state && state.fxVirtual && state.fxVirtual.initialized ? state.fxVirtual : null; }
+  function openAgents() {
+    const s = fxState();
+    const ids = new Set(Object.values((s && s.positions) || {}).map((p) => p.agent).filter(Boolean));
+    const v = vBook(); if (v) for (const id of Object.keys(v.positions || {})) ids.add(id);
+    return ids;
+  }
 
   function renderVerdict() {
     const v = document.getElementById('verdict');
@@ -289,7 +295,9 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
       ['Încredere (t)', a.stats.t.toFixed(2)],
       ['Ultimele 12 luni', a.stats.last12 == null ? '—' : `${signed(a.stats.last12)}R`, cls(a.stats.last12)],
       ['Trimestre în elită', String(a.eliteQuarters)],
-      ['Live (semnale reale)', mine.length ? `${mine.length} · ${signed(liveR, 2)}R` : '—', cls(liveR)]
+      ['Live (semnale reale)', mine.length ? `${mine.length} · ${signed(liveR, 2)}R` : '—', cls(liveR)],
+      ['Live (bani fictivi)', (() => { const v = vBook(); const st = v && v.agents[a.id]; return st ? `${st.n} tranz. · ${money(st.pnl)}` : '—'; })(), (() => { const v = vBook(); const st = v && v.agents[a.id]; return st ? cls(st.pnl) : ''; })()],
+      ['Acum', (() => { const v = vBook(); const p = v && v.positions[a.id]; if (p) return `${p.direction === 'LONG' ? 'cumpărat' : 'vândut'} ${p.pair} din ${new Date(p.openedAt).toISOString().slice(0, 10)}`; return v && v.sentHome[a.id] ? 'acasă (prea multe pierderi)' : 'fără poziție'; })()]
     ]));
     box.append(el('p', { class: 'muted', text: a.rank === 'ELITĂ' ? 'Trimite semnale reale (prin Gardian).' : a.rank === 'STAGIAR' ? 'Învață: tranzacționează doar pe hârtie în primul an.' : 'Lucrează pe hârtie; urcă în elită doar cu un palmares lung și clar pozitiv.' }));
   }
@@ -395,6 +403,11 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     tiles.append(stat('Pe an, în medie', `${signed(v.cagrPct, 2)}%`, academy.virtualOthers && academy.virtualOthers.length ? `alte vieți: ${academy.virtualOthers.map((x) => signed(x.cagrPct, 1) + '%').join(', ')}` : '', cls(v.cagrPct)));
     tiles.append(stat('Cea mai mare scădere', `${v.maxDrawdownPct}%`, `${v.positiveMonthsPct}% din luni pe plus`));
     tiles.append(stat('Tranzacții', v.trades.toLocaleString('ro-RO'), `${v.suspensions} trimiteri acasă · ${v.skippedRisk} refuzate de risc`));
+    const vb = vBook();
+    if (vb) {
+      const live = el('div', { class: 'stat', style: 'border-color:var(--ok)' }, [el('span', { class: 'lbl', text: `LIVE din ${new Date(vb.startedAt).toISOString().slice(0, 10)} (bani fictivi)` }), el('span', { class: 'big num ' + cls(vb.equity - vb.capital), text: money(vb.equity) }), el('span', { class: 'lbl', text: `${Object.keys(vb.positions).length} poziții deschise acum · ${vb.journal.length} tranzacții închise live · ${Object.keys(vb.sentHome).length} acasă` })]);
+      tiles.prepend(live);
+    }
 
     // curba capitalului
     const box = document.getElementById('capCurve');
@@ -440,11 +453,12 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
 
     // jurnal
     const jb = document.getElementById('capJournal');
-    jb.append(el('h3', { text: 'Jurnalul de tranzacții (ultimele)' }));
+    const liveJ = vBook() && vBook().journal.length ? vBook().journal : null;
+    jb.append(el('h3', { text: liveJ ? 'Jurnalul LIVE (bani fictivi)' : 'Jurnalul de tranzacții (ultimele din istorie)' }));
     const jt = el('table');
     jt.append(el('thead', {}, [el('tr', {}, [el('th', { text: 'Închisă' }), el('th', { text: 'Agent' }), el('th', { text: 'Pereche' }), el('th', { class: 'r', text: 'R' }), el('th', { class: 'r', text: 'Profit fictiv' })])]));
     const jtb = el('tbody');
-    for (const j of v.journal.slice(0, 15)) jtb.append(el('tr', {}, [el('td', { text: new Date(j.at).toISOString().slice(0, 10) }), el('td', { text: `${j.name} (${RANK_TXT[j.rank]})` }), el('td', { text: `${j.pair} ${j.direction === 'LONG' ? '↑' : '↓'}` }), el('td', { class: 'r num ' + cls(j.r), text: signed(j.r, 2) }), el('td', { class: 'r num ' + cls(j.pnl), text: money(j.pnl) })]));
+    for (const j of (liveJ || v.journal).slice(0, 15)) jtb.append(el('tr', {}, [el('td', { text: new Date(j.at).toISOString().slice(0, 10) }), el('td', { text: `${j.name} (${RANK_TXT[j.rank]})` }), el('td', { text: `${j.pair} ${j.direction === 'LONG' ? '↑' : '↓'}` }), el('td', { class: 'r num ' + cls(j.r), text: signed(j.r, 2) }), el('td', { class: 'r num ' + cls(j.pnl), text: money(j.pnl) })]));
     jt.append(jtb); jb.append(jt);
 
     // cele mai mari pierderi

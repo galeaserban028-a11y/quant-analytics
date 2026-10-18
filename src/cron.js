@@ -19,7 +19,11 @@ const { loadConfig } = require('./config');
 const MarketStateBus = require('./core/MarketStateBus');
 const { runTrendCycle } = require('./trendLive');
 const { runPropCycle, propSummary } = require('./propLive');
-const { runFxCycle } = require('./fxLive');
+const fs = require('fs');
+const { runFxCycle, fetchFxDaily } = require('./fxLive');
+const { runVirtualCycle } = require('./academy/virtualLive');
+const { loadRates } = require('./data/rates');
+const ACADEMY_FILE = path.join(__dirname, '..', 'data', 'research', 'academy.json');
 const FX_INSTRUMENTS = require('../config/forex_instruments.json');
 const { sendTelegram, roTime } = require('./notify/telegram');
 
@@ -48,9 +52,22 @@ async function main() {
     return res;
   };
 
+  // Datele Forex se descarcă o singură dată pe rulare și se împart între Academia reală și APEX Capital (fictiv)
+  const fxMemo = new Map();
+  const fxFetch = (sym, inst) => { if (!fxMemo.has(sym)) fxMemo.set(sym, fetchFxDaily(inst, { now })); return fxMemo.get(sym); };
+  const academy = fs.existsSync(ACADEMY_FILE) ? JSON.parse(fs.readFileSync(ACADEMY_FILE, 'utf8')) : null;
+  // APEX Capital: viața zilnică a celor 300 de agenți, cu bani fictivi (rulează mereu, nu trimite mesaje)
+  if (academy) {
+    try {
+      const vr = await runVirtualCycle({ academy, instruments: FX_INSTRUMENTS, bus, fetch: fxFetch, now, rates: loadRates() });
+      console.log(`${new Date(now).toISOString()} | APEX CAPITAL (fictiv) | ${JSON.stringify(vr)}`);
+    } catch (err) { console.log('APEX Capital: eroare', err.message); }
+  }
+
   // Dacă trebuie să trimită pe Telegram dar lipsesc datele, NU avansăm starea (altfel s-ar pierde mesaje)
   if (LIVE && (!process.env.TELEGRAM_TOKEN || !(process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID))) {
-    console.log('Lipsesc TELEGRAM_TOKEN / TELEGRAM_CHAT_ID (secretele din GitHub). Aștept configurarea; starea rămâne neschimbată.');
+    console.log('Lipsesc TELEGRAM_TOKEN / TELEGRAM_CHAT_ID (secretele din GitHub). Semnalele reale așteaptă configurarea; viața fictivă a agenților continuă.');
+    bus.saveSnapshot();
     return;
   }
 
@@ -58,7 +75,8 @@ async function main() {
   const propOn = Boolean((config.propDesk || {}).enabled);
   const fxOn = Boolean((config.fxDesk || {}).enabled);
   if (!trendOn && !propOn && !fxOn) {
-    console.log('Niciun departament activ (nu au trecut validarea sau au fost dezactivate). Nimic de făcut.');
+    console.log('Niciun departament cu bani reali activ (nu au trecut validarea sau au fost dezactivate). Doar viața fictivă a agenților.');
+    bus.saveSnapshot();
     return;
   }
 
@@ -76,7 +94,7 @@ async function main() {
   }
   // ACADEMIA FOREX (doar agenții ELITĂ, doar dacă Academia a trecut validarea)
   if (fxOn) {
-    const fr = await runFxCycle({ config, instruments: FX_INSTRUMENTS, bus, notify, now });
+    const fr = await runFxCycle({ config, instruments: FX_INSTRUMENTS, bus, notify, now, fetch: fxFetch });
     reports.fx = fr;
     const symErr = Object.keys(fr.errors || {}).filter((k) => !k.startsWith('fx:')).length;
     nErr += symErr;
