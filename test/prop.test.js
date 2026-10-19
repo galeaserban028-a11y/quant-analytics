@@ -449,11 +449,12 @@ test('live: ziua firmei se resetează în fusul ei orar; identitatea pozițiilor
   for (const r of Object.values(PROP_RULES)) assert.ok(r.resetTz && dayKeyIn(t, r.resetTz));
 });
 
-test('config: crypto și indicii opriți la cererea utilizatorului; configurația Prop rămâne validă', () => {
+test('config: crypto oprit; indicii activi; Academia Forex pornește doar validată', () => {
   const c = loadConfig();
   assert.equal(c.trendDesk.enabled, false);
-  assert.equal(c.propDesk.enabled, false, 'indicii sunt opriți (userDisabledDesks)');
-  assert.ok(c.userDisabledDesks.includes('propDesk'));
+  assert.equal(c.propDesk.enabled, true, 'indicii trimit semnale reale');
+  assert.ok(!c.userDisabledDesks.includes('propDesk'));
+  assert.equal(c.fxDesk.enabled, false, 'Academia Forex: fără avantaj dovedit ⇒ oprită');
   assert.ok(PROP_RULES[c.propDesk.firm]);
   assert.ok(c.propDesk.riskPct > 0 && c.propDesk.riskPct <= 4);
   assert.ok(Array.isArray(c.propDesk.strategies) && c.propDesk.strategies.length >= 1);
