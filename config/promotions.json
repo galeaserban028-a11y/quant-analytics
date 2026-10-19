@@ -147,5 +147,157 @@
         ]
       }
     }
+  },
+  "fx": {
+    "generatedAt": "2026-10-19T01:49:01.555Z",
+    "validatedOOS": false,
+    "level": "NIMIC",
+    "oos": [
+      {
+        "trades": 647,
+        "winRatePct": 58.9,
+        "expectancyR": 0,
+        "ci": [
+          -0.03,
+          0.032
+        ]
+      },
+      {
+        "trades": 598,
+        "winRatePct": 58.9,
+        "expectancyR": -0.026,
+        "ci": [
+          -0.065,
+          0.016
+        ]
+      },
+      {
+        "trades": 826,
+        "winRatePct": 57.1,
+        "expectancyR": -0.021,
+        "ci": [
+          -0.054,
+          0.012
+        ]
+      }
+    ],
+    "overrides": {
+      "fxDesk": {
+        "enabled": false,
+        "firm": "THE5ERS_HIGH_STAKES",
+        "riskPct": 3,
+        "safety": 0.7,
+        "maxOpen": 3,
+        "elite": [
+          {
+            "id": "A1756",
+            "name": "Larisa Moldovan",
+            "pair": "GBPJPY",
+            "family": "down",
+            "familyName": "Zile de scădere",
+            "params": {
+              "kind": "down",
+              "trendLen": 200,
+              "nDays": 3,
+              "exitLen": 3,
+              "stopAtr": 1.5,
+              "maxDays": 5,
+              "allowShort": false
+            }
+          },
+          {
+            "id": "A1298",
+            "name": "Vlad Grigore",
+            "pair": "EURCAD",
+            "family": "down",
+            "familyName": "Zile de scădere",
+            "params": {
+              "kind": "down",
+              "trendLen": 200,
+              "nDays": 3,
+              "exitLen": 5,
+              "stopAtr": 1.5,
+              "maxDays": 5,
+              "allowShort": true
+            }
+          },
+          {
+            "id": "A1766",
+            "name": "Ștefan Toma",
+            "pair": "AUDCAD",
+            "family": "ibs",
+            "familyName": "Închidere la extremă (IBS)",
+            "params": {
+              "kind": "ibs",
+              "trendLen": 0,
+              "ibsEntry": 0.15,
+              "stopAtr": 3,
+              "maxDays": 3,
+              "allowShort": true
+            }
+          },
+          {
+            "id": "A1828",
+            "name": "Oana Ionescu",
+            "pair": "AUDCAD",
+            "family": "rsi2",
+            "familyName": "Pullback RSI(2)",
+            "params": {
+              "kind": "rsi2",
+              "trendLen": 0,
+              "entryRsi": 10,
+              "exitLen": 5,
+              "stopAtr": 1.5,
+              "maxDays": 10,
+              "allowShort": false
+            }
+          },
+          {
+            "id": "A1733",
+            "name": "Ramona Oprea",
+            "pair": "AUDJPY",
+            "family": "rsi2",
+            "familyName": "Pullback RSI(2)",
+            "params": {
+              "kind": "rsi2",
+              "trendLen": 100,
+              "entryRsi": 20,
+              "exitLen": 10,
+              "stopAtr": 2,
+              "maxDays": 5,
+              "allowShort": false
+            }
+          }
+        ],
+        "symbols": [
+          "AUDCAD",
+          "AUDCHF",
+          "AUDJPY",
+          "AUDNZD",
+          "AUDUSD",
+          "CADJPY",
+          "CHFJPY",
+          "EURAUD",
+          "EURCAD",
+          "EURCHF",
+          "EURGBP",
+          "EURJPY",
+          "EURNZD",
+          "EURUSD",
+          "GBPAUD",
+          "GBPCAD",
+          "GBPCHF",
+          "GBPJPY",
+          "GBPNZD",
+          "GBPUSD",
+          "NZDCAD",
+          "NZDJPY",
+          "NZDUSD",
+          "USDCAD",
+          "USDCHF",
+          "USDJPY"
+        ]
+      }
+    }
   }
 }
