@@ -95,6 +95,10 @@ const STRATEGIES = {
 // era un defect de date), trend (momentum, breakout Donchian, încrucișare de medii: negative pe indici cu execuție
 // prudentă), efectul de sfârșit de lună (≈0 după costuri). Banda Bollinger și Minimul de N zile au fost adăugate pe
 // 20 octombrie 2026, după ce au trecut același walk-forward (și Bollinger chiar cu costuri duble).
+// Testate tot pe 20 oct. 2026 și NEADĂUGATE: RSI cumulat (crsi) și canalul Keltner (kc) trec singure (E ≈ +0,06…+0,08R),
+// dar adăugate la cele 4 înrăutățesc examenul (trece 37% în loc de 47%, pică 9% în loc de 5%): semnale pe aceleași zile
+// proaste, deci pierderi grupate. Minimele descrescătoare (ll) nu trec nici singure. Semnalele „de consens” (2–4 traderi
+// pe același indice) nu sunt mai bune decât cele singulare.
 const GRID = STRATEGIES.rsi2.grid; // compatibilitate
 
 function parseArgs(argv) {

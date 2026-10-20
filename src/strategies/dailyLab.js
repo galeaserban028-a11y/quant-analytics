@@ -213,6 +213,53 @@ function makeRules(bars, p, ctx = {}) {
           return n >= p.exitDay;
         }
       };
+    case 'crsi': { // RSI(2) cumulat pe `days` zile, sub prag (pullback mai adânc decât o singură zi)
+      const rsi = rsiSeries(closes, 2);
+      return {
+        warm: (p.trendLen || 0) + 15,
+        entry(i) {
+          if (!ready(i) || i < p.days) return null;
+          let sum = 0; for (let k = 0; k < p.days; k++) { if (!Number.isFinite(rsi[i - k])) return null; sum += rsi[i - k]; }
+          if (above(i) && sum < p.sumBelow) return 'LONG';
+          if (p.allowShort && below(i) && sum > 100 * p.days - p.sumBelow) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) { return pos.dir === 'LONG' ? closes[i] > smaX[i] : closes[i] < smaX[i]; }
+      };
+    }
+    case 'll': { // N zile la rând cu maxime ȘI minime mai joase (vânzare în exces)
+      return {
+        warm: (p.trendLen || 0) + 15,
+        entry(i) {
+          if (!ready(i) || i < p.nDays) return null;
+          let dn = true, up = true;
+          for (let k = 0; k < p.nDays; k++) {
+            const b = bars[i - k], a = bars[i - k - 1];
+            if (!(b.high < a.high && b.low < a.low)) dn = false;
+            if (!(b.high > a.high && b.low > a.low)) up = false;
+          }
+          if (above(i) && dn) return 'LONG';
+          if (p.allowShort && below(i) && up) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) { return pos.dir === 'LONG' ? closes[i] > smaX[i] : closes[i] < smaX[i]; }
+      };
+    }
+    case 'kc': { // închidere sub media de `len` zile minus k × ATR (canal Keltner), ieșire la revenirea peste medie
+      const m = smaSeries(closes, p.len);
+      const tr = bars.map((b, i) => (i ? Math.max(b.high - b.low, Math.abs(b.high - bars[i - 1].close), Math.abs(b.low - bars[i - 1].close)) : b.high - b.low));
+      const atrS = smaSeries(tr, p.len);
+      return {
+        warm: Math.max(p.len, p.trendLen || 0) + 15,
+        entry(i) {
+          if (!ready(i) || !Number.isFinite(m[i]) || !Number.isFinite(atrS[i])) return null;
+          if (above(i) && closes[i] < m[i] - p.k * atrS[i]) return 'LONG';
+          if (p.allowShort && below(i) && closes[i] > m[i] + p.k * atrS[i]) return 'SHORT';
+          return null;
+        },
+        exit(i, pos) { return pos.dir === 'LONG' ? closes[i] >= m[i] : closes[i] <= m[i]; }
+      };
+    }
     default:
       throw new Error(`STRATEGIE_NECUNOSCUTĂ: ${p.kind}`);
   }

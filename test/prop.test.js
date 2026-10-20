@@ -860,3 +860,14 @@ test('gardian: opțiunile gapFactor și fundedRiskPct (implicit oprite) micșore
   const exam = decide(Object.assign({}, acct, { phaseTarget: 0.08 }), rules, { riskPct: 4, safety: 0.8, maxOpen: 5, openCount: 0, fundedRiskPct: 2 });
   assert.equal(Math.round(exam.riskAmount), 400, 'în examen plafonul de finanțat nu se aplică');
 });
+
+test('laborator: strategiile crsi / ll / kc dau semnal doar după scăderi, în trend crescător', () => {
+  const up = Array.from({ length: 260 }, (_, i) => ({ timestamp: T0 + i * DAY, open: 100 + i * 0.1, high: 100.5 + i * 0.1, low: 99.5 + i * 0.1, close: 100 + i * 0.1, volume: 0 }));
+  const last = up[up.length - 1].close;
+  const drop = [1, 2, 3].map((k) => ({ timestamp: T0 + (259 + k) * DAY, open: last - (k - 1) * 1.2, high: last - (k - 1) * 1.2 + 0.2, low: last - k * 1.2 - 0.2, close: last - k * 1.2, volume: 0 }));
+  const bars = up.concat(drop);
+  for (const p of [{ kind: 'crsi', trendLen: 200, days: 2, sumBelow: 25, exitLen: 5, stopAtr: 2, maxDays: 10 }, { kind: 'll', trendLen: 200, nDays: 3, exitLen: 5, stopAtr: 2, maxDays: 10 }, { kind: 'kc', trendLen: 200, len: 10, k: 1, stopAtr: 2, maxDays: 10 }]) {
+    assert.ok(lab.liveState('X', bars, INSTR.US30, p).position, `${p.kind}: scădere în trend ⇒ semnal`);
+    assert.equal(lab.liveState('X', up, INSTR.US30, p).position, null, `${p.kind}: fără scădere ⇒ fără semnal`);
+  }
+});
