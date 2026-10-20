@@ -1,18 +1,19 @@
-# Istoric ORAR Forex de la Dukascopy (bid/ask reale), pentru cercetarea strategiilor pe sesiuni (Londra / New York).
-# Fișierele orare sunt lunare; Dukascopy refuză cererile prea dese, așa că fiecare pereche merge pe mașina ei, încet.
-name: APEX date Forex orare (Dukascopy)
+# Istoric ORAR de la Dukascopy (bid/ask reale) pentru cercetarea pe sesiuni (Forex și indici).
+# Fișierele orare sunt lunare și Dukascopy limitează cererile, așa că lucrăm pe bucăți de câte 4 ani:
+# fiecare bucată e un job separat care își salvează singur rezultatul (progresul nu se pierde).
+name: APEX date orare (Dukascopy)
 
 on:
   workflow_dispatch:
     inputs:
       pairs:
-        description: 'Perechi separate prin virgulă'
+        description: 'Instrumente separate prin virgulă'
         required: false
         default: 'EURUSD,GBPUSD,USDJPY,AUDUSD,USDCAD,USDCHF,NZDUSD,EURJPY,GBPJPY,EURGBP'
-      from:
-        description: 'Anul de început'
+      starts:
+        description: 'Anii de început ai bucăților (câte 4 ani fiecare)'
         required: false
-        default: '2010'
+        default: '2010,2014,2018,2022'
 
 permissions:
   contents: write
@@ -22,31 +23,35 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pairs: ${{ steps.p.outputs.pairs }}
+      starts: ${{ steps.p.outputs.starts }}
     steps:
       - id: p
-        run: echo "pairs=$(echo '${{ github.event.inputs.pairs }}' | python3 -c 'import sys,json; print(json.dumps([x.strip() for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "pairs=$(echo '${{ github.event.inputs.pairs }}' | python3 -c 'import sys,json; print(json.dumps([x.strip() for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
+          echo "starts=$(echo '${{ github.event.inputs.starts }}' | python3 -c 'import sys,json; print(json.dumps([int(x) for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
   fetch:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: 340
+    timeout-minutes: 300
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 6
       matrix:
         pair: ${{ fromJSON(needs.plan.outputs.pairs) }}
+        start: ${{ fromJSON(needs.plan.outputs.starts) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Descarcă orele ${{ matrix.pair }}
-        run: python3 scripts/dukascopy.py --tf h1 --pairs ${{ matrix.pair }} --from ${{ github.event.inputs.from || '2010' }} --out data/fx/dk
+      - name: Descarcă ${{ matrix.pair }} din ${{ matrix.start }} (4 ani)
+        run: python3 scripts/dukascopy.py --tf h1 --part --pairs ${{ matrix.pair }} --from ${{ matrix.start }} --to $(( ${{ matrix.start }} + 3 )) --out data/fx/dk
       - name: Salvează
         run: |
           git config user.name "apex-bot"
           git config user.email "apex-bot@users.noreply.github.com"
           git add data/fx/dk/h1
           if git diff --cached --quiet; then echo "Nimic nou."; exit 0; fi
-          git commit -m "date Forex orare Dukascopy ${{ matrix.pair }} $(date -u +%Y-%m-%d)"
+          git commit -m "date orare Dukascopy ${{ matrix.pair }} ${{ matrix.start }}+"
           for i in 1 2 3 4 5 6 7 8; do git pull --rebase && git push && exit 0; sleep $((RANDOM % 20 + 5)); done
           exit 1

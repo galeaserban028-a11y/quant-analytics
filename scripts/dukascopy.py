@@ -311,6 +311,7 @@ def main(argv=None):
     ap.add_argument('--out', default='data/fx/dk')
     ap.add_argument('--since', default='', help='YYYY-MM: descarcă doar de la luna aceasta încoace (implică --merge)')
     ap.add_argument('--merge', action='store_true', help='lipește anii descărcați peste fișierul existent (pentru actualizarea lunară)')
+    ap.add_argument('--part', action='store_true', help='h1: scrie bucata de ani în h1/PERECHE_ANUL.csv.gz')
     ap.add_argument('--tf', default='d1', choices=['d1', 'h1'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
     a = ap.parse_args(argv)
     pairs = PAIRS if a.all else [p.strip().upper() for p in a.pairs.split(',') if p.strip()]
@@ -348,7 +349,8 @@ def main(argv=None):
             dec = 3 if (p.endswith('JPY') or 'IDX' in p) else 5
             # doar lumânările ORARE (pentru cercetarea pe sesiuni); istoricul zilnic rămâne cel din fișierele anuale
             h1 = [[t * 1000, o, h, l, c, max(0.0, sp)] for (t, o, h, l, c, sp) in hours]
-            write_csv_gz(os.path.join(a.out, 'h1', f'{p}.csv.gz'), h1, dec + 1)
+            name = f'{p}_{a.y0}.csv.gz' if a.part else f'{p}.csv.gz'  # pe bucăți de ani: fiecare bucată în fișierul ei
+            write_csv_gz(os.path.join(a.out, 'h1', name), h1, dec + 1)
             first = dt.datetime.fromtimestamp(hours[0][0], dt.timezone.utc).date()
             last = dt.datetime.fromtimestamp(hours[-1][0], dt.timezone.utc).date()
             print(f'::notice::{p}: {len(hours)} ore ({first} → {last}) în {time.time() - t0:.0f}s')
