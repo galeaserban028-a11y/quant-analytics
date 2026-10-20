@@ -846,3 +846,17 @@ test('live: ieșirea unui singur trader dintr-un indice ocupat de doi spune exac
     outExits: [{ who: 'Radu (Pullback RSI(2))', prev: { direction: 'LONG', lots: 0.35 }, r: -1, pnl: -150, why: 'stop-ul a fost atins', outcome: 'STOP' }] });
   assert.ok(!/ÎNCHIDE/.test(msgs[0]) && /Nu faci nimic/.test(msgs[0]), 'la stop nu ai nimic de închis');
 });
+
+test('gardian: opțiunile gapFactor și fundedRiskPct (implicit oprite) micșorează riscul exact cum spun', () => {
+  const { decide } = require('../src/prop/guardian');
+  const rules = PROP_RULES.THE5ERS_HIGH_STAKES;
+  const acct = { initial: 10000, balance: 10000, dayStartBalance: 10000, openRisk: 0, highestEod: 10000, phaseTarget: null, tradingDays: 5 };
+  const base = decide(acct, rules, { riskPct: 4, safety: 0.8, maxOpen: 5, openCount: 0 });
+  assert.equal(Math.round(base.riskAmount), 400, 'implicit: neschimbat');
+  const gap = decide(acct, rules, { riskPct: 4, safety: 0.8, maxOpen: 5, openCount: 0, gapFactor: 1.5 });
+  assert.ok(Math.abs(gap.riskAmount - 10000 * 0.05 * 0.8 / 1.5) < 1e-6, 'cu gap 1,5: riscul × 1,5 încape în limita zilnică');
+  const funded = decide(acct, rules, { riskPct: 4, safety: 0.8, maxOpen: 5, openCount: 0, fundedRiskPct: 2 });
+  assert.equal(Math.round(funded.riskAmount), 200, 'pe finanțat: risc plafonat');
+  const exam = decide(Object.assign({}, acct, { phaseTarget: 0.08 }), rules, { riskPct: 4, safety: 0.8, maxOpen: 5, openCount: 0, fundedRiskPct: 2 });
+  assert.equal(Math.round(exam.riskAmount), 400, 'în examen plafonul de finanțat nu se aplică');
+});

@@ -35,6 +35,8 @@ function decide(acct, rules, cfg) {
 
   // Riscul de bază, redus în drawdown
   let riskPct = cfg.riskPct;
+  // Contul finanțat (fără țintă) poate merge cu risc mai mic: acolo contează să-l păstrezi, ca să încasezi lunar
+  if (!hasTarget && cfg.fundedRiskPct != null) riskPct = Math.min(riskPct, cfg.fundedRiskPct);
   const dd = (initial - balance) / initial;
   if (dd > 0.06) riskPct *= 0.25;
   else if (dd > 0.04) riskPct *= 0.5;
@@ -50,7 +52,9 @@ function decide(acct, rules, cfg) {
   const roomTotal = (balance - floor) * safety - acct.openRisk;
   // Limita zilnică: pierderea de azi + tot riscul deschis + riscul nou ≤ safety × limită
   const lostToday = Math.max(0, acct.dayStartBalance - balance);
-  const roomDaily = initial * rules.dailyLoss * safety - lostToday - acct.openRisk;
+  // Gap-urile peste stop (deschideri după știri/weekend) pot pierde mai mult de 1R: rezervăm `gapFactor` × riscul
+  const g = cfg.gapFactor != null ? cfg.gapFactor : 1;
+  const roomDaily = (initial * rules.dailyLoss * safety - lostToday - acct.openRisk * g) / g;
 
   risk = Math.min(risk, roomTotal, roomDaily);
   if (!(risk > initial * 0.0005)) return { allow: false, riskAmount: 0, reason: roomDaily <= roomTotal ? 'LIMITA_ZILNICĂ' : 'LIMITA_TOTALĂ' };
