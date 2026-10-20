@@ -30,7 +30,7 @@ const STAFF = [
   { id: 'research', name: 'Sofia', role: 'Profesoara (cercetare)', job: 'O dată pe lună re-antrenează strategiile pe ultimii 3 ani, decide cine stă pe bancă, refă simularea examenelor.' },
   { id: 'courier', name: 'Dan', role: 'Curierul', job: 'Trimite pe Telegram semnalele, închiderile și verificarea de la ora 9.' },
   { id: 'accountant', name: 'Paul', role: 'Contabilul', job: 'Ține soldul estimat, faza examenului, zilele de tranzacționare și fișele traderilor.' },
-  { id: 'data', name: 'Nelu', role: 'Paznicul datelor', job: 'Descarcă datele la 10 minute după închiderea fiecărei burse; trece pe sursa de rezervă când Yahoo cade.' }
+  { id: 'data', name: 'Nelu', role: 'Paznicul datelor', job: 'Descarcă datele la 20 de minute după închiderea fiecărei burse; trece pe sursa de rezervă când Yahoo cade.' }
 ];
 
 function nameFor(kind, sym) {

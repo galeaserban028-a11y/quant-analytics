@@ -605,7 +605,7 @@
       "id": "data",
       "name": "Nelu",
       "role": "Paznicul datelor",
-      "job": "Descarcă datele la 10 minute după închiderea fiecărei burse; trece pe sursa de rezervă când Yahoo cade."
+      "job": "Descarcă datele la 20 de minute după închiderea fiecărei burse; trece pe sursa de rezervă când Yahoo cade."
     }
   ],
   "strategies": {

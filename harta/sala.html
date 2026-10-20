@@ -79,6 +79,7 @@ select.chip { padding-right: 8px }
 .kv dt { color: var(--muted); min-width: 0 } .kv dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap }
 .pos { color: var(--ok) } .neg { color: var(--bad) }
 .life { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px }
+@media (max-width: 420px) { .teamgrid { grid-template-columns: 1fr } }
 @media (max-width: 640px) { .life { grid-template-columns: repeat(2, 1fr) } }
 .life .stat p { margin: 0; font-size: 12.5px; color: var(--muted) }
 .two { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px }
@@ -91,6 +92,32 @@ table { border-collapse: collapse; width: 100%; font-size: 13px }
 th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap }
 th { color: var(--muted); font-weight: 600; font-size: 12px }
 td.r, th.r { text-align: right }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px }
+.summary .box { border-radius: 12px; padding: 14px 16px; border: 1px solid var(--line); background: var(--panel); display: grid; gap: 4px }
+.summary .box[data-on="1"] { border-color: var(--ok); background: var(--ok-soft) }
+.summary .box b { font-size: 15px }
+.summary .tag { justify-self: start; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line) }
+.teamgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px }
+.idx { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; min-width: 0 }
+.idx-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline }
+.idx-head b { font-family: var(--mono); font-size: 14px }
+.idx-head span { font-size: 12px; color: var(--muted) }
+.tr { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding-top: 8px; border-top: 1px solid var(--line) }
+.tr .av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; background: var(--accent-soft); color: var(--accent) }
+.tr[data-st="BANCĂ"] .av { background: var(--stagiar-soft); color: var(--muted) }
+.tr[data-st="POZIȚIE"] .av { background: var(--ok); color: #fff }
+.tr .nm { display: grid; gap: 1px; min-width: 0 }
+.tr .nm b { font-size: 13.5px }
+.tr .nm span { font-size: 12px; color: var(--muted) }
+.st { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; background: var(--accent-soft); color: var(--accent) }
+.st[data-st="BANCĂ"] { background: var(--stagiar-soft); color: var(--muted) }
+.st[data-st="POZIȚIE"] { background: var(--ok-soft); color: var(--ok) }
+.staff { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px }
+.staff div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; display: grid; gap: 2px }
+.staff div span { color: var(--muted) }
+.lead { margin: 0; max-width: 85ch; color: var(--muted) }
+.part { border-top: 1px solid var(--line); padding-top: 22px; display: grid; gap: 6px }
+.part h2 { font-family: var(--display); font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink); font-size: 28px }
 footer { font-size: 12px; color: var(--muted); max-width: 80ch }
 </style>
 
@@ -98,10 +125,26 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
   <header>
     <div>
       <h1>Sala APEX</h1>
-      <div class="muted">Academia Forex · 300 de agenți care învață, lucrează, urcă în grad și se pensionează</div>
+      <div class="muted">Două echipe: traderii pe indici îți trimit semnalele reale · școala Forex învață doar pe hârtie</div>
     </div>
     <span class="live" id="live" data-mode="loading"><span class="dot"></span><span id="liveText">Se încarcă…</span></span>
   </header>
+
+  <div class="summary" id="summary"></div>
+
+  <section aria-labelledby="h-team">
+    <h2 id="h-team">Echipa de indici · de aici vin semnalele tale</h2>
+    <p class="lead">20 de traderi, câte 2 pe fiecare bursă. Fiecare are o singură regulă simplă și un singur indice. Toți cumpără doar (nu vând în lipsă), țin poziția câteva zile și ies singuri. Când unul intră sau iese, primești mesaj pe Telegram cu lotul și stopul deja calculate.</p>
+    <div class="tiles" id="propAcct"></div>
+    <div class="teamgrid" id="team"></div>
+    <h3>Personalul care îi ajută</h3>
+    <div class="staff" id="staff"></div>
+  </section>
+
+  <div class="part">
+    <h2>Școala Forex · 300 de agenți, doar pe hârtie</h2>
+    <p class="lead">Aceștia NU îți trimit semnale. E o școală: agenții învață pe perechi valutare, cu bani fictivi, iar o dată pe lună sunt verificați. Pe Forex, până acum niciun grup nu a arătat avantaj real, așa că școala tace. Dacă elita lor trece vreodată testele, sistemul te anunță pe Telegram.</p>
+  </div>
 
   <div class="verdict" id="verdict"></div>
 
@@ -136,10 +179,6 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     </div>
   </section>
 
-  <section aria-labelledby="h-acct">
-    <h2 id="h-acct">Contul de examen (semnalele elitei)</h2>
-    <div class="tiles" id="account"></div>
-  </section>
 
   <section aria-labelledby="h-evo">
     <h2 id="h-evo">Evoluția populației și rezultatul companiei</h2>
@@ -157,7 +196,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     </div>
   </section>
 
-  <footer>Palmaresele sunt „pe hârtie”, calculate pe istoria reală Dukascopy (bid/ask), cu execuție prudentă (intrare a doua zi). Doar agenții ELITĂ trimit semnale reale, și doar dacă Academia a dovedit avantaj în toate cele 3 rulări independente. Medii istorice, nu promisiuni; maximul pe care îl poți pierde este taxa examenului.</footer>
+  <footer>Semnalele reale vin doar de la echipa de indici, testată pe 2003–2026 pe date pe care nu le văzuse, cu intrare prudentă a doua zi. Palmaresele școlii Forex sunt „pe hârtie”, pe istoria reală Dukascopy (bid/ask); școala ar trimite semnale doar dacă elita ei dovedește avantaj în toate cele 3 rulări independente. Medii istorice, nu promisiuni; maximul pe care îl poți pierde este taxa examenului.</footer>
 </div>
 
 <script>
@@ -165,11 +204,12 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
   const REPO = 'https://raw.githubusercontent.com/galeaserban028-a11y/quant-analytics/main/';
   const SOURCES = {
     academy: [REPO + 'data/research/academy.json', 'academy.json', '../data/research/academy.json'],
-    state: [REPO + 'state/live_state.json', 'live_state.json', '../state/live_state.json']
+    state: [REPO + 'state/live_state.json', 'live_state.json', '../state/live_state.json'],
+    team: [REPO + 'data/research/team.json', 'team.json', '../data/research/team.json']
   };
   const RANKS = ['ELITĂ', 'SENIOR', 'JUNIOR', 'STAGIAR'];
   const RANK_TXT = { 'ELITĂ': 'Elită', SENIOR: 'Senior', JUNIOR: 'Junior', STAGIAR: 'Stagiar' };
-  let academy = null, state = null, mode = 'loading';
+  let academy = null, state = null, team = null, mode = 'loading';
   let filt = { family: 'toate', pair: 'toate' }, selected = null;
 
   async function fetchFirst(urls) {
@@ -302,23 +342,74 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     box.append(el('p', { class: 'muted', text: a.rank === 'ELITĂ' ? 'Trimite semnale reale (prin Gardian).' : a.rank === 'STAGIAR' ? 'Învață: tranzacționează doar pe hârtie în primul an.' : 'Lucrează pe hârtie; urcă în elită doar cu un palmares lung și clar pozitiv.' }));
   }
 
-  function renderAccount() {
-    const box = document.getElementById('account');
+  const CITY = { US30: 'New York', NAS100: 'New York', SPX500: 'New York', US2000: 'New York', GER40: 'Frankfurt', EU50: 'Frankfurt', FRA40: 'Paris', UK100: 'Londra', JP225: 'Tokyo', AUS200: 'Sydney' };
+  const WHEN = { 'New York': 'semnal pe la 23:10', Frankfurt: 'semnal pe la 18:40', Paris: 'semnal pe la 18:40', Londra: 'semnal pe la 18:40', Tokyo: 'semnal dimineața', Sydney: 'semnal dimineața' };
+  const RULE = { rsi2: 'Cumpără după o scădere bruscă, când piața e pe creștere', down: 'Cumpără după 3 zile de scădere la rând, când piața e pe creștere' };
+  function propState() { return state && state.prop; }
+
+  function renderSummary() {
+    const box = document.getElementById('summary');
     box.replaceChildren();
-    const s = fxState();
-    if (!s || !s.initialized) {
-      box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Stare' }), el('span', { class: 'big', text: academy && academy.enabled ? 'Pregătit' : 'Oprit' }), el('span', { class: 'lbl', text: academy && academy.enabled ? 'Pornește la prima rulare cu Telegram conectat.' : 'Fără semnale până când elita dovedește avantaj.' })]));
-      const ex = academy && academy.exam && academy.exam[0];
-      if (ex) box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Firma potrivită (simulat)' }), el('span', { class: 'big', text: ex.name.replace(' 2-Step', '') }), el('span', { class: 'lbl', text: `Trece ${ex.passPct}% · pică ${ex.failPct}% · risc ${ex.riskPct}%` })]));
+    const ps = propState();
+    const working = team ? team.agents.filter((a) => a.status !== 'BANCĂ').length : 0;
+    const liveTxt = ps && ps.initialized ? (ps.paused ? 'Frâna de urgență e trasă: nu trimite intrări noi.' : 'Rulează acum și trimite semnale pe Telegram.') : 'Gata de lucru. Pornește imediat ce pui cheile Telegram în GitHub.';
+    box.append(el('div', { class: 'box', 'data-on': '1' }, [el('span', { class: 'tag', text: 'Semnale reale' }), el('b', { text: `Echipa de indici · ${team ? team.agents.length : 20} traderi (${working} lucrează)` }), el('span', { text: 'Singura variantă care a trecut toate testele: câștig mic, dar dovedit, pe 23 de ani de date nevăzute.' }), el('span', { class: 'muted', text: liveTxt })]));
+    const on = academy && academy.enabled;
+    box.append(el('div', { class: 'box', 'data-on': on ? '1' : '0' }, [el('span', { class: 'tag', text: on ? 'Semnale reale' : 'Doar pe hârtie' }), el('b', { text: `Școala Forex · ${academy ? academy.population.length : 300} de agenți` }), el('span', { text: on ? 'Elita a dovedit avantaj și trimite semnale.' : 'Învață cu bani fictivi. Nu trimite semnale, pentru că pe Forex nu a arătat avantaj real.' }), el('span', { class: 'muted', text: 'Reverificată automat pe 1 ale fiecărei luni.' })]));
+  }
+
+  function renderPropAcct() {
+    const box = document.getElementById('propAcct');
+    box.replaceChildren();
+    const ps = propState();
+    const ex = team && team.exam && team.exam[0];
+    const tile = (lbl, big, sub, num) => box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: lbl }), el('span', { class: 'big' + (num ? ' num' : ''), text: big }), el('span', { class: 'lbl', text: sub })]));
+    if (!ps || !ps.initialized) {
+      tile('Stare', 'Așteaptă Telegram', 'Fără cheile Telegram în GitHub nu poate trimite niciun mesaj.');
+      if (ex) tile('Firma aleasă', ex.name.replace(' 2-Step', ''), `Cont 10.000 $ · taxă ~${ex.fee} $ · risc ${ex.riskPct}% pe semnal`);
+      tile('Câte semnale', '~3 pe lună', 'De obicei o singură poziție deschisă odată. Uneori trece o săptămână fără nimic.');
       return;
     }
-    const phases = s.firm === 'FTMO_1STEP' ? [0.10] : (s.firm === 'FTMO_2STEP' ? [0.10, 0.05] : [0.08, 0.05]);
-    const target = s.phase < phases.length ? phases[s.phase] : null;
-    const pos = Object.values(s.positions || {});
-    const hist = s.history || [];
-    box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: target ? `Faza ${s.phase + 1} din ${phases.length}` : 'Cont finanțat' }), el('span', { class: 'big num', text: money(s.balance) }), el('span', { class: 'lbl', text: target ? `Țintă ${money(s.initial * (1 + target))}` : 'Profitul se retrage lunar' })]));
-    box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Poziții deschise' }), el('span', { class: 'big num', text: String(pos.length) }), el('span', { class: 'lbl', text: pos.map((p) => `${p.symbol} (${(p.who || '').split(' (')[0]})`).join(', ') || 'Niciuna' })]));
-    box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: 'Tranzacții închise' }), el('span', { class: 'big num', text: String(hist.length) }), el('span', { class: 'lbl', text: hist.length ? `Total ${signed(hist.reduce((t, h) => t + (h.r || 0), 0), 2)}R` : 'Încă niciuna' })]));
+    const phases = ps.firm === 'FTMO_1STEP' ? [0.10] : (ps.firm === 'FTMO_2STEP' ? [0.10, 0.05] : [0.08, 0.05]);
+    const target = ps.phase < phases.length ? phases[ps.phase] : null;
+    const pos = Object.entries(ps.positions || {}).map(([k, p]) => Object.assign({ symbol: k.split('|')[0] }, p));
+    const hist = ps.history || [];
+    tile(target ? `Faza ${ps.phase + 1} din ${phases.length} · sold estimat` : 'Cont finanțat · sold estimat', money(ps.balance), target ? `Țintă ${money(ps.initial * (1 + target))}` : 'Profitul se retrage lunar', true);
+    tile('Poziții deschise', String(pos.length), pos.map((p) => `${p.symbol} (${(p.who || '').split(' (')[0]})`).join(', ') || 'Niciuna acum', true);
+    tile('Tranzacții închise', String(hist.length), hist.length ? `Total ${signed(hist.reduce((t, h) => t + (h.r || 0), 0), 2)}R` : 'Încă niciuna', true);
+    if (ps.paused) tile('Frâna de urgență', 'Trasă', 'Nu mai trimite intrări noi. Vezi mesajul de pe Telegram.');
+  }
+
+  function renderTeam() {
+    const grid = document.getElementById('team');
+    const staff = document.getElementById('staff');
+    grid.replaceChildren(); staff.replaceChildren();
+    if (!team) { grid.append(el('p', { class: 'muted', text: 'Echipa se încarcă…' })); return; }
+    const ps = propState();
+    const posOf = (a) => ps && ps.positions ? ps.positions[a.id] : null;
+    const histOf = (a) => ((ps && ps.history) || []).filter((h) => h.sym === a.symbol && h.strategy === a.strategy);
+    const bySym = {};
+    for (const a of team.agents) (bySym[a.symbol] = bySym[a.symbol] || []).push(a);
+    const order = ['US30', 'NAS100', 'SPX500', 'US2000', 'GER40', 'EU50', 'FRA40', 'UK100', 'JP225', 'AUS200'].filter((k) => bySym[k]).concat(Object.keys(bySym).filter((k) => !CITY[k]));
+    for (const sym of order) {
+      const city = CITY[sym] || '';
+      const card = el('div', { class: 'idx' }, [el('div', { class: 'idx-head' }, [el('b', { text: sym }), el('span', { text: `${city}${WHEN[city] ? ' · ' + WHEN[city] : ''}` })])]);
+      for (const a of bySym[sym]) {
+        const p = posOf(a);
+        const st = p ? 'POZIȚIE' : (a.status === 'BANCĂ' ? 'BANCĂ' : 'LUCREAZĂ');
+        const r = a.record || {};
+        const h = histOf(a);
+        const live = h.length ? ` · live ${signed(h.reduce((t, x) => t + (x.r || 0), 0), 2)}R` : '';
+        const y = r.last12m ? `ultimul an ${signed(r.last12m.totalR, 1)}R` : '';
+        card.append(el('div', { class: 'tr', 'data-st': st, title: a.why || '' }, [
+          el('span', { class: 'av', text: initials(a.name) }),
+          el('span', { class: 'nm' }, [el('b', { text: a.name }), el('span', { text: RULE[a.strategy] || a.strategyName }), el('span', { text: `${String(r.winRatePct).replace('.', ',')}% câștigătoare · ${y}${live}`.replace(/(\d)\.(\d)/g, '$1,$2') })]),
+          el('span', { class: 'st', 'data-st': st, text: st === 'POZIȚIE' ? `în poziție din ${new Date(p.openedAt).toISOString().slice(5, 10)}` : st === 'BANCĂ' ? 'pe bancă' : 'pândește' })
+        ]));
+      }
+      grid.append(card);
+    }
+    for (const m of team.staff || []) staff.append(el('div', {}, [el('b', { text: `${m.name} · ${m.role}` }), el('span', { text: m.job })]));
   }
 
   function renderEvo() {
@@ -476,12 +567,13 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     document.getElementById('liveText').textContent = mode === 'live' ? `Live · stare ${saved ? roDateTime(saved) : '—'} · reîmprospătare la fiecare minut` : mode === 'snap' ? `Instantaneu din ${academy ? roDate(academy.generatedAt) : '—'}` : 'Datele nu s-au încărcat';
   }
 
-  function renderAll() { renderHeader(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderCapital(); renderAccount(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
+  function renderAll() { renderHeader(); renderSummary(); renderPropAcct(); renderTeam(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderCapital(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
 
   async function load() {
-    const [a, s] = await Promise.all([fetchFirst(SOURCES.academy), fetchFirst(SOURCES.state)]);
+    const [a, s, t] = await Promise.all([fetchFirst(SOURCES.academy), fetchFirst(SOURCES.state), fetchFirst(SOURCES.team)]);
     if (a) academy = a.data;
     if (s) state = s.data;
+    if (t) team = t.data;
     mode = a ? (a.live ? 'live' : 'snap') : 'error';
     renderAll();
   }
