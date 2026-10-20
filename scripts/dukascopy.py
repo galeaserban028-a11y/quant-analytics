@@ -343,12 +343,12 @@ def main(argv=None):
                 print(f'{p}: prea puține date ({len(hours)} ore)')
                 continue
             dec = 3 if p.endswith('JPY') else 5
-            d1, h4 = to_daily(hours), to_h4(hours)
-            write_csv_gz(os.path.join(a.out, 'd1', f'{p}.csv.gz'), d1, dec + 1)
-            write_csv_gz(os.path.join(a.out, 'h4', f'{p}.csv.gz'), h4, dec + 1)
+            # doar lumânările ORARE (pentru cercetarea pe sesiuni); istoricul zilnic rămâne cel din fișierele anuale
+            h1 = [[t * 1000, o, h, l, c, max(0.0, sp)] for (t, o, h, l, c, sp) in hours]
+            write_csv_gz(os.path.join(a.out, 'h1', f'{p}.csv.gz'), h1, dec + 1)
             first = dt.datetime.fromtimestamp(hours[0][0], dt.timezone.utc).date()
             last = dt.datetime.fromtimestamp(hours[-1][0], dt.timezone.utc).date()
-            print(f'::notice::{p}: {len(hours)} ore → {len(d1)} zile, {len(h4)} lumânări H4 ({first} → {last}) în {time.time() - t0:.0f}s')
+            print(f'::notice::{p}: {len(hours)} ore ({first} → {last}) în {time.time() - t0:.0f}s')
             ok += 1
         except Exception as e:
             print(f'::error::{p}: {e}')
