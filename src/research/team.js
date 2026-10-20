@@ -22,7 +22,9 @@ const BENCH_BELOW_R = -0.05;
 /** Numele traderilor: câte unul pentru fiecare indice, pe echipe (strategii). */
 const NAMES = {
   rsi2: { US30: 'Andrei', NAS100: 'Maria', SPX500: 'Mihai', US2000: 'Elena', GER40: 'Radu', UK100: 'Ioana', FRA40: 'Vlad', EU50: 'Ana', JP225: 'Cristi', AUS200: 'Diana' },
-  down: { US30: 'Bogdan', NAS100: 'Irina', SPX500: 'Alex', US2000: 'Raluca', GER40: 'Tudor', UK100: 'Bianca', FRA40: 'Matei', EU50: 'Sara', JP225: 'Ștefan', AUS200: 'Larisa' }
+  down: { US30: 'Bogdan', NAS100: 'Irina', SPX500: 'Alex', US2000: 'Raluca', GER40: 'Tudor', UK100: 'Bianca', FRA40: 'Matei', EU50: 'Sara', JP225: 'Ștefan', AUS200: 'Larisa' },
+  bb: { US30: 'George', NAS100: 'Andreea', SPX500: 'Florin', US2000: 'Alina', GER40: 'Dragoș', UK100: 'Simona', FRA40: 'Marius', EU50: 'Roxana', JP225: 'Sorin', AUS200: 'Oana' },
+  d7: { US30: 'Adrian', NAS100: 'Gabriela', SPX500: 'Lucian', US2000: 'Laura', GER40: 'Cosmin', UK100: 'Monica', FRA40: 'Ionuț', EU50: 'Cristina', JP225: 'Răzvan', AUS200: 'Teodora' }
 };
 
 const STAFF = [

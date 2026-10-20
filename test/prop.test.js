@@ -460,7 +460,7 @@ test('config: crypto oprit; indicii activi; Academia Forex pornește doar valida
   assert.ok(PROP_RULES[c.propDesk.firm]);
   assert.ok(c.propDesk.riskPct > 0 && c.propDesk.riskPct <= 4);
   assert.ok(Array.isArray(c.propDesk.strategies) && c.propDesk.strategies.length >= 1);
-  for (const st of c.propDesk.strategies) assert.ok(['rsi2', 'down'].includes(st.kind), st.kind);
+  for (const st of c.propDesk.strategies) assert.ok(['rsi2', 'down', 'bb', 'd7'].includes(st.kind), st.kind);
   for (const s of c.propDesk.symbols) assert.equal(INSTR[s].category, 'INDEX', `doar indici: ${s}`);
   for (const s of c.propDesk.symbols) assert.ok(INSTR[s], `instrument lipsă: ${s}`);
   for (const [s, i] of Object.entries(INSTR)) {
@@ -601,7 +601,7 @@ test('cercetare: alegerea riscului respectă pragul de 5% șanse de a pica; stra
   const { best, table } = chooseRisk(trades, PROP_RULES.THE5ERS_HIGH_STAKES, { risks: [2, 6], safeties: [0.7, 0.95], maxOpens: [3], orderSeeds: 2 });
   assert.ok(table.length === 4);
   if (table.some((x) => x.failPct <= 5)) assert.ok(best.failPct <= 5);
-  assert.deepEqual(Object.keys(STRATEGIES).sort(), ['down', 'rsi2']);
+  assert.deepEqual(Object.keys(STRATEGIES).sort(), ['bb', 'd7', 'down', 'rsi2']);
   for (const st of Object.values(STRATEGIES)) assert.ok(st.grid.length >= 16 && st.grid.every((p) => p.stopAtr > 0));
   assert.equal(deskStrategies({ params: { trendLen: 200 } })[0].kind, 'rsi2', 'compatibil cu configurația veche');
 });
@@ -610,6 +610,17 @@ test('cercetare: nu alege niciodată o variantă cu peste 5% șanse de a pica, c
   const t = [{ riskPct: 6, failPct: 12, expectedValuePerAttempt: 900 }, { riskPct: 3, failPct: 4, expectedValuePerAttempt: 300 }, { riskPct: 2, failPct: 1, expectedValuePerAttempt: 200 }];
   assert.equal(pickBest(t).riskPct, 3);
   assert.equal(pickBest([{ riskPct: 6, failPct: 12, expectedValuePerAttempt: 900 }, { riskPct: 5, failPct: 9, expectedValuePerAttempt: 950 }]).riskPct, 5, 'fără variante sigure: cea mai bună dintre toate');
+});
+
+test('cercetare: la valoare practic egală (≤5% diferență) alege varianta la care treci mai repede; nu sacrifică valoare mare pentru viteză', () => {
+  const t = [
+    { riskPct: 2, failPct: 4, expectedValuePerAttempt: 383, passWithin365Pct: 27, passWithin180Pct: 14 },
+    { riskPct: 3, failPct: 3.7, expectedValuePerAttempt: 376, passWithin365Pct: 31, passWithin180Pct: 17 },
+    { riskPct: 4, failPct: 4.8, expectedValuePerAttempt: 340, passWithin365Pct: 33, passWithin180Pct: 19 },
+    { riskPct: 5, failPct: 7, expectedValuePerAttempt: 390, passWithin365Pct: 40, passWithin180Pct: 25 }
+  ];
+  assert.equal(pickBest(t).riskPct, 3, 'risc 3%: aproape aceeași valoare, mai rapid; 4% pierde prea multă valoare; 5% pică prea des');
+  assert.equal(pickBest(t, 5, 0).riskPct, 2, 'fără toleranță: strict cea mai bună valoare');
 });
 
 test('laborator: „3 zile de scădere” cere scăderi stricte; zile egale nu declanșează', () => {
@@ -671,11 +682,12 @@ test('stare: nu rescrie fișierul dacă nimic nu s-a schimbat (rulare din 5 în 
 const team = require('../src/research/team');
 const scen = require('../src/research/scenario');
 
-test('echipa: 20 de traderi cu nume unice, câte unul pe fiecare indice și strategie; 5 oameni în personal', () => {
+test('echipa: 40 de traderi cu nume unice, câte unul pe fiecare indice și strategie; 5 oameni în personal', () => {
   const names = Object.values(team.NAMES).flatMap((m) => Object.values(m));
-  assert.equal(names.length, 20);
-  assert.equal(new Set(names).size, 20);
-  for (const kind of ['rsi2', 'down']) for (const [s, i] of Object.entries(INSTR)) if (i && i.category === 'INDEX') assert.ok(team.NAMES[kind][s], `${kind}/${s} fără nume`);
+  assert.equal(names.length, 40);
+  assert.equal(new Set(names).size, 40);
+  for (const s of team.STAFF) assert.ok(!names.includes(s.name), `${s.name} e și trader, și personal`);
+  for (const kind of ['rsi2', 'down', 'bb', 'd7']) for (const [s, i] of Object.entries(INSTR)) if (i && i.category === 'INDEX') assert.ok(team.NAMES[kind][s], `${kind}/${s} fără nume`);
   assert.equal(team.nameFor('down', 'GER40'), 'Tudor');
   assert.equal(team.STAFF.length, 5);
 });

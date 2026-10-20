@@ -65,40 +65,40 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-18T18:40:52.946Z",
+    "generatedAt": "2026-10-20T17:26:01.169Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
-      "trades": 3472,
-      "wins": 2266,
-      "losses": 1206,
-      "winRatePct": 65.3,
-      "avgWinR": 0.422,
-      "avgLossR": 0.656,
-      "expectancyR": 0.048,
+      "trades": 6905,
+      "wins": 4305,
+      "losses": 2600,
+      "winRatePct": 62.3,
+      "avgWinR": 0.574,
+      "avgLossR": 0.771,
+      "expectancyR": 0.068,
       "expectancyCI95": [
-        0.027,
-        0.068
+        0.05,
+        0.085
       ],
-      "tStat": 4.54,
-      "totalR": 165.87,
-      "profitFactor": 1.21,
-      "maxDrawdownR": 26.47,
-      "maxLosingStreak": 9,
+      "tStat": 7.34,
+      "totalR": 468,
+      "profitFactor": 1.23,
+      "maxDrawdownR": 30.39,
+      "maxLosingStreak": 11,
       "outcomes": {
-        "TARGET": 2777,
-        "STOP": 617,
-        "TIME": 21,
-        "END_OF_DATA": 57
+        "TARGET": 4716,
+        "STOP": 1657,
+        "TIME": 431,
+        "END_OF_DATA": 101
       }
     },
     "overrides": {
       "propDesk": {
         "enabled": true,
         "firm": "THE5ERS_HIGH_STAKES",
-        "riskPct": 4,
+        "riskPct": 3,
         "safety": 0.7,
-        "maxOpen": 3,
+        "maxOpen": 5,
         "strategies": [
           {
             "kind": "rsi2",
@@ -125,6 +125,31 @@
               "maxDays": 10,
               "allowShort": false
             }
+          },
+          {
+            "kind": "bb",
+            "name": "Banda Bollinger",
+            "params": {
+              "kind": "bb",
+              "len": 10,
+              "k": 1.5,
+              "trendLen": 0,
+              "stopAtr": 2,
+              "maxDays": 10,
+              "allowShort": false
+            }
+          },
+          {
+            "kind": "d7",
+            "name": "Minimul de N zile",
+            "params": {
+              "kind": "d7",
+              "trendLen": 200,
+              "lookback": 10,
+              "stopAtr": 2,
+              "maxDays": 10,
+              "allowShort": false
+            }
           }
         ],
         "symbols": [
@@ -143,8 +168,14 @@
           "FRA40|rsi2",
           "AUS200|rsi2",
           "UK100|down",
-          "FRA40|down"
-        ]
+          "FRA40|down",
+          "FRA40|bb",
+          "UK100|d7",
+          "FRA40|d7",
+          "EU50|d7",
+          "AUS200|d7"
+        ],
+        "expectedR": 0.068
       }
     }
   },

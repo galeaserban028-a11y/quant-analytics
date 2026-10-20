@@ -1,6 +1,6 @@
-# Raport — Departamentul PROP (indici, grafic zilnic, 2 strategii)
+# Raport — Departamentul PROP (indici, grafic zilnic, 4 strategii candidate)
 
-Generat: 2026-10-18T18:40:52.944Z · 10 indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere
+Generat: 2026-10-20T17:26:01.166Z · 10 indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere
 
 ## 1. Strategiile (out-of-sample)
 
@@ -8,22 +8,24 @@ Generat: 2026-10-18T18:40:52.944Z · 10 indici · walk-forward anual (antrenare 
 |---|---|---|---|---|---|
 | Pullback RSI(2) | 2097 | 64.9% | 0.043 (0.016 … 0.070) | 14/24 | **LIVE** |
 | 3 zile de scădere | 1375 | 65.9% | 0.055 (0.021 … 0.087) | 15/24 | **LIVE** |
-| **Portofoliu** | 3472 | 65.3% | 0.048 | – | **LIVE** |
+| Banda Bollinger | 1675 | 60.2% | 0.092 (0.050 … 0.134) | 16/24 | **LIVE** |
+| Minimul de N zile | 1758 | 58.6% | 0.084 (0.039 … 0.127) | 15/24 | **LIVE** |
+| **Portofoliu** | 6905 | 62.3% | 0.068 | – | **LIVE** |
 
-Portofoliu la risc 1%/tranzacție (fără reguli prop): 1.15% pe an, scădere maximă 33.6%.
+Portofoliu la risc 1%/tranzacție (fără reguli prop): 5.14% pe an, scădere maximă 27.8%.
 
-Respinse după testare: Forex (date zilnice nealiniate; pierde cu execuție realistă), IBS (≈0 pe indici), Double Seven (prea slab), sfârșit de lună (≈0 după costuri).
+Respinse după testare: Forex (fără avantaj real pe date Dukascopy), IBS (≈0 pe indici), strategiile de trend (momentum, breakout, medii: negative pe indici), sfârșit de lună (≈0 după costuri).
 
 ## 2. Șansele la examen (511 date de start, orizont 3 ani, apoi 12 luni pe contul finanțat)
 
 | Firmă | Risc | Trece | Pică | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |
 |---|---|---|---|---|---|---|---|---|
-| The5ers High Stakes 2-Step | 4% (siguranță 0.7, max 3 poz.) | **54.7%** | 3.2% | 313 | 12.5% | 31.5% | 95$ | 377$ |
-| FundedNext Stellar 2-Step | 4% (siguranță 0.7, max 3 poz.) | **54.7%** | 3.2% | 314 | 12% | 31.4% | 99$ | 381$ |
-| FTMO 2-Step (Swing) | 4% (siguranță 0.7, max 3 poz.) | **51.8%** | 3.3% | 356 | 7.8% | 26.3% | 170$ | 266$ |
-| FTMO 1-Step | 4% (siguranță 0.7, max 3 poz.) | **58.2%** | 4.3% | 406 | 7.2% | 25.4% | 150$ | 248$ |
+| The5ers High Stakes 2-Step | 3% (siguranță 0.7, max 5 poz.) | **47.8%** | 3.7% | 251 | 17.3% | 31% | 95$ | 376$ |
+| FundedNext Stellar 2-Step | 3% (siguranță 0.7, max 5 poz.) | **47.2%** | 3.7% | 256 | 16.1% | 30.2% | 99$ | 366$ |
+| FTMO 2-Step (Swing) | 3% (siguranță 0.7, max 5 poz.) | **45.1%** | 3.5% | 294 | 12.3% | 26.3% | 170$ | 275$ |
+| FTMO 1-Step | 4% (siguranță 0.6, max 5 poz.) | **50.4%** | 1.5% | 367 | 9.6% | 25.3% | 150$ | 207$ |
 
-**Recomandare:** The5ers High Stakes 2-Step, risc 4% pe tranzacție, Gardianul Prop activ.
+**Recomandare:** The5ers High Stakes 2-Step, risc 3% pe tranzacție, Gardianul Prop activ.
 
 ## 3. Echipa (strategie × indice)
 
@@ -49,28 +51,48 @@ Respinse după testare: Forex (date zilnice nealiniate; pierde cu execuție real
 | Ștefan | 3 zile de scădere | JP225 | LUCREAZĂ | 138 | 67.4% | 0.036 | 13/23 | 0.193 (22) |
 | Larisa | 3 zile de scădere | AUS200 | LUCREAZĂ | 165 | 68.5% | 0.017 | 16/24 | -0.042 (28) |
 | Raluca | 3 zile de scădere | US2000 | LUCREAZĂ | 147 | 65.3% | 0.069 | 13/24 | 0.150 (23) |
+| George | Banda Bollinger | US30 | LUCREAZĂ | 167 | 63.5% | 0.186 | 16/23 | 0.145 (42) |
+| Andreea | Banda Bollinger | NAS100 | LUCREAZĂ | 169 | 58% | 0.084 | 16/23 | 0.141 (41) |
+| Florin | Banda Bollinger | SPX500 | LUCREAZĂ | 175 | 62.9% | 0.121 | 14/23 | 0.203 (37) |
+| Dragoș | Banda Bollinger | GER40 | LUCREAZĂ | 192 | 60.9% | 0.088 | 13/24 | 0.084 (40) |
+| Simona | Banda Bollinger | UK100 | LUCREAZĂ | 187 | 63.1% | 0.145 | 19/24 | 0.117 (39) |
+| Marius | Banda Bollinger | FRA40 | BANCĂ | 199 | 56.8% | 0.013 | 12/24 | -0.154 (47) |
+| Roxana | Banda Bollinger | EU50 | LUCREAZĂ | 158 | 58.2% | 0.095 | 11/18 | 0.094 (43) |
+| Sorin | Banda Bollinger | JP225 | LUCREAZĂ | 178 | 62.9% | 0.125 | 16/23 | 0.215 (42) |
+| Oana | Banda Bollinger | AUS200 | LUCREAZĂ | 195 | 55.4% | 0.020 | 12/24 | 0.042 (43) |
+| Alina | Banda Bollinger | US2000 | LUCREAZĂ | 179 | 60.9% | 0.088 | 14/23 | 0.087 (47) |
+| Adrian | Minimul de N zile | US30 | LUCREAZĂ | 194 | 60.8% | 0.093 | 13/22 | 0.158 (26) |
+| Gabriela | Minimul de N zile | NAS100 | LUCREAZĂ | 215 | 61.9% | 0.160 | 15/21 | 0.189 (29) |
+| Lucian | Minimul de N zile | SPX500 | LUCREAZĂ | 209 | 64.1% | 0.169 | 15/21 | 0.335 (30) |
+| Cosmin | Minimul de N zile | GER40 | LUCREAZĂ | 229 | 60.7% | 0.090 | 13/22 | 0.103 (29) |
+| Monica | Minimul de N zile | UK100 | BANCĂ | 201 | 59.2% | 0.068 | 12/22 | -0.051 (26) |
+| Ionuț | Minimul de N zile | FRA40 | BANCĂ | 207 | 53.6% | -0.010 | 10/22 | -0.286 (19) |
+| Cristina | Minimul de N zile | EU50 | BANCĂ | 161 | 54.7% | 0.037 | 10/18 | -0.078 (26) |
+| Răzvan | Minimul de N zile | JP225 | LUCREAZĂ | 191 | 54.5% | 0.028 | 12/22 | 0.352 (21) |
+| Teodora | Minimul de N zile | AUS200 | BANCĂ | 202 | 58.4% | 0.096 | 11/22 | -0.238 (24) |
+| Laura | Minimul de N zile | US2000 | LUCREAZĂ | 206 | 57.8% | 0.094 | 13/22 | 0.093 (27) |
 
 Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe tranzacție în ultimii 3 ani (minim 10 tranzacții) stă pe bancă până își revine. Efect mic, dar constant: trecere puțin mai mare, picare puțin mai mică.
 
 ## 4. Scenarii (cont 10.000 $)
 
-- **O lună în examen:** mediană 0 $; 1 lună din 10 sub -425 $, 1 din 10 peste 477 $; 47.4% din luni pe plus; ~3 tranzacții pe lună.
-- **O lună pe contul finanțat (înainte de split):** mediană 0 $; 1 din 10 sub -425 $, 1 din 10 peste 466 $; 47.3% din luni pe plus.
+- **O lună în examen:** mediană 3 $; 1 lună din 10 sub -487 $, 1 din 10 peste 526 $; 50% din luni pe plus; ~6 tranzacții pe lună.
+- **O lună pe contul finanțat (înainte de split):** mediană 0 $; 1 din 10 sub -487 $, 1 din 10 peste 516 $; 49.9% din luni pe plus.
 
 | Luna | Încă în faza 1 | În faza 2 | Finanțat | Picat | Încasat cumulat (medie) |
 |---|---|---|---|---|---|
-| 1 | 97.8% | 1.5% | 0% | 0.7% | 0 $ |
-| 2 | 91.2% | 7.3% | 0.5% | 1% | 0 $ |
-| 3 | 84.2% | 12.4% | 1.9% | 1.5% | 0 $ |
-| 4 | 75.7% | 18.5% | 4.1% | 1.7% | 3 $ |
-| 5 | 67.9% | 23.9% | 6.1% | 2% | 9 $ |
-| 6 | 61.5% | 26.7% | 9.7% | 2.2% | 17 $ |
-| 7 | 57.4% | 26.5% | 13.8% | 2.4% | 27 $ |
-| 8 | 54% | 25.3% | 18% | 2.7% | 44 $ |
-| 9 | 50.4% | 26.5% | 20.2% | 2.9% | 63 $ |
-| 10 | 47.2% | 28% | 21.9% | 2.9% | 85 $ |
-| 11 | 43.6% | 29.2% | 24.1% | 2.9% | 102 $ |
-| 12 | 40.6% | 29.4% | 26.8% | 2.9% | 120 $ |
+| 1 | 98.3% | 1.4% | 0% | 0.3% | 0 $ |
+| 2 | 91% | 8.7% | 0% | 0.3% | 0 $ |
+| 3 | 80.8% | 16.3% | 2.4% | 0.5% | 0 $ |
+| 4 | 71% | 21.2% | 6.6% | 1.2% | 2 $ |
+| 5 | 64.3% | 24.3% | 9.8% | 1.5% | 12 $ |
+| 6 | 58.6% | 25% | 14.6% | 1.9% | 29 $ |
+| 7 | 54.3% | 25.8% | 17.8% | 2% | 51 $ |
+| 8 | 51.1% | 26.7% | 19.9% | 2.4% | 75 $ |
+| 9 | 48% | 27.2% | 22.2% | 2.5% | 100 $ |
+| 10 | 45.8% | 27.2% | 24.4% | 2.5% | 122 $ |
+| 11 | 44% | 27.2% | 26.3% | 2.5% | 145 $ |
+| 12 | 42.6% | 27.2% | 27.5% | 2.7% | 168 $ |
 
 ## Configurația propusă
 
@@ -78,9 +100,9 @@ Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe 
 {
   "enabled": true,
   "firm": "THE5ERS_HIGH_STAKES",
-  "riskPct": 4,
+  "riskPct": 3,
   "safety": 0.7,
-  "maxOpen": 3,
+  "maxOpen": 5,
   "strategies": [
     {
       "kind": "rsi2",
@@ -107,6 +129,31 @@ Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe 
         "maxDays": 10,
         "allowShort": false
       }
+    },
+    {
+      "kind": "bb",
+      "name": "Banda Bollinger",
+      "params": {
+        "kind": "bb",
+        "len": 10,
+        "k": 1.5,
+        "trendLen": 0,
+        "stopAtr": 2,
+        "maxDays": 10,
+        "allowShort": false
+      }
+    },
+    {
+      "kind": "d7",
+      "name": "Minimul de N zile",
+      "params": {
+        "kind": "d7",
+        "trendLen": 200,
+        "lookback": 10,
+        "stopAtr": 2,
+        "maxDays": 10,
+        "allowShort": false
+      }
     }
   ],
   "symbols": [
@@ -125,8 +172,14 @@ Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe 
     "FRA40|rsi2",
     "AUS200|rsi2",
     "UK100|down",
-    "FRA40|down"
-  ]
+    "FRA40|down",
+    "FRA40|bb",
+    "UK100|d7",
+    "FRA40|d7",
+    "EU50|d7",
+    "AUS200|d7"
+  ],
+  "expectedR": 0.068
 }
 ```
 

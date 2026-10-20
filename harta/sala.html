@@ -134,7 +134,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
 
   <section aria-labelledby="h-team">
     <h2 id="h-team">Echipa de indici · de aici vin semnalele tale</h2>
-    <p class="lead">20 de traderi, câte 2 pe fiecare bursă. Fiecare are o singură regulă simplă și un singur indice. Toți cumpără doar (nu vând în lipsă), țin poziția câteva zile și ies singuri. Când unul intră sau iese, primești mesaj pe Telegram cu lotul și stopul deja calculate.</p>
+    <p class="lead"><span id="teamCount">40 de traderi, câte 4 pe fiecare bursă</span>. Fiecare are o singură regulă simplă și un singur indice. Câștigul vine din prețuri reale de bursă, nu din simulare. Toți cumpără doar (nu vând în lipsă), țin poziția câteva zile și ies singuri. Când unul intră sau iese, primești mesaj pe Telegram cu lotul și stopul deja calculate.</p>
     <div class="tiles" id="propAcct"></div>
     <div class="teamgrid" id="team"></div>
     <h3>Personalul care îi ajută</h3>
@@ -344,7 +344,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
 
   const CITY = { US30: 'New York', NAS100: 'New York', SPX500: 'New York', US2000: 'New York', GER40: 'Frankfurt', EU50: 'Frankfurt', FRA40: 'Paris', UK100: 'Londra', JP225: 'Tokyo', AUS200: 'Sydney' };
   const WHEN = { 'New York': 'semnal pe la 23:10', Frankfurt: 'semnal pe la 18:40', Paris: 'semnal pe la 18:40', Londra: 'semnal pe la 18:40', Tokyo: 'semnal dimineața', Sydney: 'semnal dimineața' };
-  const RULE = { rsi2: 'Cumpără după o scădere bruscă, când piața e pe creștere', down: 'Cumpără după 3 zile de scădere la rând, când piața e pe creștere' };
+  const RULE = { rsi2: 'Cumpără după o scădere bruscă, când piața e pe creștere', down: 'Cumpără după 3 zile de scădere la rând, când piața e pe creștere', bb: 'Cumpără când prețul cade mult sub media ultimelor zile', d7: 'Cumpără la minimul ultimelor 10 zile, când piața e pe creștere' };
   function propState() { return state && state.prop; }
 
   function renderSummary() {
@@ -353,7 +353,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     const ps = propState();
     const working = team ? team.agents.filter((a) => a.status !== 'BANCĂ').length : 0;
     const liveTxt = ps && ps.initialized ? (ps.paused ? 'Frâna de urgență e trasă: nu trimite intrări noi.' : 'Rulează acum și trimite semnale pe Telegram.') : 'Gata de lucru. Pornește imediat ce pui cheile Telegram în GitHub.';
-    box.append(el('div', { class: 'box', 'data-on': '1' }, [el('span', { class: 'tag', text: 'Semnale reale' }), el('b', { text: `Echipa de indici · ${team ? team.agents.length : 20} traderi (${working} lucrează)` }), el('span', { text: 'Singura variantă care a trecut toate testele: câștig mic, dar dovedit, pe 23 de ani de date nevăzute.' }), el('span', { class: 'muted', text: liveTxt })]));
+    box.append(el('div', { class: 'box', 'data-on': '1' }, [el('span', { class: 'tag', text: 'Semnale reale' }), el('b', { text: `Echipa de indici · ${team ? team.agents.length : 40} de traderi (${working} lucrează)` }), el('span', { text: 'Singura variantă care a trecut toate testele: câștig mic, dar dovedit, pe 23 de ani de date nevăzute.' }), el('span', { class: 'muted', text: liveTxt })]));
     const on = academy && academy.enabled;
     box.append(el('div', { class: 'box', 'data-on': on ? '1' : '0' }, [el('span', { class: 'tag', text: on ? 'Semnale reale' : 'Doar pe hârtie' }), el('b', { text: `Școala Forex · ${academy ? academy.population.length : 300} de agenți` }), el('span', { text: on ? 'Elita a dovedit avantaj și trimite semnale.' : 'Învață cu bani fictivi. Nu trimite semnale, pentru că pe Forex nu a arătat avantaj real.' }), el('span', { class: 'muted', text: 'Reverificată automat pe 1 ale fiecărei luni.' })]));
   }
@@ -367,7 +367,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     if (!ps || !ps.initialized) {
       tile('Stare', 'Așteaptă Telegram', 'Fără cheile Telegram în GitHub nu poate trimite niciun mesaj.');
       if (ex) tile('Firma aleasă', ex.name.replace(' 2-Step', ''), `Cont 10.000 $ · taxă ~${ex.fee} $ · risc ${ex.riskPct}% pe semnal`);
-      tile('Câte semnale', '~3 pe lună', 'De obicei o singură poziție deschisă odată. Uneori trece o săptămână fără nimic.');
+      tile('Câte semnale', `~${(team.scenario && team.scenario.challengeMonth && team.scenario.challengeMonth.tradesMedian) || 6} pe lună`, 'Gardianul ține de obicei 1–2 poziții odată, ca să nu atingi limita zilnică. Uneori trece o săptămână fără nimic.');
       return;
     }
     const phases = ps.firm === 'FTMO_1STEP' ? [0.10] : (ps.firm === 'FTMO_2STEP' ? [0.10, 0.05] : [0.08, 0.05]);
@@ -385,6 +385,8 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     const staff = document.getElementById('staff');
     grid.replaceChildren(); staff.replaceChildren();
     if (!team) { grid.append(el('p', { class: 'muted', text: 'Echipa se încarcă…' })); return; }
+    const nSym = new Set(team.agents.map((a) => a.symbol)).size;
+    document.getElementById('teamCount').textContent = `${team.agents.length} de traderi, câte ${Math.round(team.agents.length / Math.max(1, nSym))} pe fiecare bursă`;
     const ps = propState();
     const posOf = (a) => ps && ps.positions ? ps.positions[a.id] : null;
     const histOf = (a) => ((ps && ps.history) || []).filter((h) => h.sym === a.symbol && h.strategy === a.strategy);

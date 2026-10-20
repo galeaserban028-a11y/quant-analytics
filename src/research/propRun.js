@@ -58,10 +58,32 @@ const STRATEGIES = {
       }
       return g;
     })()
+  },
+  bb: {
+    name: 'Banda Bollinger',
+    grid: (() => {
+      const g = [];
+      for (const len of [10, 20]) for (const k of [1.5, 2, 2.5]) for (const trendLen of [0, 200]) for (const stopAtr of [2, 3, 4]) for (const allowShort of [false, true]) {
+        g.push({ kind: 'bb', len, k, trendLen, stopAtr, maxDays: 10, allowShort });
+      }
+      return g;
+    })()
+  },
+  d7: {
+    name: 'Minimul de N zile',
+    grid: (() => {
+      const g = [];
+      for (const trendLen of [100, 200]) for (const lookback of [5, 7, 10]) for (const stopAtr of [2, 3, 4]) for (const maxDays of [10, 15]) {
+        g.push({ kind: 'd7', trendLen, lookback, stopAtr, maxDays, allowShort: false });
+      }
+      return g;
+    })()
   }
 };
 // Respinse după testare (păstrate în raport ca să nu le mai încercăm orbește): IBS (0 pe indici; „miracolul” de pe Forex
-// era un defect de date), Double Seven (prea slab pentru examen), efectul de sfârșit de lună (≈0 după costuri).
+// era un defect de date), trend (momentum, breakout Donchian, încrucișare de medii: negative pe indici cu execuție
+// prudentă), efectul de sfârșit de lună (≈0 după costuri). Banda Bollinger și Minimul de N zile au fost adăugate pe
+// 20 octombrie 2026, după ce au trecut același walk-forward (și Bollinger chiar cu costuri duble).
 const GRID = STRATEGIES.rsi2.grid; // compatibilitate
 
 function parseArgs(argv) {
@@ -122,10 +144,18 @@ function rankFirms(a, b) {
   return eb - ea;
 }
 
-/** Cea mai bună valoare așteptată dintre variantele cu P(pică) ≤ 5% (dacă nu există niciuna: dintre toate). */
-function pickBest(table, maxFailPct = 5) {
+/**
+ * Alegerea variantei: doar cele cu P(pică) ≤ 5% (dacă nu există niciuna: dintre toate). Dintre ele, cele cu valoare
+ * așteptată practic egală cu cea mai bună (cel mult 5% sub ea); iar dintre acestea, cea la care treci CEL MAI REPEDE
+ * (șansa de a trece în ≤1 an, apoi în ≤6 luni). Așa nu plătim viteza cu bani pierduți în medie.
+ */
+function pickBest(table, maxFailPct = 5, evTolerance = 0.05) {
   const ok = table.filter((r) => r.failPct <= maxFailPct);
-  return (ok.length ? ok : table).slice().sort((a, b) => b.expectedValuePerAttempt - a.expectedValuePerAttempt || a.failPct - b.failPct)[0];
+  const pool = ok.length ? ok : table;
+  const top = Math.max(...pool.map((r) => r.expectedValuePerAttempt));
+  const near = pool.filter((r) => r.expectedValuePerAttempt >= top - evTolerance * Math.abs(top));
+  const speed = (r) => [r.passWithin365Pct || 0, r.passWithin180Pct || 0];
+  return near.slice().sort((a, b) => (speed(b)[0] - speed(a)[0]) || (speed(b)[1] - speed(a)[1]) || (b.expectedValuePerAttempt - a.expectedValuePerAttempt) || (a.failPct - b.failPct))[0];
 }
 
 /** Simulatorul folosit în validare: execuție prudentă (a doua zi la deschidere). */
@@ -197,7 +227,7 @@ async function main() {
   for (const r of ranking) console.log(`  ${r.rules.padEnd(28)} risc ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poziții): trece ${r.passPct}% | pică ${r.failPct}% | zile mediane ${r.medianDaysToPass} | ≤6 luni ${r.passWithin180Pct}% | EV ${r.expectedValuePerAttempt}$`);
 
   const L = [];
-  L.push('# Raport — Departamentul PROP (indici, grafic zilnic, 2 strategii)');
+  L.push(`# Raport — Departamentul PROP (indici, grafic zilnic, ${Object.keys(STRATEGIES).length} strategii candidate)`);
   L.push('');
   L.push(`Generat: ${new Date().toISOString()} · ${Object.keys(data).length} indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere`);
   L.push('');
@@ -213,7 +243,7 @@ async function main() {
   L.push('');
   if (port) L.push(`Portofoliu la risc 1%/tranzacție (fără reguli prop): ${port.cagrPct}% pe an, scădere maximă ${port.maxDrawdownPct}%.`);
   L.push('');
-  L.push('Respinse după testare: Forex (date zilnice nealiniate; pierde cu execuție realistă), IBS (≈0 pe indici), Double Seven (prea slab), sfârșit de lună (≈0 după costuri).');
+  L.push('Respinse după testare: Forex (fără avantaj real pe date Dukascopy), IBS (≈0 pe indici), strategiile de trend (momentum, breakout, medii: negative pe indici), sfârșit de lună (≈0 după costuri).');
   L.push('');
   L.push(`## 2. Șansele la examen (${top.attempts || 0} date de start, orizont 3 ani, apoi 12 luni pe contul finanțat)`);
   L.push('');
