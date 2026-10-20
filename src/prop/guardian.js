@@ -38,8 +38,11 @@ function decide(acct, rules, cfg) {
   // Contul finanțat (fără țintă) poate merge cu risc mai mic: acolo contează să-l păstrezi, ca să încasezi lunar
   if (!hasTarget && cfg.fundedRiskPct != null) riskPct = Math.min(riskPct, cfg.fundedRiskPct);
   const dd = (initial - balance) / initial;
-  if (dd > 0.06) riskPct *= 0.25;
-  else if (dd > 0.04) riskPct *= 0.5;
+  // Reducerea în drawdown: implicit la jumătate sub −4% și la un sfert sub −6% (configurabil pentru cercetare)
+  const steps = cfg.ddSteps || [[0.06, 0.25], [0.04, 0.5]];
+  for (const [lvl, mult] of steps) { if (dd > lvl) { riskPct *= mult; break; } }
+  // Opțional: altă mărime de risc când ești deja pe plus în fază (ex. protejezi câștigul sau apeși accelerația)
+  if (hasTarget && cfg.ahead && balance >= initial * (1 + cfg.ahead[0])) riskPct *= cfg.ahead[1];
   // Nu risca mai mult decât lipsește până la țintă (+ puțin): evită să dai „tot” când ești aproape
   let risk = initial * riskPct / 100;
   if (hasTarget) risk = Math.min(risk, Math.max(initial * 0.0025, targetBalance - balance));

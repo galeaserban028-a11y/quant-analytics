@@ -34,6 +34,9 @@ REC = struct.Struct('>iiiiif')
 
 
 def scale(pair):
+    # indicii CFD Dukascopy (ex. USA500IDXUSD, DEUIDXEUR) au prețuri cu 3 zecimale
+    if 'IDX' in pair:
+        return 1000.0
     return 1000.0 if pair.endswith('JPY') else 100000.0
 
 
@@ -342,7 +345,7 @@ def main(argv=None):
             if len(hours) < 1000:
                 print(f'{p}: prea puține date ({len(hours)} ore)')
                 continue
-            dec = 3 if p.endswith('JPY') else 5
+            dec = 3 if (p.endswith('JPY') or 'IDX' in p) else 5
             # doar lumânările ORARE (pentru cercetarea pe sesiuni); istoricul zilnic rămâne cel din fișierele anuale
             h1 = [[t * 1000, o, h, l, c, max(0.0, sp)] for (t, o, h, l, c, sp) in hours]
             write_csv_gz(os.path.join(a.out, 'h1', f'{p}.csv.gz'), h1, dec + 1)
