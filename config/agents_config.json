@@ -620,5 +620,7 @@
     "elite": [],
     "symbols": [],
     "note": "Academia Forex: se activează doar dacă compania agenților ELITĂ are avantaj clar în toate cele 3 rulări (npm run research:academy -- --apply)."
-  }
+  },
+  "propMode": "echilibrat",
+  "_propModeNote": "Ales de utilizator pe 20 oct. 2026. Moduri: sigur = risc 3% (siguranță 0,7); echilibrat = risc 4% (siguranță 0,8); rapid = risc 5% (siguranță 0,9). Peste 5% câștigul mediu devine negativ."
 }

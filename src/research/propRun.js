@@ -39,6 +39,14 @@ const UNIVERSE = ['INDEX'];
 // Banca: judecată pe ultimii 5 ani (testat walk-forward pe 20 oct. 2026 față de 3 ani: aceeași valoare așteptată,
 // trecere 53% vs 48%, picare 2,3% vs 3,7%, median 240 vs 251 zile; o fereastră mai lungă = mai puțin zgomot).
 const BENCH_RULE = { years: 5, belowR: -0.05, minTrades: 15 };
+// Modurile de viteză alese de utilizator (simulate pe 20 oct. 2026, The5ers): sigur 3% → median ~8 luni, pică ~2%;
+// echilibrat 4% → ~6 luni, pică ~5%; rapid 5% → ~5 luni, pică ~19%. Peste 5%: pică ~80%, câștig mediu negativ.
+const PROP_MODES = {
+  sigur: { risks: [3], safeties: [0.7], maxOpens: [5] },
+  echilibrat: { risks: [4], safeties: [0.8], maxOpens: [5] },
+  rapid: { risks: [5], safeties: [0.9], maxOpens: [5] }
+};
+const AGENTS_CONFIG = require('../../config/agents_config.json');
 
 /** Strategiile candidate și grilele lor (alegerea parametrilor se face DOAR pe anii de antrenare). */
 const STRATEGIES = {
@@ -193,7 +201,9 @@ async function main() {
   const port = trades.length ? portfolioSim(trades, { riskPct: 1, maxOpen: 5, maxOpenRiskPct: 5 }) : null;
 
   const firms = {};
-  if (trades.length) for (const [key, rules] of Object.entries(PROP_RULES)) firms[key] = chooseRisk(trades, rules);
+  const mode = PROP_MODES[args.mode || AGENTS_CONFIG.propMode] || null; // modul ales de utilizator (viteză vs. siguranță)
+  if (mode) console.log(`Mod: ${args.mode || AGENTS_CONFIG.propMode} (risc ${mode.risks[0]}%, siguranță ${mode.safeties[0]})`);
+  if (trades.length) for (const [key, rules] of Object.entries(PROP_RULES)) firms[key] = chooseRisk(trades, rules, mode || {});
   const ranking = Object.entries(firms).map(([k, v]) => ({ key: k, ...v.best })).sort(rankFirms);
   const top = ranking[0] || {};
   const agents = team.agents.filter((a) => acceptedKinds.includes(a.strategy));
@@ -314,4 +324,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch((err) => { console.error(err); process.exitCode = 1; });
-module.exports = { chooseRisk, pickBest, rankFirms, GRID, STRATEGIES, loadDaily, D1_DIR, prudentSim };
+module.exports = { PROP_MODES, chooseRisk, pickBest, rankFirms, GRID, STRATEGIES, loadDaily, D1_DIR, prudentSim };

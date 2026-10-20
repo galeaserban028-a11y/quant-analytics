@@ -65,7 +65,7 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-20T17:59:38.623Z",
+    "generatedAt": "2026-10-20T18:30:35.121Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
@@ -96,8 +96,8 @@
       "propDesk": {
         "enabled": true,
         "firm": "THE5ERS_HIGH_STAKES",
-        "riskPct": 3,
-        "safety": 0.7,
+        "riskPct": 4,
+        "safety": 0.8,
         "maxOpen": 5,
         "strategies": [
           {

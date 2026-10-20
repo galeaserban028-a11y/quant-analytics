@@ -1,6 +1,6 @@
 # Raport — Departamentul PROP (indici, grafic zilnic, 4 strategii candidate)
 
-Generat: 2026-10-20T17:59:38.620Z · 10 indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere
+Generat: 2026-10-20T18:30:35.118Z · 10 indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere
 
 ## 1. Strategiile (out-of-sample)
 
@@ -20,12 +20,12 @@ Respinse după testare: Forex (fără avantaj real pe date Dukascopy), IBS (≈0
 
 | Firmă | Risc | Trece | Pică | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |
 |---|---|---|---|---|---|---|---|---|
-| The5ers High Stakes 2-Step | 3% (siguranță 0.7, max 5 poz.) | **52.7%** | 2.3% | 240 | 17.7% | 36.9% | 95$ | 375$ |
-| FundedNext Stellar 2-Step | 3% (siguranță 0.7, max 5 poz.) | **52.6%** | 2.4% | 243 | 16.8% | 36.7% | 99$ | 355$ |
-| FTMO 2-Step (Swing) | 3% (siguranță 0.7, max 5 poz.) | **49.2%** | 2.5% | 285 | 10.9% | 30.5% | 170$ | 262$ |
-| FTMO 1-Step | 4% (siguranță 0.7, max 3 poz.) | **53.5%** | 5% | 262 | 15.1% | 35.9% | 150$ | 248$ |
+| The5ers High Stakes 2-Step | 4% (siguranță 0.8, max 5 poz.) | **49%** | 4.6% | 188 | 23.4% | 40.7% | 95$ | 374$ |
+| FundedNext Stellar 2-Step | 4% (siguranță 0.8, max 5 poz.) | **48.3%** | 4.6% | 196 | 21.5% | 40% | 99$ | 343$ |
+| FTMO 1-Step | 4% (siguranță 0.8, max 5 poz.) | **51.1%** | 8.3% | 217 | 20.5% | 38.9% | 150$ | 263$ |
+| FTMO 2-Step (Swing) | 4% (siguranță 0.8, max 5 poz.) | **44.9%** | 4.9% | 216 | 17.2% | 35.1% | 170$ | 242$ |
 
-**Recomandare:** The5ers High Stakes 2-Step, risc 3% pe tranzacție, Gardianul Prop activ.
+**Recomandare:** The5ers High Stakes 2-Step, risc 4% pe tranzacție, Gardianul Prop activ.
 
 ## 3. Echipa (strategie × indice)
 
@@ -76,23 +76,23 @@ Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe 
 
 ## 4. Scenarii (cont 10.000 $)
 
-- **O lună în examen:** mediană 6 $; 1 lună din 10 sub -494 $, 1 din 10 peste 519 $; 50.2% din luni pe plus; ~6 tranzacții pe lună.
-- **O lună pe contul finanțat (înainte de split):** mediană 6 $; 1 din 10 sub -494 $, 1 din 10 peste 516 $; 50.1% din luni pe plus.
+- **O lună în examen:** mediană 0 $; 1 lună din 10 sub -602 $, 1 din 10 peste 637 $; 49.2% din luni pe plus; ~3 tranzacții pe lună.
+- **O lună pe contul finanțat (înainte de split):** mediană 0 $; 1 din 10 sub -602 $, 1 din 10 peste 637 $; 48.9% din luni pe plus.
 
 | Luna | Încă în faza 1 | În faza 2 | Finanțat | Picat | Încasat cumulat (medie) |
 |---|---|---|---|---|---|
-| 1 | 98.1% | 1.9% | 0% | 0% | 0 $ |
-| 2 | 91.2% | 8.7% | 0.2% | 0% | 0 $ |
-| 3 | 80.6% | 17% | 2.4% | 0% | 0 $ |
-| 4 | 71.1% | 22.8% | 6.1% | 0% | 0 $ |
-| 5 | 64.5% | 26% | 9.5% | 0% | 6 $ |
-| 6 | 58.2% | 27% | 14.8% | 0% | 16 $ |
-| 7 | 54.2% | 26.5% | 19.4% | 0% | 35 $ |
-| 8 | 51.4% | 26.3% | 21.6% | 0.2% | 57 $ |
-| 9 | 48.4% | 26.5% | 24.1% | 0.2% | 77 $ |
-| 10 | 45.3% | 26.8% | 26.7% | 0.2% | 99 $ |
-| 11 | 43.6% | 26% | 29.2% | 0.2% | 121 $ |
-| 12 | 42.3% | 26.7% | 29.9% | 0.2% | 146 $ |
+| 1 | 94.6% | 3.7% | 0% | 1.7% | 0 $ |
+| 2 | 82.3% | 14.3% | 0.7% | 2.7% | 0 $ |
+| 3 | 69.8% | 23.3% | 3.6% | 3.2% | 0 $ |
+| 4 | 60.8% | 25.1% | 9.8% | 3.9% | 5 $ |
+| 5 | 54.8% | 25.3% | 14.9% | 4.1% | 13 $ |
+| 6 | 49.6% | 25.8% | 18.8% | 4.4% | 36 $ |
+| 7 | 46.3% | 24.1% | 23.3% | 4.6% | 58 $ |
+| 8 | 43.6% | 22.8% | 26.7% | 4.9% | 81 $ |
+| 9 | 40.9% | 21.7% | 29.5% | 5.3% | 111 $ |
+| 10 | 39.4% | 20.5% | 31.7% | 5.4% | 139 $ |
+| 11 | 37.5% | 20% | 33.8% | 5.6% | 166 $ |
+| 12 | 36.5% | 20% | 34.3% | 5.9% | 195 $ |
 
 ## Configurația propusă
 
@@ -100,8 +100,8 @@ Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe 
 {
   "enabled": true,
   "firm": "THE5ERS_HIGH_STAKES",
-  "riskPct": 3,
-  "safety": 0.7,
+  "riskPct": 4,
+  "safety": 0.8,
   "maxOpen": 5,
   "strategies": [
     {
