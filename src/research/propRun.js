@@ -172,7 +172,8 @@ async function main() {
     maxOpen: top.maxOpen,
     strategies: accepted.map(([kind, r]) => ({ kind, name: r.name, params: r.params })),
     symbols: Object.keys(data),
-    benched: agents.filter((a) => a.status === 'BANCĂ').map((a) => a.id)
+    benched: agents.filter((a) => a.status === 'BANCĂ').map((a) => a.id),
+    expectedR: combined.expectancyR // folosit de frâna de urgență live
   };
 
   // Scenarii (cu configurația aleasă)

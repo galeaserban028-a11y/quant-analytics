@@ -128,12 +128,16 @@ function shouldFetch(acct, sym, inst, now) {
  * @param {number} [p.now]
  * @param {object} [p.env] suprascrieri: PROP_BALANCE, PROP_ACCOUNT_SIZE, PROP_FIRM, PROP_PHASE
  */
-async function runPropCycle({ config, instruments, bus, notify, fetch, now = Date.now(), env = process.env, deskKey = 'propDesk', stateKey = 'prop', label = 'APEX PROP', simOpts = {} }) {
+async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, fetch, now = Date.now(), env = process.env, deskKey = 'propDesk', stateKey = 'prop', label = 'APEX PROP', simOpts = {} }) {
   const desk = Object.assign({}, config[deskKey] || {});
   if (!desk.enabled) return { skipped: 'PROP_DESK_DISABLED' };
+  let instruments = instrumentsIn;
   if (env.PROP_FIRM && PROP_RULES[env.PROP_FIRM]) desk.firm = env.PROP_FIRM;
   if (env.PROP_ACCOUNT_SIZE && Number(env.PROP_ACCOUNT_SIZE) > 0) desk.accountSize = Number(env.PROP_ACCOUNT_SIZE);
   const rules = PROP_RULES[desk.firm] || PROP_RULES.THE5ERS_HIGH_STAKES;
+  // Valoarea unui punct diferă de la firmă la firmă (ex. JP225: 1 sau 100 yeni pe punct la 1 lot). PROP_CONTRACT_SIZES
+  // o corectează: „JP225=100,GER40=1”. Fără ea folosim valorile din config/forex_instruments.json.
+  instruments = applyContractSizes(instruments, env.PROP_CONTRACT_SIZES);
   const strategies = deskStrategies(desk);
   const benched = new Set(desk.benched || []);
   const fetcher = fetch || ((sym, inst) => fetchDaily(inst, { now }));
@@ -243,6 +247,13 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
         continue;
       }
 
+      // Frâna de urgență: dacă rezultatele live sunt mult sub teste, nu mai deschidem nimic până la reluare
+      if (acct.paused) {
+        acct.skipped[key] = position.openedAt;
+        report.events.push({ sym, strategy: st.kind, event: 'SKIP', reason: 'PAUZĂ' });
+        continue;
+      }
+
       // 2. Semnal nou: doar dacă s-a deschis pe ULTIMA lumânare, proaspăt închisă (nu intrăm în tranzacții deja începute)
       const onLastBar = position.openedAt >= lastBar.timestamp + DAY_MS - SAME_POS_MS / 2;
       if (firstRun || stale || !onLastBar) {
@@ -274,12 +285,14 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
       if (!acct.tradingDays.includes(day)) acct.tradingDays.push(day);
       const long = position.direction === 'LONG';
       const pts = stopDist / inst.pipSize;
+      const pointUsd = (inst.contractSize || 1) * inst.pipSize * (lot.perLotRiskUsd / ((inst.contractSize || 1) * stopDist));
       await notify([
         `📈 <b>SEMNAL ${label === 'APEX PROP' ? 'PROP' : 'FOREX'}: ${escapeHtml(sym)}</b> ${long ? '🟢 CUMPĂRĂ (Buy)' : '🔴 VINDE (Sell)'} la prețul pieței, ACUM`,
         `🧠 Trader: ${escapeHtml(who)}`,
         `📦 Lot: <b>${lot.lots.toFixed(2)}</b> (risc ${money(lot.actualRiskUsd)} = ${(lot.actualRiskUsd / acct.initial * 100).toFixed(2)}% din cont)`,
         `🛑 Stop loss: la <b>${pts.toFixed(inst.pipSize >= 1 ? 0 : 1)} ${inst.category === 'FX' ? 'pips' : 'puncte'}</b> ${long ? 'SUB' : 'PESTE'} prețul tău de intrare`,
         `📍 Preț de referință (închiderea de azi): ${fmtPx(position.entry, inst)} → stop ≈ ${fmtPx(position.stop, inst)}`,
+        `🔎 Presupus: 1 lot = ${pointUsd < 1 ? pointUsd.toFixed(3) : pointUsd.toFixed(2)} $ pe ${inst.category === 'FX' ? 'pip' : 'punct'}. Verifică în platformă (specificațiile contractului); dacă diferă, NU intra și setează PROP_CONTRACT_SIZES.${lot.lots > 20 ? ' ⚠️ Lot neobișnuit de mare: verifică de două ori!' : ''}`,
         `🎯 Fără take-profit fix: primești mesaj de ÎNCHIDERE (de obicei în 1–5 zile).`,
         `⏱️ Bursa s-a închis la ${roTime(barClose)} (ora României). Intră cât mai repede; dacă au trecut peste 12 ore, sari peste.`,
         progressLine(acct, rules),
@@ -287,6 +300,20 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
       ].join('\n'));
       report.events.push({ sym, strategy: st.kind, event: 'ENTRY', lots: lot.lots, riskUsd: lot.actualRiskUsd });
     }
+  }
+
+  // Reluare după pauză: PROP_RESUME cu o valoare nouă (ex. data de azi)
+  if (acct.paused && env.PROP_RESUME && env.PROP_RESUME !== acct.resumeToken) {
+    acct.paused = null;
+    acct.resumeToken = env.PROP_RESUME;
+    acct.breakerFrom = acct.history.length; // evaluarea reîncepe de la zero
+    await notify(`▶️ <b>${label}: reluat</b> (PROP_RESUME=${escapeHtml(env.PROP_RESUME)}). Semnalele noi vin din nou.`);
+  }
+  const brk = breakerCheck(acct.history.slice(acct.breakerFrom || 0), desk.expectedR != null ? desk.expectedR : 0.04);
+  if (brk && !acct.paused) {
+    acct.paused = { at: now, why: brk };
+    await notify(`⛔ <b>${label}: FRÂNĂ DE URGENȚĂ</b>\n${brk}\nNu mai intru în tranzacții noi. Pozițiile deschise le închid normal. Verifică dacă execuți corect semnalele (lot, stop, ora). Pentru reluare setează variabila PROP_RESUME în GitHub (orice valoare nouă, de exemplu data de azi).`);
+    report.events.push({ event: 'PAUSED', why: brk });
   }
 
   // 3. Fazele examenului
@@ -331,6 +358,37 @@ async function runPropCycle({ config, instruments, bus, notify, fetch, now = Dat
   return report;
 }
 
+/** Suprascrie valoarea contractului per instrument: „JP225=100,GER40=1”. */
+function applyContractSizes(instruments, spec) {
+  if (!spec) return instruments;
+  const out = Object.assign({}, instruments);
+  for (const part of String(spec).split(',')) {
+    const [sym, val] = part.split('=').map((x) => (x || '').trim());
+    const v = Number(val);
+    if (out[sym] && v > 0) out[sym] = Object.assign({}, out[sym], { contractSize: v });
+  }
+  return out;
+}
+
+/**
+ * Frâna de urgență: oprește intrările noi dacă rezultatele live ies clar din ce au arătat testele.
+ *  - după cel puțin 20 de tranzacții, media live e sub cea așteptată cu mai mult de 2,5 erori standard; sau
+ *  - 15 pierderi la rând (în teste, cea mai lungă serie a fost 14).
+ */
+function breakerCheck(history, expectedR = 0.04) {
+  const rs = history.map((h) => h.r).filter(Number.isFinite);
+  let streak = 0, worst = 0;
+  for (const r of rs) { streak = r < 0 ? streak + 1 : 0; worst = Math.max(worst, streak); }
+  if (worst >= 15) return `${worst} pierderi la rând (în teste, cea mai lungă serie a fost 14).`;
+  if (rs.length >= 20) {
+    const n = rs.length, m = rs.reduce((a, b) => a + b, 0) / n;
+    const sd = Math.sqrt(rs.reduce((a, b) => a + (b - m) ** 2, 0) / (n - 1)) || 1;
+    const t = (m - expectedR) / (sd / Math.sqrt(n));
+    if (t < -2.5) return `După ${n} tranzacții live, media e ${m.toFixed(2)}R, mult sub ${expectedR.toFixed(2)}R cât au arătat testele (diferență statistică clară).`;
+  }
+  return null;
+}
+
 const FX_FOR = { EUR: 'EURUSD', GBP: 'GBPUSD', AUD: 'AUDUSD', NZD: 'NZDUSD', JPY: 'USDJPY', CAD: 'USDCAD', CHF: 'USDCHF' };
 
 /** Cursurile necesare pentru loturile instrumentelor cotate în altă monedă decât USD (EUR, GBP, JPY, AUD). */
@@ -364,4 +422,4 @@ function propSummary(acct, config) {
   return `💼 <b>Contul de prop</b> (${rules.name})\n${progressLine(acct, rules)}\n${roomLine(acct, rules)}\n` + (pos.length ? `Poziții deschise:\n${lines.join('\n')}` : 'Nicio poziție deschisă.');
 }
 
-module.exports = { runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf };
+module.exports = { runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };

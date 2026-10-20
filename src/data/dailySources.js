@@ -72,7 +72,7 @@ function zonedToUtc(y, m, d, hh, mm, tz) {
   return t;
 }
 
-const CLOSE_BUFFER_MS = 10 * 60e3; // așteptăm 10 minute după închiderea oficială (licitația de închidere, actualizarea datelor)
+const CLOSE_BUFFER_MS = 20 * 60e3; // așteptăm 20 de minute după închiderea oficială (licitația de închidere, prețul final la Yahoo)
 
 /** Închiderea oficială (UTC) a sesiunii din care face parte lumânarea. Yahoo: timestamp la deschiderea locală; Stooq: data la miezul nopții UTC. */
 function sessionCloseUtc(barTs, inst, source = 'yahoo') {

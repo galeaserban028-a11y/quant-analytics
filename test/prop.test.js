@@ -300,7 +300,8 @@ test('date: parserele Yahoo/Stooq, filtrul OHLC invalid și regula lumânării �
   assert.equal(ds.closedDaily([bar], INSTR.US30, Date.UTC(2026, 9, 16, 21)).length, 1);
   const sbar = { timestamp: Date.UTC(2026, 9, 16) }; // Stooq: data la miezul nopții UTC ⇒ ziua bursei = data UTC
   assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 16, 20, 5), 'stooq').length, 0);
-  assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 16, 20, 15), 'stooq').length, 1);
+  assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 16, 20, 15), 'stooq').length, 0, 'încă în cele 20 de minute de așteptare');
+  assert.equal(ds.closedDaily([sbar], INSTR.US30, Date.UTC(2026, 9, 16, 20, 25), 'stooq').length, 1);
   // instrument fără program de bursă (Forex): regula de 24h pentru Stooq
   assert.equal(ds.closedDaily([sbar], INSTR.EURUSD, Date.UTC(2026, 9, 16, 21), 'stooq').length, 0);
   assert.equal(ds.closedDaily([sbar], INSTR.EURUSD, Date.UTC(2026, 9, 17, 0, 1), 'stooq').length, 1);
@@ -355,6 +356,7 @@ test('live: pornire tăcută → semnal nou cu lot și stop → mesaj de ieșire
   assert.match(msgs[1], /Lot: <b>\d+\.\d\d<\/b>/);
   assert.match(msgs[1], /pips<\/b> SUB/);
   assert.match(msgs[1], /Gardian:/);
+  assert.match(msgs[1], /Presupus: 1 lot = 10\.00 \$ pe pip/, 'mesajul arată valoarea pip-ului, de verificat în platformă');
 
   // 2b) aceeași lumânare din nou (rulare orară): nimic nou
   r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars), now: tLast + 2 * 3600e3, env });
@@ -551,15 +553,16 @@ test('live: descarcă date doar după închiderea bursei sau o dată pe oră (ru
   assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close), true, 'prima dată mereu');
   acct.lastFetch.US30 = close - 5 * 60e3;
   acct.lastBarClose.US30 = close - DAY;
-  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 5 * 60e3), false, 'înainte de +10 minute');
-  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 12 * 60e3), true, 'lumânarea nouă e gata');
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 5 * 60e3), false, 'înainte de +20 minute');
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 12 * 60e3), false, 'prețul de închidere încă se poate corecta');
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 22 * 60e3), true, 'lumânarea nouă e gata');
   acct.lastFetch.US30 = close + 12 * 60e3;
   acct.lastBarClose.US30 = close;
-  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 17 * 60e3), false, 'deja procesată');
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 27 * 60e3), false, 'deja procesată');
   assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 70 * 60e3), true, 'verificarea orară');
   acct.lastBarClose.US30 = close - DAY; // Yahoo încă nu a actualizat: mai încercăm la fiecare rulare în fereastră
   acct.lastFetch.US30 = close + 12 * 60e3;
-  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 17 * 60e3), true);
+  assert.equal(shouldFetch(acct, 'US30', INSTR.US30, close + 27 * 60e3), true);
 });
 
 test('live: două strategii pe același indice → două poziții separate, lot GER40 cu conversie EUR→USD', async () => {
@@ -769,4 +772,45 @@ test('cercetare: la valoare așteptată practic egală, câștigă firma la care
   const b = { key: 'B', expectedValuePerAttempt: 377, passWithin180Pct: 12.5, failPct: 3.2 };
   const c = { key: 'C', expectedValuePerAttempt: 250, passWithin180Pct: 20, failPct: 1 };
   assert.deepEqual([a, b, c].sort(rankFirms).map((x) => x.key), ['B', 'A', 'C']);
+});
+
+test('frâna de urgență: se declanșează doar la rezultate live clar sub teste sau la 15 pierderi la rând', () => {
+  const { breakerCheck } = require('../src/propLive');
+  const h = (rs) => rs.map((r) => ({ r }));
+  assert.equal(breakerCheck(h([0.5, -1, 0.4, 0.6, -1, 0.3])), null, 'puține tranzacții: nicio judecată');
+  const normal = []; for (let i = 0; i < 40; i++) normal.push(i % 3 === 0 ? -1 : 0.55);
+  assert.equal(breakerCheck(h(normal)), null, 'rezultate ca în teste: merge mai departe');
+  const bad = []; for (let i = 0; i < 30; i++) bad.push(i % 5 === 0 ? 0.4 : -1);
+  assert.match(breakerCheck(h(bad)), /mult sub/);
+  assert.match(breakerCheck(h(Array(15).fill(-0.8))), /15 pierderi la rând/);
+  assert.equal(breakerCheck(h(Array(14).fill(-0.2).concat([0.5]))), null);
+});
+
+test('live: frâna oprește intrările noi, PROP_RESUME le reia; mesajul arată valoarea punctului; PROP_CONTRACT_SIZES o corectează', async () => {
+  const { applyContractSizes } = require('../src/propLive');
+  const fixed = applyContractSizes(INSTR, 'JP225=100, GER40=1, XXX=5, US30=abc');
+  assert.equal(fixed.JP225.contractSize, 100);
+  assert.equal(fixed.US30.contractSize, INSTR.US30.contractSize, 'valorile invalide se ignoră');
+  assert.equal(INSTR.JP225.contractSize, 1, 'configul original nu se modifică');
+
+  const { config, bus, msgs, notify } = liveFixture();
+  const bars = pullbackSeries();
+  const tLast = bars[bars.length - 1].timestamp + DAY;
+  await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars.slice(0, -1)), now: tLast - DAY + 3600e3, env: {} });
+  // istoric live prost ⇒ frână
+  bus.state.prop.history = Array.from({ length: 16 }, () => ({ r: -1 }));
+  await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars.slice(0, -1)), now: tLast - DAY + 2 * 3600e3, env: {} });
+  assert.ok(bus.state.prop.paused);
+  assert.match(msgs[msgs.length - 1], /FRÂNĂ DE URGENȚĂ/);
+  let r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars), now: tLast + 3600e3, env: {} });
+  assert.deepEqual(r.events.map((e) => e.reason), ['PAUZĂ']);
+  // reluare: evaluarea reîncepe de la zero; semnalul următor (zi nouă) trece
+  const L = bars[bars.length - 1];
+  const more = bars.concat([{ timestamp: L.timestamp + DAY, open: L.close, high: L.close + 0.001, low: L.close - 0.011, close: L.close - 0.01, volume: 0 }]);
+  bus.state.prop.skipped = {};
+  r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(more), now: tLast + DAY + 3600e3, env: { PROP_RESUME: '2026-10-20' } });
+  assert.equal(bus.state.prop.paused, null);
+  assert.ok(msgs.some((m) => /reluat/.test(m)));
+  const entry = msgs.find((m) => /SEMNAL PROP/.test(m));
+  if (entry) assert.match(entry, /Presupus: 1 lot = 10\.00 \$ pe pip/, 'EURUSD: 100.000 × 0,0001 = 10 $ pe pip');
 });
