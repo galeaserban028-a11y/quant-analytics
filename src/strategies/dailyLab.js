@@ -35,7 +35,22 @@ function weekdaysLeftInMonth(ts) {
   return n;
 }
 
+/**
+ * Regulile unei strategii, cu ieșire alternativă opțională (p.exitMode):
+ *  'upclose' = prima închidere pe plus față de ziua anterioară (ieșire rapidă);
+ *  'either'  = regula proprie SAU prima închidere pe plus, oricare vine prima.
+ */
 function makeRules(bars, p, ctx = {}) {
+  const r = makeRulesBase(bars, p, ctx);
+  if (!p.exitMode || p.exitMode === 'own') return r;
+  const c = bars.map((b) => b.close);
+  const up = (i, pos) => (pos.dir === 'LONG' ? c[i] > c[i - 1] : c[i] < c[i - 1]);
+  const own = r.exit;
+  r.exit = p.exitMode === 'upclose' ? up : (i, pos) => up(i, pos) || own(i, pos);
+  return r;
+}
+
+function makeRulesBase(bars, p, ctx = {}) {
   const closes = bars.map((b) => b.close);
   const smaT = p.trendLen ? smaSeries(closes, p.trendLen) : closes.map(() => NaN);
   const smaX = smaSeries(closes, p.exitLen || 5);

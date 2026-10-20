@@ -25,7 +25,12 @@ const PROP_RULES = {
   },
   THE5ERS_HIGH_STAKES: {
     name: 'The5ers High Stakes 2-Step', phases: [0.08, 0.05], dailyLoss: 0.05, maxLoss: 0.10, maxLossType: 'static',
-    minDays: 3, split: 0.8, fee10k: 95, resetTz: 'Europe/Athens', notes: 'Weekend permis, EA permise. Minim 3 zile cu cel puțin 0,5% profit.'
+    minDays: 3, split: 0.8, fee10k: 78, resetTz: 'Europe/Athens', notes: 'Varianta CLASICĂ (8% / 5%); ~70–78 $ pentru 10.000 $ (oct. 2026). Există și varianta „Nouă” 10% / 5%, mai ieftină (~62–69 $), dar mai lentă. Weekend permis, EA permise. Minim 3 zile cu cel puțin 0,5% profit.'
+  },
+  FUNDINGPIPS_2STEP: {
+    name: 'FundingPips 2-Step', phases: [0.08, 0.05], dailyLoss: 0.05, maxLoss: 0.10, maxLossType: 'static',
+    minDays: 3, split: 0.8, fee10k: 66, resetTz: 'Europe/Moscow', weekendFunded: false,
+    notes: 'Aceleași ținte și limite ca The5ers, mai ieftin (~53–66 $). DAR pe contul finanțat pozițiile se închid automat vineri (sept. 2026), iar strategiile noastre țin până la 10 zile: nu e recomandat până nu se ridică restricția.'
   },
   FTMO_1STEP: {
     name: 'FTMO 1-Step', phases: [0.10], dailyLoss: 0.03, maxLoss: 0.10, maxLossType: 'trailingEod',

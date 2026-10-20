@@ -209,7 +209,8 @@ async function main() {
   if (mode) console.log(`Mod: ${args.mode || AGENTS_CONFIG.propMode} (risc ${mode.risks[0]}%, siguranță ${mode.safeties[0]})`);
   if (trades.length) for (const [key, rules] of Object.entries(PROP_RULES)) firms[key] = chooseRisk(trades, rules, mode || {});
   const ranking = Object.entries(firms).map(([k, v]) => ({ key: k, ...v.best })).sort(rankFirms);
-  const top = ranking[0] || {};
+  // recomandarea: doar firmele la care strategiile noastre (ținute câteva zile, și peste weekend) merg pe tot drumul
+  const top = ranking.find((r) => PROP_RULES[r.key].weekendFunded !== false) || ranking[0] || {};
   const agents = team.agents.filter((a) => acceptedKinds.includes(a.strategy));
   const proposed = {
     enabled: level !== 'NIMIC',
@@ -313,7 +314,7 @@ async function main() {
     config: proposed,
     agents, staff: STAFF,
     strategies: Object.fromEntries(Object.entries(results).map(([k, r]) => [k, { name: r.name, level: r.level, params: r.params, oos: { trades: r.oos.trades, winRatePct: r.oos.winRatePct, expectancyR: r.oos.expectancyR, ci: r.oos.expectancyCI95 } }])),
-    exam: ranking.map((r) => ({ key: r.key, name: r.rules, riskPct: r.riskPct, safety: r.safety, maxOpen: r.maxOpen, passPct: r.passPct, failPct: r.failPct, timeoutPct: r.timeoutPct, medianDaysToPass: r.medianDaysToPass, passWithin180Pct: r.passWithin180Pct, passWithin365Pct: r.passWithin365Pct, fee: r.fee, ev: r.expectedValuePerAttempt })),
+    exam: [top].concat(ranking.filter((r) => r !== top)).filter((r) => r && r.key).map((r) => ({ key: r.key, name: r.rules, riskPct: r.riskPct, safety: r.safety, maxOpen: r.maxOpen, passPct: r.passPct, failPct: r.failPct, timeoutPct: r.timeoutPct, medianDaysToPass: r.medianDaysToPass, passWithin180Pct: r.passWithin180Pct, passWithin365Pct: r.passWithin365Pct, fee: r.fee, ev: r.expectedValuePerAttempt })),
     scenario
   }, null, 2));
   console.log('Raport: data/research/RAPORT_PROP.md');

@@ -871,3 +871,11 @@ test('laborator: strategiile crsi / ll / kc dau semnal doar după scăderi, în 
     assert.equal(lab.liveState('X', up, INSTR.US30, p).position, null, `${p.kind}: fără scădere ⇒ fără semnal`);
   }
 });
+
+test('laborator: exitMode „upclose” iese la prima închidere pe plus; implicit regula proprie', () => {
+  const up = Array.from({ length: 230 }, (_, i) => ({ timestamp: T0 + i * DAY, open: 100 + i * 0.1, high: 100.5 + i * 0.1, low: 99.5 + i * 0.1, close: 100 + i * 0.1, volume: 0 }));
+  const r = lab.makeRules(up, { kind: 'rsi2', trendLen: 200, entryRsi: 20, exitLen: 5, stopAtr: 2, exitMode: 'upclose' });
+  assert.equal(r.exit(229, { dir: 'LONG' }), true);
+  const own = lab.makeRules(up, { kind: 'rsi2', trendLen: 200, entryRsi: 20, exitLen: 5, stopAtr: 2 });
+  assert.equal(typeof own.exit, 'function');
+});
