@@ -42,9 +42,11 @@ function nameFor(kind, sym) {
 const agentId = (sym, kind) => `${sym}|${kind}`;
 
 /** Stă pe bancă? (doar din tranzacțiile din antrenare, adică trecutul) */
-function benchDecision(trainTrades) {
+function benchDecision(trainTrades, rule = {}) {
   const m = computeMetrics(trainTrades);
-  const benched = m.trades >= BENCH_MIN_TRADES && m.expectancyR < BENCH_BELOW_R;
+  const minT = rule.minTrades != null ? rule.minTrades : BENCH_MIN_TRADES;
+  const below = rule.belowR != null ? rule.belowR : BENCH_BELOW_R;
+  const benched = !rule.off && m.trades >= minT && m.expectancyR < below;
   return { benched, trades: m.trades, expectancyR: m.expectancyR };
 }
 
@@ -90,11 +92,12 @@ function teamWalkForward(data, instruments, strategies, sim, opts = {}) {
       const S = byStrategy[kind];
       const fold = { testFrom: new Date(ts).toISOString().slice(0, 10), testTo: new Date(te).toISOString().slice(0, 10), params: best.params, trading: best.obj > 0, benched: [] };
       if (best.obj > 0) {
-        const trainTrades = sim(train, instruments, best.params, { barMs: DAY });
+        const benchData = opts.bench && opts.bench.years ? sliceBars(data, ts - opts.bench.years * YEAR, ts) : train;
+        const trainTrades = sim(benchData, instruments, best.params, { barMs: DAY });
         const oos = sim(test, instruments, best.params, { barMs: DAY, tradeFromTs: ts, tradeUntilTs: te });
         S.oosAll.push(...oos);
         for (const sym of Object.keys(data)) {
-          const b = benchDecision(trainTrades.filter((t) => t.symbol === sym));
+          const b = benchDecision(trainTrades.filter((t) => t.symbol === sym), opts.bench);
           if (b.benched) fold.benched.push(sym);
           else S.oos.push(...oos.filter((t) => t.symbol === sym));
         }
@@ -108,8 +111,10 @@ function teamWalkForward(data, instruments, strategies, sim, opts = {}) {
 
   // Starea de ACUM: parametrii celei mai recente școli și banca pe ultimii 3 ani
   const now = end + DAY;
-  const recent = sliceBars(data, now - trainYears * YEAR, now);
+  const recent = sliceBars(data, now - ((opts.bench && opts.bench.years) || trainYears) * YEAR, now);
   const agents = [];
+  const benchYears = (opts.bench && opts.bench.years) || trainYears;
+  const benchBelow = opts.bench && opts.bench.belowR != null ? opts.bench.belowR : BENCH_BELOW_R;
   for (const [kind, st] of Object.entries(strategies)) {
     const S = byStrategy[kind];
     if (!S.latest) continue;
@@ -120,7 +125,7 @@ function teamWalkForward(data, instruments, strategies, sim, opts = {}) {
       const years = new Map();
       for (const t of mine) { const y = new Date(t.openedAt).getUTCFullYear(); years.set(y, (years.get(y) || 0) + t.resultR); }
       const last12 = computeMetrics(mine.filter((t) => t.openedAt >= now - YEAR));
-      const b = benchDecision(recentTrades.filter((t) => t.symbol === sym));
+      const b = benchDecision(recentTrades.filter((t) => t.symbol === sym), opts.bench);
       agents.push({
         id: agentId(sym, kind),
         name: nameFor(kind, sym),
@@ -129,9 +134,9 @@ function teamWalkForward(data, instruments, strategies, sim, opts = {}) {
         symbol: sym,
         status: b.benched ? 'BANCĂ' : 'LUCREAZĂ',
         why: b.benched
-          ? `În ultimii 3 ani: ${b.expectancyR.toFixed(3)}R pe tranzacție din ${b.trades} (sub ${BENCH_BELOW_R}R). Revine când își revine.`
-          : `În ultimii 3 ani: ${b.trades ? `${b.expectancyR >= 0 ? '+' : ''}${b.expectancyR.toFixed(3)}R pe tranzacție din ${b.trades}` : 'prea puține tranzacții pentru o judecată'}.`,
-        last3y: { trades: b.trades, expectancyR: b.expectancyR },
+          ? `În ultimii ${benchYears} ani: ${b.expectancyR.toFixed(3)}R pe tranzacție din ${b.trades} (sub ${benchBelow}R). Revine când își revine.`
+          : `În ultimii ${benchYears} ani: ${b.trades ? `${b.expectancyR >= 0 ? '+' : ''}${b.expectancyR.toFixed(3)}R pe tranzacție din ${b.trades}` : 'prea puține tranzacții pentru o judecată'}.`,
+        last3y: { trades: b.trades, expectancyR: b.expectancyR, years: benchYears },
         record: {
           trades: m.trades, winRatePct: m.winRatePct, expectancyR: m.expectancyR, totalR: m.totalR,
           maxLosingStreak: m.maxLosingStreak,

@@ -588,8 +588,12 @@ test('live: două strategii pe același indice → două poziții separate, lot 
   const entries = r.events.filter((e) => e.event === 'ENTRY');
   assert.equal(entries.length, 2, JSON.stringify(r.events));
   assert.deepEqual(Object.keys(bus.state.prop.positions).sort(), ['GER40|down', 'GER40|rsi2']);
-  assert.ok(msgs.some((m) => /Trader: Tudor \(3 zile de scădere\)/.test(m)));
-  assert.ok(msgs.some((m) => /puncte<\/b> SUB/.test(m)));
+  const sig = msgs.filter((m) => /SEMNAL PROP: GER40/.test(m));
+  assert.equal(sig.length, 1, 'doi traderi pe același indice deodată ⇒ UN singur semnal');
+  assert.ok(/2 traderi de acord: .*Tudor \(3 zile de scădere\)/.test(sig[0]), sig[0]);
+  const lots = Object.values(bus.state.prop.positions).reduce((t, p) => t + p.lots, 0);
+  assert.ok(sig[0].includes(`Lot TOTAL: <b>${lots.toFixed(2)}</b>`) || /poziții separate/.test(sig[0]), sig[0]);
+  assert.ok(/puncte<\/b> SUB/.test(sig[0]));
   const totalRisk = Object.values(bus.state.prop.positions).reduce((s, p) => s + p.riskUsd, 0);
   assert.ok(totalRisk <= 10000 * 0.05 * 0.8 + 1e-6, 'Gardianul împarte bugetul zilnic între poziții');
   assert.equal(bus.state.prop.fxRates.EURUSD, 1.1);
@@ -825,4 +829,20 @@ test('live: frâna oprește intrările noi, PROP_RESUME le reia; mesajul arată 
   assert.ok(msgs.some((m) => /reluat/.test(m)));
   const entry = msgs.find((m) => /SEMNAL PROP/.test(m));
   if (entry) assert.match(entry, /Presupus: 1 lot = 10\.00 \$ pe pip/, 'EURUSD: 100.000 × 0,0001 = 10 $ pe pip');
+});
+
+test('live: ieșirea unui singur trader dintr-un indice ocupat de doi spune exact ce lot închizi și ce rămâne', async () => {
+  const { flushSymbol } = require('../src/propLive');
+  const msgs = [];
+  const acct = { initial: 10000, balance: 10050, dayStart: 10000, highestEod: 10000, phase: 0, tradingDays: ['x'], positions: { 'GER40|down': { lots: 0.4, who: 'Tudor (3 zile de scădere)', riskUsd: 150 } } };
+  const rules = PROP_RULES.THE5ERS_HIGH_STAKES;
+  await flushSymbol({ sym: 'GER40', inst: INSTR.GER40, acct, rules, label: 'APEX PROP', barClose: Date.UTC(2026, 0, 5, 16, 30), outEntries: [], notify: async (t) => { msgs.push(t); },
+    outExits: [{ who: 'Radu (Pullback RSI(2))', prev: { direction: 'LONG', lots: 0.35 }, r: 0.4, pnl: 60, why: 'prețul a revenit', outcome: 'EXIT' }] });
+  assert.equal(msgs.length, 1);
+  assert.ok(/ÎNCHIDE 0\.35 loturi/.test(msgs[0]), msgs[0]);
+  assert.ok(/Rămâne deschis pe GER40: 0\.40 loturi \(Tudor\)/.test(msgs[0]), msgs[0]);
+  msgs.length = 0;
+  await flushSymbol({ sym: 'GER40', inst: INSTR.GER40, acct: Object.assign({}, acct, { positions: {} }), rules, label: 'APEX PROP', barClose: 0, outEntries: [], notify: async (t) => { msgs.push(t); },
+    outExits: [{ who: 'Radu (Pullback RSI(2))', prev: { direction: 'LONG', lots: 0.35 }, r: -1, pnl: -150, why: 'stop-ul a fost atins', outcome: 'STOP' }] });
+  assert.ok(!/ÎNCHIDE/.test(msgs[0]) && /Nu faci nimic/.test(msgs[0]), 'la stop nu ai nimic de închis');
 });

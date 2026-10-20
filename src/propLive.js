@@ -118,6 +118,61 @@ function shouldFetch(acct, sym, inst, now) {
   return now - last >= REFETCH_MS;
 }
 
+const lotsTxt = (x) => x.toFixed(2);
+
+/**
+ * Mesajele unui instrument la o rulare: întâi ieșirile, apoi intrările, câte UN mesaj pentru fiecare.
+ * Când mai mulți traderi intră deodată pe același instrument, în aceeași direcție, primești un singur semnal cu lotul
+ * TOTAL; la ieșire, mesajul spune exact ce lot închizi și ce rămâne deschis.
+ */
+async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, outEntries, notify }) {
+  const tag = label === 'APEX PROP' ? 'PROP' : 'FOREX';
+  const unit = inst.category === 'FX' ? 'pips' : 'puncte';
+  const newKeys = new Set(outEntries.map((e) => e.key));
+  const stillOpen = () => Object.entries(acct.positions).filter(([k]) => k.split('|')[0] === sym && !newKeys.has(k)).map(([, p]) => p);
+  if (outExits.length) {
+    const left = stillOpen();
+    const lines = [`⏹️ <b>${tag}: ${escapeHtml(sym)}</b> ${outExits[0].prev.direction === 'LONG' ? '(cumpărare)' : '(vânzare)'}`];
+    for (const x of outExits) {
+      const why = x.why.replace(/ — ÎNCHIDE ACUM$/, '');
+      const action = x.outcome === 'STOP' ? 'Nu faci nimic.' : `<b>ÎNCHIDE ${x.prev.lots != null && (left.length || outExits.length > 1) ? lotsTxt(x.prev.lots) + ' loturi' : 'ACUM'}</b>.`;
+      lines.push(`• ${escapeHtml(x.who)}: ${why}. ${action} Rezultat estimat: <b>${x.r >= 0 ? '+' : ''}${x.r.toFixed(2)}R ≈ ${money(x.pnl)}</b>`);
+    }
+    if (left.length) lines.push(`Rămâne deschis pe ${escapeHtml(sym)}: ${lotsTxt(left.reduce((t, p) => t + (p.lots || 0), 0))} loturi (${left.map((p) => escapeHtml((p.who || '').split(' (')[0])).join(', ')}). Pe acelea NU le închide.`);
+    else if (outExits.filter((x) => x.outcome !== 'STOP').length > 1) lines.push(`➡️ Închizi TOT ce ai pe ${escapeHtml(sym)}.`);
+    lines.push(progressLine(acct, rules));
+    await notify(lines.join('\n'));
+  }
+  const groups = {};
+  for (const e of outEntries) (groups[e.position.direction] = groups[e.position.direction] || []).push(e);
+  for (const [dir, es] of Object.entries(groups)) {
+    const long = dir === 'LONG';
+    const totalLots = es.reduce((t, e) => t + e.lot.lots, 0);
+    const totalRisk = es.reduce((t, e) => t + e.lot.actualRiskUsd, 0);
+    const sameStop = es.every((e) => Math.abs(e.position.stop - es[0].position.stop) < inst.pipSize / 2);
+    const pts = (e) => (e.stopDist / inst.pipSize).toFixed(inst.pipSize >= 1 ? 0 : 1);
+    const lines = [`📈 <b>SEMNAL ${tag}: ${escapeHtml(sym)}</b> ${long ? '🟢 CUMPĂRĂ (Buy)' : '🔴 VINDE (Sell)'} la prețul pieței, ACUM`];
+    if (es.length === 1) lines.push(`🧠 Trader: ${escapeHtml(es[0].who)}`);
+    else lines.push(`🧠 ${es.length} traderi de acord: ${es.map((e) => `${escapeHtml(e.who)} ${lotsTxt(e.lot.lots)}`).join(' · ')}`);
+    if (sameStop) {
+      lines.push(`📦 Lot${es.length > 1 ? ' TOTAL' : ''}: <b>${lotsTxt(totalLots)}</b> (risc ${money(totalRisk)} = ${(totalRisk / acct.initial * 100).toFixed(2)}% din cont)${es.length > 1 ? '. Îl poți deschide ca o singură poziție; la ieșire îți spun exact cât închizi.' : ''}`);
+      lines.push(`🛑 Stop loss: la <b>${pts(es[0])} ${unit}</b> ${long ? 'SUB' : 'PESTE'} prețul tău de intrare`);
+      lines.push(`📍 Preț de referință (închiderea de azi): ${fmtPx(es[0].position.entry, inst)} → stop ≈ ${fmtPx(es[0].position.stop, inst)}`);
+    } else {
+      lines.push(`📦 Deschide ${es.length} poziții separate (stopuri diferite), risc total ${money(totalRisk)} = ${(totalRisk / acct.initial * 100).toFixed(2)}% din cont:`);
+      es.forEach((e, k) => lines.push(`  ${k + 1}) lot <b>${lotsTxt(e.lot.lots)}</b>, stop la <b>${pts(e)} ${unit}</b> ${long ? 'SUB' : 'PESTE'} intrare (≈ ${fmtPx(e.position.stop, inst)}) · ${escapeHtml((e.who || '').split(' (')[0])}`));
+      lines.push(`📍 Preț de referință (închiderea de azi): ${fmtPx(es[0].position.entry, inst)}`);
+    }
+    const pu = es[0].pointUsd;
+    lines.push(`🔎 Presupus: 1 lot = ${pu < 1 ? pu.toFixed(3) : pu.toFixed(2)} $ pe ${inst.category === 'FX' ? 'pip' : 'punct'}. Verifică în platformă (specificațiile contractului); dacă diferă, NU intra și setează PROP_CONTRACT_SIZES.${totalLots > 20 ? ' ⚠️ Lot neobișnuit de mare: verifică de două ori!' : ''}`);
+    lines.push('🎯 Fără take-profit fix: primești mesaj de ÎNCHIDERE (de obicei în 1–5 zile).');
+    lines.push(`⏱️ ${inst.category === 'FX' ? 'Ziua Forex' : 'Bursa'} s-a închis la ${roTime(barClose)} (ora României). Intră cât mai repede; dacă au trecut peste 12 ore, sari peste.`);
+    lines.push(progressLine(acct, rules));
+    lines.push(roomLine(acct, rules));
+    await notify(lines.join('\n'));
+  }
+}
+
 /**
  * @param {object} p
  * @param {object} p.config config efectiv (cu propDesk)
@@ -203,6 +258,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
     prices[sym] = lastBar.close;
     const stale = now - barClose > FRESH_MS;
 
+    const outExits = [], outEntries = []; // mesajele se trimit la final, câte UNUL pe instrument (nu câte unul pe trader)
     for (const st of strategies) {
       if (st.symbols && !st.symbols.includes(sym)) continue; // agenții Academiei au fiecare perechea lui
       const key = st.id ? `${sym}|${st.id}` : `${sym}|${st.kind}`;
@@ -221,11 +277,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
         acct.history.push({ sym, strategy: st.kind, agent: st.id || null, direction: prev.direction, openedAt: prev.openedAt, closedAt: closed ? closed.closedAt : now, r, pnl, outcome: closed ? closed.outcome : 'NECUNOSCUT' });
         if (acct.history.length > 300) acct.history.shift();
         const why = !closed ? 'poziția s-a închis' : (closed.outcome === 'STOP' ? 'stop-ul a fost atins (s-a închis singur la broker)' : (closed.outcome === 'TIME' ? `a expirat timpul maxim de ${params.maxDays || 10} zile — ÎNCHIDE ACUM` : 'prețul a revenit — ÎNCHIDE ACUM'));
-        await notify([
-          `⏹️ <b>PROP: ${escapeHtml(sym)}</b> ${prev.direction === 'LONG' ? '(cumpărare)' : '(vânzare)'} · ${escapeHtml(who)}: ${why}.`,
-          `Rezultat estimat: <b>${r >= 0 ? '+' : ''}${r.toFixed(2)}R ≈ ${money(pnl)}</b>.`,
-          progressLine(acct, rules)
-        ].join('\n'));
+        outExits.push({ who, prev, r, pnl, why, outcome: closed ? closed.outcome : null });
         report.events.push({ sym, strategy: st.kind, event: 'EXIT', r });
       }
       const skippedHere = acct.skipped[key] != null && position && Math.abs(position.openedAt - acct.skipped[key]) < SAME_POS_MS;
@@ -283,23 +335,11 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
       acct.positions[key] = Object.assign({}, position, { strategy: st.kind, agent: st.id || null, who, riskUsd: lot.actualRiskUsd, lots: lot.lots });
       const day = dayKeyIn(now, rules.resetTz);
       if (!acct.tradingDays.includes(day)) acct.tradingDays.push(day);
-      const long = position.direction === 'LONG';
-      const pts = stopDist / inst.pipSize;
       const pointUsd = (inst.contractSize || 1) * inst.pipSize * (lot.perLotRiskUsd / ((inst.contractSize || 1) * stopDist));
-      await notify([
-        `📈 <b>SEMNAL ${label === 'APEX PROP' ? 'PROP' : 'FOREX'}: ${escapeHtml(sym)}</b> ${long ? '🟢 CUMPĂRĂ (Buy)' : '🔴 VINDE (Sell)'} la prețul pieței, ACUM`,
-        `🧠 Trader: ${escapeHtml(who)}`,
-        `📦 Lot: <b>${lot.lots.toFixed(2)}</b> (risc ${money(lot.actualRiskUsd)} = ${(lot.actualRiskUsd / acct.initial * 100).toFixed(2)}% din cont)`,
-        `🛑 Stop loss: la <b>${pts.toFixed(inst.pipSize >= 1 ? 0 : 1)} ${inst.category === 'FX' ? 'pips' : 'puncte'}</b> ${long ? 'SUB' : 'PESTE'} prețul tău de intrare`,
-        `📍 Preț de referință (închiderea de azi): ${fmtPx(position.entry, inst)} → stop ≈ ${fmtPx(position.stop, inst)}`,
-        `🔎 Presupus: 1 lot = ${pointUsd < 1 ? pointUsd.toFixed(3) : pointUsd.toFixed(2)} $ pe ${inst.category === 'FX' ? 'pip' : 'punct'}. Verifică în platformă (specificațiile contractului); dacă diferă, NU intra și setează PROP_CONTRACT_SIZES.${lot.lots > 20 ? ' ⚠️ Lot neobișnuit de mare: verifică de două ori!' : ''}`,
-        `🎯 Fără take-profit fix: primești mesaj de ÎNCHIDERE (de obicei în 1–5 zile).`,
-        `⏱️ Bursa s-a închis la ${roTime(barClose)} (ora României). Intră cât mai repede; dacă au trecut peste 12 ore, sari peste.`,
-        progressLine(acct, rules),
-        roomLine(acct, rules)
-      ].join('\n'));
+      outEntries.push({ key, who, position, lot, stopDist, pointUsd });
       report.events.push({ sym, strategy: st.kind, event: 'ENTRY', lots: lot.lots, riskUsd: lot.actualRiskUsd });
     }
+    await flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, outEntries, notify });
   }
 
   // Reluare după pauză: PROP_RESUME cu o valoare nouă (ex. data de azi)
@@ -351,7 +391,8 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
     acct.initialized = true;
     await notify(`🚀 <b>${label} a pornit</b>: ${rules.name}, cont ${money(acct.initial)}, ${nSyms} instrumente, ${strategies.length} ${label === 'APEX PROP' ? 'strategii' : 'agenți ELITĂ'} (${strategies.slice(0, 8).map((s) => escapeHtml(s.who || s.name || s.kind)).join(', ')}${strategies.length > 8 ? '…' : ''}).\n` +
       `Semnalele vin după închiderea zilei, cu lot exact și stop. Riscul de bază e de ${desk.riskPct}% pe tranzacție; Gardianul îl reduce automat ca să nu atingi niciodată limitele (${(rules.dailyLoss * 100).toFixed(0)}% pe zi, ${(rules.maxLoss * 100).toFixed(0)}% total).\n` +
-      `Pozițiile deja începute în piață NU îți sunt trimise. Așteptăm semnale noi.`);
+      `Pozițiile deja începute în piață NU îți sunt trimise. Așteptăm semnale noi.` +
+      (label === 'APEX PROP' ? '' : `\n⚠️ Semnalele FOREX sunt pentru un cont SEPARAT de cel cu indici (alt examen). Pe același cont riscurile s-ar aduna și ai putea depăși limita zilnică.`));
   }
   bus.saveSnapshot();
   report.account = { phase: acct.phase, balance: acct.balance, open: Object.keys(acct.positions) };
@@ -422,4 +463,4 @@ function propSummary(acct, config) {
   return `💼 <b>Contul de prop</b> (${rules.name})\n${progressLine(acct, rules)}\n${roomLine(acct, rules)}\n` + (pos.length ? `Poziții deschise:\n${lines.join('\n')}` : 'Nicio poziție deschisă.');
 }
 
-module.exports = { runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };
+module.exports = { flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };

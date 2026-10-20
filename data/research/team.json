@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T17:26:01.168Z",
+  "generatedAt": "2026-10-20T17:59:38.622Z",
   "nextSchool": "2026-11-01T02:30:00.000Z",
   "config": {
     "enabled": true,
@@ -73,17 +73,16 @@
       "US2000"
     ],
     "benched": [
+      "UK100|rsi2",
       "FRA40|rsi2",
       "AUS200|rsi2",
       "UK100|down",
       "FRA40|down",
       "FRA40|bb",
-      "UK100|d7",
       "FRA40|d7",
-      "EU50|d7",
       "AUS200|d7"
     ],
-    "expectedR": 0.068
+    "expectedR": 0.064
   },
   "agents": [
     {
@@ -93,10 +92,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "US30",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.126R pe tranzacție din 44.",
+      "why": "În ultimii 5 ani: +0.109R pe tranzacție din 81.",
       "last3y": {
-        "trades": 44,
-        "expectancyR": 0.126
+        "trades": 81,
+        "expectancyR": 0.109,
+        "years": 5
       },
       "record": {
         "trades": 233,
@@ -119,10 +119,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "NAS100",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.056R pe tranzacție din 48.",
+      "why": "În ultimii 5 ani: +0.111R pe tranzacție din 84.",
       "last3y": {
-        "trades": 48,
-        "expectancyR": 0.056
+        "trades": 84,
+        "expectancyR": 0.111,
+        "years": 5
       },
       "record": {
         "trades": 233,
@@ -145,10 +146,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "SPX500",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.143R pe tranzacție din 45.",
+      "why": "În ultimii 5 ani: +0.122R pe tranzacție din 82.",
       "last3y": {
-        "trades": 45,
-        "expectancyR": 0.143
+        "trades": 82,
+        "expectancyR": 0.122,
+        "years": 5
       },
       "record": {
         "trades": 239,
@@ -171,10 +173,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "GER40",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.109R pe tranzacție din 48.",
+      "why": "În ultimii 5 ani: +0.120R pe tranzacție din 86.",
       "last3y": {
-        "trades": 48,
-        "expectancyR": 0.109
+        "trades": 86,
+        "expectancyR": 0.12,
+        "years": 5
       },
       "record": {
         "trades": 231,
@@ -196,11 +199,12 @@
       "strategy": "rsi2",
       "strategyName": "Pullback RSI(2)",
       "symbol": "UK100",
-      "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: -0.050R pe tranzacție din 39.",
+      "status": "BANCĂ",
+      "why": "În ultimii 5 ani: -0.154R pe tranzacție din 66 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 39,
-        "expectancyR": -0.05
+        "trades": 66,
+        "expectancyR": -0.154,
+        "years": 5
       },
       "record": {
         "trades": 232,
@@ -223,10 +227,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "FRA40",
       "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.141R pe tranzacție din 32 (sub -0.05R). Revine când își revine.",
+      "why": "În ultimii 5 ani: -0.121R pe tranzacție din 63 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 32,
-        "expectancyR": -0.141
+        "trades": 63,
+        "expectancyR": -0.121,
+        "years": 5
       },
       "record": {
         "trades": 228,
@@ -249,10 +254,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "EU50",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.072R pe tranzacție din 45.",
+      "why": "În ultimii 5 ani: +0.097R pe tranzacție din 79.",
       "last3y": {
-        "trades": 45,
-        "expectancyR": 0.072
+        "trades": 79,
+        "expectancyR": 0.097,
+        "years": 5
       },
       "record": {
         "trades": 174,
@@ -275,10 +281,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "JP225",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.157R pe tranzacție din 38.",
+      "why": "În ultimii 5 ani: +0.124R pe tranzacție din 71.",
       "last3y": {
-        "trades": 38,
-        "expectancyR": 0.157
+        "trades": 71,
+        "expectancyR": 0.124,
+        "years": 5
       },
       "record": {
         "trades": 204,
@@ -301,10 +308,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "AUS200",
       "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.069R pe tranzacție din 41 (sub -0.05R). Revine când își revine.",
+      "why": "În ultimii 5 ani: -0.065R pe tranzacție din 74 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 41,
-        "expectancyR": -0.069
+        "trades": 74,
+        "expectancyR": -0.065,
+        "years": 5
       },
       "record": {
         "trades": 234,
@@ -327,10 +335,11 @@
       "strategyName": "Pullback RSI(2)",
       "symbol": "US2000",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.115R pe tranzacție din 46.",
+      "why": "În ultimii 5 ani: +0.063R pe tranzacție din 71.",
       "last3y": {
-        "trades": 46,
-        "expectancyR": 0.115
+        "trades": 71,
+        "expectancyR": 0.063,
+        "years": 5
       },
       "record": {
         "trades": 223,
@@ -353,10 +362,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "US30",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: -0.019R pe tranzacție din 26.",
+      "why": "În ultimii 5 ani: +0.062R pe tranzacție din 49.",
       "last3y": {
-        "trades": 26,
-        "expectancyR": -0.019
+        "trades": 49,
+        "expectancyR": 0.062,
+        "years": 5
       },
       "record": {
         "trades": 158,
@@ -379,10 +389,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "NAS100",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.030R pe tranzacție din 21.",
+      "why": "În ultimii 5 ani: +0.136R pe tranzacție din 41.",
       "last3y": {
-        "trades": 21,
-        "expectancyR": 0.03
+        "trades": 41,
+        "expectancyR": 0.136,
+        "years": 5
       },
       "record": {
         "trades": 161,
@@ -405,10 +416,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "SPX500",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.274R pe tranzacție din 27.",
+      "why": "În ultimii 5 ani: +0.204R pe tranzacție din 45.",
       "last3y": {
-        "trades": 27,
-        "expectancyR": 0.274
+        "trades": 45,
+        "expectancyR": 0.204,
+        "years": 5
       },
       "record": {
         "trades": 157,
@@ -431,10 +443,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "GER40",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.177R pe tranzacție din 31.",
+      "why": "În ultimii 5 ani: +0.209R pe tranzacție din 48.",
       "last3y": {
-        "trades": 31,
-        "expectancyR": 0.177
+        "trades": 48,
+        "expectancyR": 0.209,
+        "years": 5
       },
       "record": {
         "trades": 150,
@@ -457,10 +470,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "UK100",
       "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.130R pe tranzacție din 29 (sub -0.05R). Revine când își revine.",
+      "why": "În ultimii 5 ani: -0.071R pe tranzacție din 51 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 29,
-        "expectancyR": -0.13
+        "trades": 51,
+        "expectancyR": -0.071,
+        "years": 5
       },
       "record": {
         "trades": 155,
@@ -483,10 +497,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "FRA40",
       "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.198R pe tranzacție din 24 (sub -0.05R). Revine când își revine.",
+      "why": "În ultimii 5 ani: -0.159R pe tranzacție din 45 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 24,
-        "expectancyR": -0.198
+        "trades": 45,
+        "expectancyR": -0.159,
+        "years": 5
       },
       "record": {
         "trades": 165,
@@ -509,10 +524,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "EU50",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.033R pe tranzacție din 26.",
+      "why": "În ultimii 5 ani: +0.024R pe tranzacție din 46.",
       "last3y": {
-        "trades": 26,
-        "expectancyR": 0.033
+        "trades": 46,
+        "expectancyR": 0.024,
+        "years": 5
       },
       "record": {
         "trades": 118,
@@ -535,10 +551,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "JP225",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.193R pe tranzacție din 22.",
+      "why": "În ultimii 5 ani: +0.202R pe tranzacție din 43.",
       "last3y": {
-        "trades": 22,
-        "expectancyR": 0.193
+        "trades": 43,
+        "expectancyR": 0.202,
+        "years": 5
       },
       "record": {
         "trades": 138,
@@ -561,10 +578,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "AUS200",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: -0.042R pe tranzacție din 28.",
+      "why": "În ultimii 5 ani: +0.021R pe tranzacție din 47.",
       "last3y": {
-        "trades": 28,
-        "expectancyR": -0.042
+        "trades": 47,
+        "expectancyR": 0.021,
+        "years": 5
       },
       "record": {
         "trades": 165,
@@ -587,10 +605,11 @@
       "strategyName": "3 zile de scădere",
       "symbol": "US2000",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.150R pe tranzacție din 23.",
+      "why": "În ultimii 5 ani: +0.072R pe tranzacție din 36.",
       "last3y": {
-        "trades": 23,
-        "expectancyR": 0.15
+        "trades": 36,
+        "expectancyR": 0.072,
+        "years": 5
       },
       "record": {
         "trades": 147,
@@ -613,10 +632,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "US30",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.145R pe tranzacție din 42.",
+      "why": "În ultimii 5 ani: +0.032R pe tranzacție din 80.",
       "last3y": {
-        "trades": 42,
-        "expectancyR": 0.145
+        "trades": 80,
+        "expectancyR": 0.032,
+        "years": 5
       },
       "record": {
         "trades": 167,
@@ -639,10 +659,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "NAS100",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.141R pe tranzacție din 41.",
+      "why": "În ultimii 5 ani: +0.095R pe tranzacție din 75.",
       "last3y": {
-        "trades": 41,
-        "expectancyR": 0.141
+        "trades": 75,
+        "expectancyR": 0.095,
+        "years": 5
       },
       "record": {
         "trades": 169,
@@ -665,10 +686,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "SPX500",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.203R pe tranzacție din 37.",
+      "why": "În ultimii 5 ani: +0.015R pe tranzacție din 68.",
       "last3y": {
-        "trades": 37,
-        "expectancyR": 0.203
+        "trades": 68,
+        "expectancyR": 0.015,
+        "years": 5
       },
       "record": {
         "trades": 175,
@@ -691,10 +713,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "GER40",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.084R pe tranzacție din 40.",
+      "why": "În ultimii 5 ani: +0.028R pe tranzacție din 75.",
       "last3y": {
-        "trades": 40,
-        "expectancyR": 0.084
+        "trades": 75,
+        "expectancyR": 0.028,
+        "years": 5
       },
       "record": {
         "trades": 192,
@@ -717,10 +740,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "UK100",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.117R pe tranzacție din 39.",
+      "why": "În ultimii 5 ani: +0.058R pe tranzacție din 74.",
       "last3y": {
-        "trades": 39,
-        "expectancyR": 0.117
+        "trades": 74,
+        "expectancyR": 0.058,
+        "years": 5
       },
       "record": {
         "trades": 187,
@@ -743,10 +767,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "FRA40",
       "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.154R pe tranzacție din 47 (sub -0.05R). Revine când își revine.",
+      "why": "În ultimii 5 ani: -0.126R pe tranzacție din 80 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 47,
-        "expectancyR": -0.154
+        "trades": 80,
+        "expectancyR": -0.126,
+        "years": 5
       },
       "record": {
         "trades": 199,
@@ -769,10 +794,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "EU50",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.094R pe tranzacție din 43.",
+      "why": "În ultimii 5 ani: +0.120R pe tranzacție din 80.",
       "last3y": {
-        "trades": 43,
-        "expectancyR": 0.094
+        "trades": 80,
+        "expectancyR": 0.12,
+        "years": 5
       },
       "record": {
         "trades": 158,
@@ -795,10 +821,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "JP225",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.215R pe tranzacție din 42.",
+      "why": "În ultimii 5 ani: +0.140R pe tranzacție din 73.",
       "last3y": {
-        "trades": 42,
-        "expectancyR": 0.215
+        "trades": 73,
+        "expectancyR": 0.14,
+        "years": 5
       },
       "record": {
         "trades": 178,
@@ -821,10 +848,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "AUS200",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.042R pe tranzacție din 43.",
+      "why": "În ultimii 5 ani: -0.043R pe tranzacție din 78.",
       "last3y": {
-        "trades": 43,
-        "expectancyR": 0.042
+        "trades": 78,
+        "expectancyR": -0.043,
+        "years": 5
       },
       "record": {
         "trades": 195,
@@ -847,10 +875,11 @@
       "strategyName": "Banda Bollinger",
       "symbol": "US2000",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.087R pe tranzacție din 47.",
+      "why": "În ultimii 5 ani: -0.044R pe tranzacție din 81.",
       "last3y": {
-        "trades": 47,
-        "expectancyR": 0.087
+        "trades": 81,
+        "expectancyR": -0.044,
+        "years": 5
       },
       "record": {
         "trades": 179,
@@ -873,10 +902,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "US30",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.158R pe tranzacție din 26.",
+      "why": "În ultimii 5 ani: +0.076R pe tranzacție din 47.",
       "last3y": {
-        "trades": 26,
-        "expectancyR": 0.158
+        "trades": 47,
+        "expectancyR": 0.076,
+        "years": 5
       },
       "record": {
         "trades": 194,
@@ -899,10 +929,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "NAS100",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.189R pe tranzacție din 29.",
+      "why": "În ultimii 5 ani: +0.206R pe tranzacție din 50.",
       "last3y": {
-        "trades": 29,
-        "expectancyR": 0.189
+        "trades": 50,
+        "expectancyR": 0.206,
+        "years": 5
       },
       "record": {
         "trades": 215,
@@ -925,10 +956,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "SPX500",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.335R pe tranzacție din 30.",
+      "why": "În ultimii 5 ani: +0.226R pe tranzacție din 48.",
       "last3y": {
-        "trades": 30,
-        "expectancyR": 0.335
+        "trades": 48,
+        "expectancyR": 0.226,
+        "years": 5
       },
       "record": {
         "trades": 209,
@@ -951,10 +983,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "GER40",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.103R pe tranzacție din 29.",
+      "why": "În ultimii 5 ani: +0.011R pe tranzacție din 50.",
       "last3y": {
-        "trades": 29,
-        "expectancyR": 0.103
+        "trades": 50,
+        "expectancyR": 0.011,
+        "years": 5
       },
       "record": {
         "trades": 229,
@@ -976,11 +1009,12 @@
       "strategy": "d7",
       "strategyName": "Minimul de N zile",
       "symbol": "UK100",
-      "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.051R pe tranzacție din 26 (sub -0.05R). Revine când își revine.",
+      "status": "LUCREAZĂ",
+      "why": "În ultimii 5 ani: -0.048R pe tranzacție din 46.",
       "last3y": {
-        "trades": 26,
-        "expectancyR": -0.051
+        "trades": 46,
+        "expectancyR": -0.048,
+        "years": 5
       },
       "record": {
         "trades": 201,
@@ -1003,10 +1037,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "FRA40",
       "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.286R pe tranzacție din 19 (sub -0.05R). Revine când își revine.",
+      "why": "În ultimii 5 ani: -0.160R pe tranzacție din 43 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 19,
-        "expectancyR": -0.286
+        "trades": 43,
+        "expectancyR": -0.16,
+        "years": 5
       },
       "record": {
         "trades": 207,
@@ -1028,11 +1063,12 @@
       "strategy": "d7",
       "strategyName": "Minimul de N zile",
       "symbol": "EU50",
-      "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.078R pe tranzacție din 26 (sub -0.05R). Revine când își revine.",
+      "status": "LUCREAZĂ",
+      "why": "În ultimii 5 ani: +0.073R pe tranzacție din 50.",
       "last3y": {
-        "trades": 26,
-        "expectancyR": -0.078
+        "trades": 50,
+        "expectancyR": 0.073,
+        "years": 5
       },
       "record": {
         "trades": 161,
@@ -1055,10 +1091,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "JP225",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.352R pe tranzacție din 21.",
+      "why": "În ultimii 5 ani: +0.241R pe tranzacție din 42.",
       "last3y": {
-        "trades": 21,
-        "expectancyR": 0.352
+        "trades": 42,
+        "expectancyR": 0.241,
+        "years": 5
       },
       "record": {
         "trades": 191,
@@ -1081,10 +1118,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "AUS200",
       "status": "BANCĂ",
-      "why": "În ultimii 3 ani: -0.238R pe tranzacție din 24 (sub -0.05R). Revine când își revine.",
+      "why": "În ultimii 5 ani: -0.071R pe tranzacție din 46 (sub -0.05R). Revine când își revine.",
       "last3y": {
-        "trades": 24,
-        "expectancyR": -0.238
+        "trades": 46,
+        "expectancyR": -0.071,
+        "years": 5
       },
       "record": {
         "trades": 202,
@@ -1107,10 +1145,11 @@
       "strategyName": "Minimul de N zile",
       "symbol": "US2000",
       "status": "LUCREAZĂ",
-      "why": "În ultimii 3 ani: +0.093R pe tranzacție din 27.",
+      "why": "În ultimii 5 ani: +0.030R pe tranzacție din 43.",
       "last3y": {
-        "trades": 27,
-        "expectancyR": 0.093
+        "trades": 43,
+        "expectancyR": 0.03,
+        "years": 5
       },
       "record": {
         "trades": 206,
@@ -1173,12 +1212,12 @@
         "allowShort": false
       },
       "oos": {
-        "trades": 2097,
-        "winRatePct": 64.9,
-        "expectancyR": 0.043,
+        "trades": 2126,
+        "winRatePct": 64.7,
+        "expectancyR": 0.04,
         "ci": [
-          0.016,
-          0.07
+          0.012,
+          0.067
         ]
       }
     },
@@ -1195,12 +1234,12 @@
         "allowShort": false
       },
       "oos": {
-        "trades": 1375,
-        "winRatePct": 65.9,
-        "expectancyR": 0.055,
+        "trades": 1378,
+        "winRatePct": 66.2,
+        "expectancyR": 0.054,
         "ci": [
-          0.021,
-          0.087
+          0.022,
+          0.086
         ]
       }
     },
@@ -1217,12 +1256,12 @@
         "allowShort": false
       },
       "oos": {
-        "trades": 1675,
-        "winRatePct": 60.2,
-        "expectancyR": 0.092,
+        "trades": 1698,
+        "winRatePct": 59.7,
+        "expectancyR": 0.083,
         "ci": [
-          0.05,
-          0.134
+          0.04,
+          0.127
         ]
       }
     },
@@ -1238,12 +1277,12 @@
         "allowShort": false
       },
       "oos": {
-        "trades": 1758,
-        "winRatePct": 58.6,
-        "expectancyR": 0.084,
+        "trades": 1785,
+        "winRatePct": 58.9,
+        "expectancyR": 0.085,
         "ci": [
-          0.039,
-          0.127
+          0.042,
+          0.128
         ]
       }
     }
@@ -1255,14 +1294,14 @@
       "riskPct": 3,
       "safety": 0.7,
       "maxOpen": 5,
-      "passPct": 47.8,
-      "failPct": 3.7,
-      "timeoutPct": 48.5,
-      "medianDaysToPass": 251,
-      "passWithin180Pct": 17.3,
-      "passWithin365Pct": 31,
+      "passPct": 52.7,
+      "failPct": 2.3,
+      "timeoutPct": 44.9,
+      "medianDaysToPass": 240,
+      "passWithin180Pct": 17.7,
+      "passWithin365Pct": 36.9,
       "fee": 95,
-      "ev": 376
+      "ev": 375
     },
     {
       "key": "FUNDEDNEXT_STELLAR_2STEP",
@@ -1270,14 +1309,14 @@
       "riskPct": 3,
       "safety": 0.7,
       "maxOpen": 5,
-      "passPct": 47.2,
-      "failPct": 3.7,
-      "timeoutPct": 49.1,
-      "medianDaysToPass": 256,
-      "passWithin180Pct": 16.1,
-      "passWithin365Pct": 30.2,
+      "passPct": 52.6,
+      "failPct": 2.4,
+      "timeoutPct": 45.1,
+      "medianDaysToPass": 243,
+      "passWithin180Pct": 16.8,
+      "passWithin365Pct": 36.7,
       "fee": 99,
-      "ev": 366
+      "ev": 355
     },
     {
       "key": "FTMO_2STEP",
@@ -1285,29 +1324,29 @@
       "riskPct": 3,
       "safety": 0.7,
       "maxOpen": 5,
-      "passPct": 45.1,
-      "failPct": 3.5,
-      "timeoutPct": 51.4,
-      "medianDaysToPass": 294,
-      "passWithin180Pct": 12.3,
-      "passWithin365Pct": 26.3,
+      "passPct": 49.2,
+      "failPct": 2.5,
+      "timeoutPct": 48.3,
+      "medianDaysToPass": 285,
+      "passWithin180Pct": 10.9,
+      "passWithin365Pct": 30.5,
       "fee": 170,
-      "ev": 275
+      "ev": 262
     },
     {
       "key": "FTMO_1STEP",
       "name": "FTMO 1-Step",
       "riskPct": 4,
-      "safety": 0.6,
-      "maxOpen": 5,
-      "passPct": 50.4,
-      "failPct": 1.5,
-      "timeoutPct": 48.1,
-      "medianDaysToPass": 367,
-      "passWithin180Pct": 9.6,
-      "passWithin365Pct": 25.3,
+      "safety": 0.7,
+      "maxOpen": 3,
+      "passPct": 53.5,
+      "failPct": 5,
+      "timeoutPct": 41.5,
+      "medianDaysToPass": 262,
+      "passWithin180Pct": 15.1,
+      "passWithin365Pct": 35.9,
       "fee": 150,
-      "ev": 207
+      "ev": 248
     }
   ],
   "scenario": {
@@ -1320,41 +1359,41 @@
     "fee": 95,
     "challengeMonth": {
       "months": 1224,
-      "p10": -487,
-      "p25": -222,
-      "median": 3,
-      "p75": 287,
-      "p90": 526,
-      "average": 31,
-      "positivePct": 50,
+      "p10": -494,
+      "p25": -231,
+      "median": 6,
+      "p75": 294,
+      "p90": 519,
+      "average": 30,
+      "positivePct": 50.2,
       "tradesMedian": 6,
       "tradesP10": 1,
-      "tradesP90": 9,
-      "winRatePct": 61.2
+      "tradesP90": 10,
+      "winRatePct": 61.4
     },
     "fundedMonth": {
       "months": 1224,
-      "p10": -487,
-      "p25": -222,
-      "median": 0,
-      "p75": 286,
+      "p10": -494,
+      "p25": -231,
+      "median": 6,
+      "p75": 291,
       "p90": 516,
-      "average": 30,
-      "positivePct": 49.9,
+      "average": 29,
+      "positivePct": 50.1,
       "tradesMedian": 6,
       "tradesP10": 1,
       "tradesP90": 9,
-      "winRatePct": 61.2
+      "winRatePct": 61.4
     },
     "journey": {
       "runs": 589,
       "byMonth": [
         {
           "month": 1,
-          "phase1Pct": 98.3,
-          "phase2Pct": 1.4,
+          "phase1Pct": 98.1,
+          "phase2Pct": 1.9,
           "fundedPct": 0,
-          "failedPct": 0.3,
+          "failedPct": 0,
           "lostFundedPct": 0,
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
@@ -1363,10 +1402,10 @@
         },
         {
           "month": 2,
-          "phase1Pct": 91,
+          "phase1Pct": 91.2,
           "phase2Pct": 8.7,
-          "fundedPct": 0,
-          "failedPct": 0.3,
+          "fundedPct": 0.2,
+          "failedPct": 0,
           "lostFundedPct": 0,
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
@@ -1375,10 +1414,10 @@
         },
         {
           "month": 3,
-          "phase1Pct": 80.8,
-          "phase2Pct": 16.3,
+          "phase1Pct": 80.6,
+          "phase2Pct": 17,
           "fundedPct": 2.4,
-          "failedPct": 0.5,
+          "failedPct": 0,
           "lostFundedPct": 0,
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
@@ -1387,111 +1426,111 @@
         },
         {
           "month": 4,
-          "phase1Pct": 71,
-          "phase2Pct": 21.2,
-          "fundedPct": 6.6,
-          "failedPct": 1.2,
+          "phase1Pct": 71.1,
+          "phase2Pct": 22.8,
+          "fundedPct": 6.1,
+          "failedPct": 0,
           "lostFundedPct": 0,
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
-          "cumPayoutAvg": 2,
-          "netAvg": -93
+          "cumPayoutAvg": 0,
+          "netAvg": -95
         },
         {
           "month": 5,
-          "phase1Pct": 64.3,
-          "phase2Pct": 24.3,
-          "fundedPct": 9.8,
-          "failedPct": 1.5,
+          "phase1Pct": 64.5,
+          "phase2Pct": 26,
+          "fundedPct": 9.5,
+          "failedPct": 0,
           "lostFundedPct": 0,
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
-          "cumPayoutAvg": 12,
-          "netAvg": -83
+          "cumPayoutAvg": 6,
+          "netAvg": -89
         },
         {
           "month": 6,
-          "phase1Pct": 58.6,
-          "phase2Pct": 25,
-          "fundedPct": 14.6,
-          "failedPct": 1.9,
+          "phase1Pct": 58.2,
+          "phase2Pct": 27,
+          "fundedPct": 14.8,
+          "failedPct": 0,
           "lostFundedPct": 0,
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
-          "cumPayoutAvg": 29,
-          "netAvg": -66
+          "cumPayoutAvg": 16,
+          "netAvg": -79
         },
         {
           "month": 7,
-          "phase1Pct": 54.3,
-          "phase2Pct": 25.8,
-          "fundedPct": 17.8,
-          "failedPct": 2,
+          "phase1Pct": 54.2,
+          "phase2Pct": 26.5,
+          "fundedPct": 19.4,
+          "failedPct": 0,
           "lostFundedPct": 0,
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
-          "cumPayoutAvg": 51,
-          "netAvg": -44
+          "cumPayoutAvg": 35,
+          "netAvg": -60
         },
         {
           "month": 8,
-          "phase1Pct": 51.1,
-          "phase2Pct": 26.7,
-          "fundedPct": 19.9,
-          "failedPct": 2.4,
-          "lostFundedPct": 0,
+          "phase1Pct": 51.4,
+          "phase2Pct": 26.3,
+          "fundedPct": 21.6,
+          "failedPct": 0.2,
+          "lostFundedPct": 0.5,
           "cumPayoutMedian": 0,
-          "cumPayoutP90": 290,
-          "cumPayoutAvg": 75,
-          "netAvg": -20
+          "cumPayoutP90": 200,
+          "cumPayoutAvg": 57,
+          "netAvg": -38
         },
         {
           "month": 9,
-          "phase1Pct": 48,
-          "phase2Pct": 27.2,
-          "fundedPct": 22.2,
-          "failedPct": 2.5,
-          "lostFundedPct": 0,
+          "phase1Pct": 48.4,
+          "phase2Pct": 26.5,
+          "fundedPct": 24.1,
+          "failedPct": 0.2,
+          "lostFundedPct": 0.8,
           "cumPayoutMedian": 0,
-          "cumPayoutP90": 357,
-          "cumPayoutAvg": 100,
-          "netAvg": 5
+          "cumPayoutP90": 256,
+          "cumPayoutAvg": 77,
+          "netAvg": -18
         },
         {
           "month": 10,
-          "phase1Pct": 45.8,
-          "phase2Pct": 27.2,
-          "fundedPct": 24.4,
-          "failedPct": 2.5,
-          "lostFundedPct": 0,
+          "phase1Pct": 45.3,
+          "phase2Pct": 26.8,
+          "fundedPct": 26.7,
+          "failedPct": 0.2,
+          "lostFundedPct": 1,
           "cumPayoutMedian": 0,
-          "cumPayoutP90": 507,
-          "cumPayoutAvg": 122,
-          "netAvg": 27
+          "cumPayoutP90": 415,
+          "cumPayoutAvg": 99,
+          "netAvg": 4
         },
         {
           "month": 11,
-          "phase1Pct": 44,
-          "phase2Pct": 27.2,
-          "fundedPct": 26.3,
-          "failedPct": 2.5,
-          "lostFundedPct": 0,
+          "phase1Pct": 43.6,
+          "phase2Pct": 26,
+          "fundedPct": 29.2,
+          "failedPct": 0.2,
+          "lostFundedPct": 1,
           "cumPayoutMedian": 0,
-          "cumPayoutP90": 599,
-          "cumPayoutAvg": 145,
-          "netAvg": 50
+          "cumPayoutP90": 440,
+          "cumPayoutAvg": 121,
+          "netAvg": 26
         },
         {
           "month": 12,
-          "phase1Pct": 42.6,
-          "phase2Pct": 27.2,
-          "fundedPct": 27.5,
-          "failedPct": 2.7,
-          "lostFundedPct": 0,
+          "phase1Pct": 42.3,
+          "phase2Pct": 26.7,
+          "fundedPct": 29.9,
+          "failedPct": 0.2,
+          "lostFundedPct": 1,
           "cumPayoutMedian": 0,
-          "cumPayoutP90": 625,
-          "cumPayoutAvg": 168,
-          "netAvg": 73
+          "cumPayoutP90": 492,
+          "cumPayoutAvg": 146,
+          "netAvg": 51
         }
       ]
     }

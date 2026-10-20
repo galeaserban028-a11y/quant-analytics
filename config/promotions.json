@@ -65,30 +65,30 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-20T17:26:01.169Z",
+    "generatedAt": "2026-10-20T17:59:38.623Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
-      "trades": 6905,
-      "wins": 4305,
-      "losses": 2600,
+      "trades": 6987,
+      "wins": 4352,
+      "losses": 2635,
       "winRatePct": 62.3,
-      "avgWinR": 0.574,
-      "avgLossR": 0.771,
-      "expectancyR": 0.068,
+      "avgWinR": 0.573,
+      "avgLossR": 0.775,
+      "expectancyR": 0.064,
       "expectancyCI95": [
-        0.05,
-        0.085
+        0.047,
+        0.084
       ],
-      "tStat": 7.34,
-      "totalR": 468,
-      "profitFactor": 1.23,
+      "tStat": 7.01,
+      "totalR": 450.57,
+      "profitFactor": 1.22,
       "maxDrawdownR": 30.39,
       "maxLosingStreak": 11,
       "outcomes": {
-        "TARGET": 4716,
-        "STOP": 1657,
-        "TIME": 431,
+        "TARGET": 4760,
+        "STOP": 1693,
+        "TIME": 433,
         "END_OF_DATA": 101
       }
     },
@@ -165,17 +165,16 @@
           "US2000"
         ],
         "benched": [
+          "UK100|rsi2",
           "FRA40|rsi2",
           "AUS200|rsi2",
           "UK100|down",
           "FRA40|down",
           "FRA40|bb",
-          "UK100|d7",
           "FRA40|d7",
-          "EU50|d7",
           "AUS200|d7"
         ],
-        "expectedR": 0.068
+        "expectedR": 0.064
       }
     }
   },

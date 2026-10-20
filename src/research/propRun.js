@@ -36,6 +36,9 @@ const D1_DIR = path.join(DATA_DIR, 'fx', 'd1');
 const INSTRUMENTS = require('../../config/forex_instruments.json');
 const DAY = 864e5;
 const UNIVERSE = ['INDEX'];
+// Banca: judecată pe ultimii 5 ani (testat walk-forward pe 20 oct. 2026 față de 3 ani: aceeași valoare așteptată,
+// trecere 53% vs 48%, picare 2,3% vs 3,7%, median 240 vs 251 zile; o fereastră mai lungă = mai puțin zgomot).
+const BENCH_RULE = { years: 5, belowR: -0.05, minTrades: 15 };
 
 /** Strategiile candidate și grilele lor (alegerea parametrilor se face DOAR pe anii de antrenare). */
 const STRATEGIES = {
@@ -173,7 +176,7 @@ async function main() {
   }
   if (Object.keys(data).length < 4) { console.log('Prea puține instrumente cu date.'); process.exitCode = 1; return; }
 
-  const team = teamWalkForward(data, INSTRUMENTS, STRATEGIES, prudentSim, { trainYears: 3, minTrades: 40, log: (m) => console.log(m.slice(0, 220)) });
+  const team = teamWalkForward(data, INSTRUMENTS, STRATEGIES, prudentSim, { trainYears: 3, minTrades: 40, bench: BENCH_RULE, log: (m) => console.log(m.slice(0, 220)) });
   const results = {};
   for (const [kind, st] of Object.entries(STRATEGIES)) {
     const S = team.byStrategy[kind];
@@ -255,11 +258,11 @@ async function main() {
   L.push('');
   L.push('## 3. Echipa (strategie × indice)');
   L.push('');
-  L.push('| Trader | Strategie | Indice | Status | Tranzacții OOS | Câștigătoare | R / tranzacție | Ani pe plus | Ultimii 3 ani |');
+  L.push('| Trader | Strategie | Indice | Status | Tranzacții OOS | Câștigătoare | R / tranzacție | Ani pe plus | Ultimii 5 ani |');
   L.push('|---|---|---|---|---|---|---|---|---|');
   for (const a of agents) L.push(`| ${a.name} | ${a.strategyName} | ${a.symbol} | ${a.status} | ${a.record.trades} | ${a.record.winRatePct}% | ${fmt(a.record.expectancyR)} | ${a.record.yearsPositive}/${a.record.years} | ${fmt(a.last3y.expectancyR)} (${a.last3y.trades}) |`);
   L.push('');
-  L.push('Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe tranzacție în ultimii 3 ani (minim 10 tranzacții) stă pe bancă până își revine. Efect mic, dar constant: trecere puțin mai mare, picare puțin mai mică.');
+  L.push('Regula băncii (testată walk-forward): un trader care a pierdut peste 0,05R pe tranzacție în ultimii 5 ani (minim 15 tranzacții) stă pe bancă până își revine.');
   L.push('');
   if (scenario) {
     const cm = scenario.challengeMonth, fm = scenario.fundedMonth;

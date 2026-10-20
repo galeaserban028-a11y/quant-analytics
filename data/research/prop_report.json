@@ -4,27 +4,27 @@
     "rsi2": {
       "level": "LIVE",
       "oos": {
-        "trades": 2097,
-        "wins": 1360,
-        "losses": 737,
-        "winRatePct": 64.9,
+        "trades": 2126,
+        "wins": 1375,
+        "losses": 751,
+        "winRatePct": 64.7,
         "avgWinR": 0.431,
-        "avgLossR": 0.674,
-        "expectancyR": 0.043,
+        "avgLossR": 0.678,
+        "expectancyR": 0.04,
         "expectancyCI95": [
-          0.016,
-          0.07
+          0.012,
+          0.067
         ],
-        "tStat": 3.12,
-        "totalR": 90.1,
-        "profitFactor": 1.18,
-        "maxDrawdownR": 26.47,
+        "tStat": 2.88,
+        "totalR": 84.19,
+        "profitFactor": 1.17,
+        "maxDrawdownR": 26.42,
         "maxLosingStreak": 8,
         "outcomes": {
-          "TARGET": 1655,
-          "STOP": 395,
-          "TIME": 13,
-          "END_OF_DATA": 34
+          "TARGET": 1675,
+          "STOP": 403,
+          "TIME": 12,
+          "END_OF_DATA": 36
         }
       },
       "params": {
@@ -108,11 +108,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "NAS100"
-          ],
-          "oos": -0.08,
-          "n": 119
+          "benched": [],
+          "oos": -0.081,
+          "n": 135
         },
         {
           "test": "2008-01-03",
@@ -140,9 +138,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [],
-          "oos": 0.203,
-          "n": 58
+          "benched": [
+            "UK100"
+          ],
+          "oos": 0.181,
+          "n": 53
         },
         {
           "test": "2010-01-02",
@@ -203,11 +203,9 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [
-            "NAS100"
-          ],
-          "oos": 0.032,
-          "n": 29
+          "benched": [],
+          "oos": 0.035,
+          "n": 30
         },
         {
           "test": "2014-01-02",
@@ -220,9 +218,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": 0.079,
-          "n": 76
+          "benched": [
+            "AUS200"
+          ],
+          "oos": 0.119,
+          "n": 66
         },
         {
           "test": "2015-01-03",
@@ -252,11 +252,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "SPX500"
-          ],
-          "oos": -0.095,
-          "n": 59
+          "benched": [],
+          "oos": -0.057,
+          "n": 64
         },
         {
           "test": "2017-01-02",
@@ -269,9 +267,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": 0.19,
-          "n": 49
+          "benched": [
+            "AUS200"
+          ],
+          "oos": 0.177,
+          "n": 45
         },
         {
           "test": "2018-01-02",
@@ -299,11 +299,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "FRA40"
-          ],
-          "oos": -0.023,
-          "n": 131
+          "benched": [],
+          "oos": -0.024,
+          "n": 150
         },
         {
           "test": "2020-01-03",
@@ -333,11 +331,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "FRA40"
-          ],
-          "oos": 0.141,
-          "n": 175
+          "benched": [],
+          "oos": 0.1,
+          "n": 197
         },
         {
           "test": "2022-01-02",
@@ -368,9 +364,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [],
-          "oos": 0.165,
-          "n": 49
+          "benched": [
+            "EU50"
+          ],
+          "oos": 0.159,
+          "n": 43
         },
         {
           "test": "2024-01-03",
@@ -401,10 +399,11 @@
             "allowShort": false
           },
           "benched": [
-            "UK100"
+            "UK100",
+            "FRA40"
           ],
-          "oos": 0.103,
-          "n": 71
+          "oos": 0.145,
+          "n": 62
         },
         {
           "test": "2026-01-02",
@@ -429,27 +428,27 @@
     "down": {
       "level": "LIVE",
       "oos": {
-        "trades": 1375,
-        "wins": 906,
-        "losses": 469,
-        "winRatePct": 65.9,
-        "avgWinR": 0.409,
-        "avgLossR": 0.628,
-        "expectancyR": 0.055,
+        "trades": 1378,
+        "wins": 912,
+        "losses": 466,
+        "winRatePct": 66.2,
+        "avgWinR": 0.399,
+        "avgLossR": 0.621,
+        "expectancyR": 0.054,
         "expectancyCI95": [
-          0.021,
-          0.087
+          0.022,
+          0.086
         ],
-        "tStat": 3.38,
-        "totalR": 75.78,
+        "tStat": 3.35,
+        "totalR": 73.99,
         "profitFactor": 1.26,
-        "maxDrawdownR": 13.62,
+        "maxDrawdownR": 13.68,
         "maxLosingStreak": 9,
         "outcomes": {
-          "TARGET": 1122,
-          "STOP": 222,
-          "TIME": 8,
-          "END_OF_DATA": 23
+          "TARGET": 1129,
+          "STOP": 218,
+          "TIME": 7,
+          "END_OF_DATA": 24
         }
       },
       "params": {
@@ -503,9 +502,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": 0.079,
-          "n": 70
+          "benched": [
+            "JP225"
+          ],
+          "oos": 0.091,
+          "n": 63
         },
         {
           "test": "2006-01-02",
@@ -535,12 +536,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "NAS100",
-            "US2000"
-          ],
-          "oos": 0.042,
-          "n": 38
+          "benched": [],
+          "oos": 0.06,
+          "n": 48
         },
         {
           "test": "2008-01-03",
@@ -553,9 +551,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [],
-          "oos": 0.154,
-          "n": 98
+          "benched": [
+            "US30"
+          ],
+          "oos": 0.139,
+          "n": 90
         },
         {
           "test": "2009-01-02",
@@ -568,9 +568,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [],
-          "oos": 0.229,
-          "n": 41
+          "benched": [
+            "US2000"
+          ],
+          "oos": 0.185,
+          "n": 35
         },
         {
           "test": "2010-01-02",
@@ -583,9 +585,11 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [],
-          "oos": -0.061,
-          "n": 40
+          "benched": [
+            "JP225"
+          ],
+          "oos": -0.091,
+          "n": 36
         },
         {
           "test": "2011-01-03",
@@ -633,10 +637,11 @@
             "allowShort": false
           },
           "benched": [
+            "JP225",
             "AUS200"
           ],
-          "oos": 0.221,
-          "n": 78
+          "oos": 0.169,
+          "n": 69
         },
         {
           "test": "2014-01-02",
@@ -649,9 +654,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": 0.074,
-          "n": 68
+          "benched": [
+            "AUS200"
+          ],
+          "oos": 0.116,
+          "n": 58
         },
         {
           "test": "2015-01-03",
@@ -665,11 +672,10 @@
             "allowShort": false
           },
           "benched": [
-            "US30",
             "AUS200"
           ],
-          "oos": -0.095,
-          "n": 41
+          "oos": -0.059,
+          "n": 43
         },
         {
           "test": "2016-01-03",
@@ -682,9 +688,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": 0.093,
-          "n": 21
+          "benched": [
+            "US2000"
+          ],
+          "oos": 0.054,
+          "n": 17
         },
         {
           "test": "2017-01-02",
@@ -697,9 +705,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": 0.138,
-          "n": 39
+          "benched": [
+            "AUS200"
+          ],
+          "oos": 0.127,
+          "n": 37
         },
         {
           "test": "2018-01-02",
@@ -727,11 +737,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "GER40"
-          ],
-          "oos": 0.082,
-          "n": 61
+          "benched": [],
+          "oos": 0.105,
+          "n": 67
         },
         {
           "test": "2020-01-03",
@@ -744,13 +752,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "UK100",
-            "AUS200",
-            "US2000"
-          ],
-          "oos": 0.083,
-          "n": 52
+          "benched": [],
+          "oos": 0.07,
+          "n": 67
         },
         {
           "test": "2021-01-02",
@@ -763,13 +767,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "NAS100",
-            "UK100",
-            "AUS200"
-          ],
-          "oos": -0.064,
-          "n": 58
+          "benched": [],
+          "oos": -0.03,
+          "n": 82
         },
         {
           "test": "2022-01-02",
@@ -817,11 +817,9 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [
-            "EU50"
-          ],
-          "oos": -0.095,
-          "n": 36
+          "benched": [],
+          "oos": -0.091,
+          "n": 41
         },
         {
           "test": "2025-01-02",
@@ -835,11 +833,10 @@
             "allowShort": false
           },
           "benched": [
-            "UK100",
             "FRA40"
           ],
-          "oos": 0.095,
-          "n": 62
+          "oos": 0.069,
+          "n": 69
         },
         {
           "test": "2026-01-02",
@@ -852,36 +849,39 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": -0.04,
-          "n": 75
+          "benched": [
+            "UK100",
+            "FRA40"
+          ],
+          "oos": 0.037,
+          "n": 59
         }
       ]
     },
     "bb": {
       "level": "LIVE",
       "oos": {
-        "trades": 1675,
-        "wins": 1008,
-        "losses": 667,
-        "winRatePct": 60.2,
+        "trades": 1698,
+        "wins": 1014,
+        "losses": 684,
+        "winRatePct": 59.7,
         "avgWinR": 0.716,
-        "avgLossR": 0.851,
-        "expectancyR": 0.092,
+        "avgLossR": 0.855,
+        "expectancyR": 0.083,
         "expectancyCI95": [
-          0.05,
-          0.134
+          0.04,
+          0.127
         ],
-        "tStat": 4.37,
-        "totalR": 154.72,
-        "profitFactor": 1.27,
+        "tStat": 3.95,
+        "totalR": 141.39,
+        "profitFactor": 1.24,
         "maxDrawdownR": 30.39,
         "maxLosingStreak": 7,
         "outcomes": {
-          "TARGET": 939,
-          "TIME": 251,
-          "STOP": 472,
-          "END_OF_DATA": 13
+          "TARGET": 937,
+          "TIME": 261,
+          "STOP": 488,
+          "END_OF_DATA": 12
         }
       },
       "params": {
@@ -905,11 +905,9 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [
-            "SPX500"
-          ],
-          "oos": 0.112,
-          "n": 35
+          "benched": [],
+          "oos": 0.163,
+          "n": 38
         },
         {
           "test": "2004-01-03",
@@ -922,9 +920,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": -0.023,
-          "n": 52
+          "benched": [
+            "AUS200"
+          ],
+          "oos": -0.094,
+          "n": 43
         },
         {
           "test": "2005-01-02",
@@ -937,9 +937,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": -0.089,
-          "n": 58
+          "benched": [
+            "GER40"
+          ],
+          "oos": -0.091,
+          "n": 51
         },
         {
           "test": "2006-01-02",
@@ -952,9 +954,12 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": 0.273,
-          "n": 108
+          "benched": [
+            "SPX500",
+            "GER40"
+          ],
+          "oos": 0.251,
+          "n": 85
         },
         {
           "test": "2007-01-03",
@@ -967,11 +972,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "NAS100"
-          ],
-          "oos": 0,
-          "n": 58
+          "benched": [],
+          "oos": 0.016,
+          "n": 66
         },
         {
           "test": "2008-01-03",
@@ -1000,10 +1003,10 @@
             "allowShort": true
           },
           "benched": [
-            "FRA40"
+            "NAS100"
           ],
-          "oos": 0.178,
-          "n": 92
+          "oos": 0.185,
+          "n": 93
         },
         {
           "test": "2010-01-02",
@@ -1031,11 +1034,9 @@
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [
-            "AUS200"
-          ],
-          "oos": 0.221,
-          "n": 88
+          "benched": [],
+          "oos": 0.22,
+          "n": 95
         },
         {
           "test": "2012-01-03",
@@ -1097,12 +1098,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "FRA40",
-            "EU50"
-          ],
-          "oos": 0.264,
-          "n": 107
+          "benched": [],
+          "oos": 0.193,
+          "n": 129
         },
         {
           "test": "2016-01-03",
@@ -1134,10 +1132,11 @@
             "allowShort": false
           },
           "benched": [
+            "FRA40",
             "AUS200"
           ],
-          "oos": 0.334,
-          "n": 53
+          "oos": 0.337,
+          "n": 44
         },
         {
           "test": "2018-01-02",
@@ -1180,12 +1179,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "SPX500",
-            "US2000"
-          ],
-          "oos": -0.063,
-          "n": 93
+          "benched": [],
+          "oos": -0.083,
+          "n": 117
         },
         {
           "test": "2021-01-02",
@@ -1260,11 +1256,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "UK100"
-          ],
-          "oos": 0.256,
-          "n": 63
+          "benched": [],
+          "oos": 0.258,
+          "n": 69
         },
         {
           "test": "2026-01-02",
@@ -1286,27 +1280,27 @@
     "d7": {
       "level": "LIVE",
       "oos": {
-        "trades": 1758,
-        "wins": 1031,
-        "losses": 727,
-        "winRatePct": 58.6,
-        "avgWinR": 0.769,
-        "avgLossR": 0.888,
-        "expectancyR": 0.084,
+        "trades": 1785,
+        "wins": 1051,
+        "losses": 734,
+        "winRatePct": 58.9,
+        "avgWinR": 0.772,
+        "avgLossR": 0.899,
+        "expectancyR": 0.085,
         "expectancyCI95": [
-          0.039,
-          0.127
+          0.042,
+          0.128
         ],
-        "tStat": 3.84,
-        "totalR": 147.41,
+        "tStat": 3.89,
+        "totalR": 151,
         "profitFactor": 1.23,
-        "maxDrawdownR": 28.31,
+        "maxDrawdownR": 27.11,
         "maxLosingStreak": 11,
         "outcomes": {
-          "TARGET": 1000,
-          "STOP": 568,
-          "TIME": 159,
-          "END_OF_DATA": 31
+          "TARGET": 1019,
+          "STOP": 584,
+          "TIME": 153,
+          "END_OF_DATA": 29
         }
       },
       "params": {
@@ -1384,11 +1378,9 @@
             "maxDays": 15,
             "allowShort": false
           },
-          "benched": [
-            "JP225"
-          ],
-          "oos": 0.158,
-          "n": 68
+          "benched": [],
+          "oos": 0.129,
+          "n": 76
         },
         {
           "test": "2008-01-03",
@@ -1414,11 +1406,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "JP225"
-          ],
-          "oos": 0.506,
-          "n": 79
+          "benched": [],
+          "oos": 0.474,
+          "n": 86
         },
         {
           "test": "2010-01-02",
@@ -1444,11 +1434,9 @@
             "maxDays": 15,
             "allowShort": false
           },
-          "benched": [
-            "NAS100"
-          ],
-          "oos": -0.037,
-          "n": 101
+          "benched": [],
+          "oos": -0.022,
+          "n": 116
         },
         {
           "test": "2012-01-03",
@@ -1461,11 +1449,13 @@
             "allowShort": false
           },
           "benched": [
+            "GER40",
             "FRA40",
+            "EU50",
             "JP225"
           ],
-          "oos": 0.143,
-          "n": 61
+          "oos": 0.08,
+          "n": 46
         },
         {
           "test": "2013-01-02",
@@ -1495,10 +1485,11 @@
           },
           "benched": [
             "UK100",
+            "EU50",
             "AUS200"
           ],
-          "oos": 0.089,
-          "n": 88
+          "oos": 0.097,
+          "n": 78
         },
         {
           "test": "2015-01-03",
@@ -1511,10 +1502,10 @@
             "allowShort": false
           },
           "benched": [
-            "UK100"
+            "AUS200"
           ],
-          "oos": -0.174,
-          "n": 107
+          "oos": -0.147,
+          "n": 108
         },
         {
           "test": "2016-01-03",
@@ -1527,11 +1518,10 @@
             "allowShort": false
           },
           "benched": [
-            "SPX500",
-            "EU50"
+            "JP225"
           ],
-          "oos": -0.027,
-          "n": 79
+          "oos": 0.047,
+          "n": 93
         },
         {
           "test": "2017-01-02",
@@ -1544,10 +1534,11 @@
             "allowShort": false
           },
           "benched": [
+            "GER40",
             "AUS200"
           ],
-          "oos": 0.331,
-          "n": 86
+          "oos": 0.381,
+          "n": 75
         },
         {
           "test": "2018-01-02",
@@ -1590,15 +1581,10 @@
             "allowShort": false
           },
           "benched": [
-            "SPX500",
-            "UK100",
-            "FRA40",
-            "EU50",
-            "JP225",
-            "US2000"
+            "FRA40"
           ],
-          "oos": 0.021,
-          "n": 35
+          "oos": 0.102,
+          "n": 76
         },
         {
           "test": "2021-01-02",
@@ -1611,10 +1597,11 @@
             "allowShort": false
           },
           "benched": [
+            "GER40",
             "US2000"
           ],
-          "oos": 0.084,
-          "n": 176
+          "oos": 0.09,
+          "n": 158
         },
         {
           "test": "2022-01-02",
@@ -1626,9 +1613,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": -0.323,
-          "n": 20
+          "benched": [
+            "FRA40"
+          ],
+          "oos": -0.315,
+          "n": 18
         },
         {
           "test": "2023-01-03",
@@ -1641,10 +1630,11 @@
             "allowShort": false
           },
           "benched": [
-            "JP225"
+            "JP225",
+            "US2000"
           ],
-          "oos": 0.045,
-          "n": 121
+          "oos": 0.041,
+          "n": 112
         },
         {
           "test": "2024-01-03",
@@ -1671,13 +1661,12 @@
             "allowShort": false
           },
           "benched": [
-            "UK100",
             "FRA40",
-            "AUS200",
+            "JP225",
             "US2000"
           ],
-          "oos": 0.326,
-          "n": 70
+          "oos": 0.21,
+          "n": 85
         },
         {
           "test": "2026-01-02",
@@ -1690,35 +1679,36 @@
             "allowShort": false
           },
           "benched": [
+            "GER40",
             "FRA40"
           ],
-          "oos": 0.092,
-          "n": 73
+          "oos": 0.06,
+          "n": 64
         }
       ]
     }
   },
   "combined": {
-    "trades": 6905,
-    "wins": 4305,
-    "losses": 2600,
+    "trades": 6987,
+    "wins": 4352,
+    "losses": 2635,
     "winRatePct": 62.3,
-    "avgWinR": 0.574,
-    "avgLossR": 0.771,
-    "expectancyR": 0.068,
+    "avgWinR": 0.573,
+    "avgLossR": 0.775,
+    "expectancyR": 0.064,
     "expectancyCI95": [
-      0.05,
-      0.085
+      0.047,
+      0.084
     ],
-    "tStat": 7.34,
-    "totalR": 468,
-    "profitFactor": 1.23,
+    "tStat": 7.01,
+    "totalR": 450.57,
+    "profitFactor": 1.22,
     "maxDrawdownR": 30.39,
     "maxLosingStreak": 11,
     "outcomes": {
-      "TARGET": 4716,
-      "STOP": 1657,
-      "TIME": 431,
+      "TARGET": 4760,
+      "STOP": 1693,
+      "TIME": 433,
       "END_OF_DATA": 101
     }
   },
@@ -1730,20 +1720,20 @@
       "rules": "The5ers High Stakes 2-Step",
       "riskPct": 3,
       "attempts": 511,
-      "passPct": 47.8,
-      "failPct": 3.7,
-      "timeoutPct": 48.5,
-      "medianDaysToPass": 251,
-      "passWithin90Pct": 3.4,
-      "passWithin180Pct": 17.3,
-      "passWithin365Pct": 31,
-      "fundedSurvivalPct": 100,
-      "avgPayoutFirstMonths": 985,
-      "expectedValuePerAttempt": 376,
+      "passPct": 52.7,
+      "failPct": 2.3,
+      "timeoutPct": 44.9,
+      "medianDaysToPass": 240,
+      "passWithin90Pct": 2.7,
+      "passWithin180Pct": 17.7,
+      "passWithin365Pct": 36.9,
+      "fundedSurvivalPct": 96.8,
+      "avgPayoutFirstMonths": 891,
+      "expectedValuePerAttempt": 375,
       "fee": 95,
       "passPctRange": [
-        45.6,
-        50.5
+        47.6,
+        58.3
       ],
       "orderSeeds": 8
     },
@@ -1754,20 +1744,20 @@
       "rules": "FundedNext Stellar 2-Step",
       "riskPct": 3,
       "attempts": 511,
-      "passPct": 47.2,
-      "failPct": 3.7,
-      "timeoutPct": 49.1,
-      "medianDaysToPass": 256,
-      "passWithin90Pct": 2.4,
-      "passWithin180Pct": 16.1,
-      "passWithin365Pct": 30.2,
-      "fundedSurvivalPct": 100,
-      "avgPayoutFirstMonths": 984,
-      "expectedValuePerAttempt": 366,
+      "passPct": 52.6,
+      "failPct": 2.4,
+      "timeoutPct": 45.1,
+      "medianDaysToPass": 243,
+      "passWithin90Pct": 2.3,
+      "passWithin180Pct": 16.8,
+      "passWithin365Pct": 36.7,
+      "fundedSurvivalPct": 99.3,
+      "avgPayoutFirstMonths": 862,
+      "expectedValuePerAttempt": 355,
       "fee": 99,
       "passPctRange": [
-        45,
-        49.7
+        47.7,
+        57.5
       ],
       "orderSeeds": 8
     },
@@ -1778,44 +1768,44 @@
       "rules": "FTMO 2-Step (Swing)",
       "riskPct": 3,
       "attempts": 511,
-      "passPct": 45.1,
-      "failPct": 3.5,
-      "timeoutPct": 51.4,
-      "medianDaysToPass": 294,
-      "passWithin90Pct": 0.9,
-      "passWithin180Pct": 12.3,
-      "passWithin365Pct": 26.3,
-      "fundedSurvivalPct": 100,
-      "avgPayoutFirstMonths": 984,
-      "expectedValuePerAttempt": 275,
+      "passPct": 49.2,
+      "failPct": 2.5,
+      "timeoutPct": 48.3,
+      "medianDaysToPass": 285,
+      "passWithin90Pct": 0.6,
+      "passWithin180Pct": 10.9,
+      "passWithin365Pct": 30.5,
+      "fundedSurvivalPct": 97,
+      "avgPayoutFirstMonths": 878,
+      "expectedValuePerAttempt": 262,
       "fee": 170,
       "passPctRange": [
-        40.1,
-        47.9
+        42.9,
+        55.2
       ],
       "orderSeeds": 8
     },
     {
       "key": "FTMO_1STEP",
-      "safety": 0.6,
-      "maxOpen": 5,
+      "safety": 0.7,
+      "maxOpen": 3,
       "rules": "FTMO 1-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 50.4,
-      "failPct": 1.5,
-      "timeoutPct": 48.1,
-      "medianDaysToPass": 367,
-      "passWithin90Pct": 0.4,
-      "passWithin180Pct": 9.6,
-      "passWithin365Pct": 25.3,
-      "fundedSurvivalPct": 96.9,
-      "avgPayoutFirstMonths": 703,
-      "expectedValuePerAttempt": 207,
+      "passPct": 53.5,
+      "failPct": 5,
+      "timeoutPct": 41.5,
+      "medianDaysToPass": 262,
+      "passWithin90Pct": 1.2,
+      "passWithin180Pct": 15.1,
+      "passWithin365Pct": 35.9,
+      "fundedSurvivalPct": 99.3,
+      "avgPayoutFirstMonths": 742,
+      "expectedValuePerAttempt": 248,
       "fee": 150,
       "passPctRange": [
-        41.5,
-        56.9
+        41.3,
+        60.1
       ],
       "orderSeeds": 8
     }
@@ -1892,61 +1882,60 @@
       "US2000"
     ],
     "benched": [
+      "UK100|rsi2",
       "FRA40|rsi2",
       "AUS200|rsi2",
       "UK100|down",
       "FRA40|down",
       "FRA40|bb",
-      "UK100|d7",
       "FRA40|d7",
-      "EU50|d7",
       "AUS200|d7"
     ],
-    "expectedR": 0.068
+    "expectedR": 0.064
   },
   "portfolio": {
     "startEquity": 10000,
-    "endEquity": 32607.07,
-    "totalReturnPct": 226.07,
-    "cagrPct": 5.14,
-    "maxDrawdownPct": 27.8,
-    "sharpeMonthly": 0.45,
+    "endEquity": 36016.83,
+    "totalReturnPct": 260.17,
+    "cagrPct": 5.58,
+    "maxDrawdownPct": 26.31,
+    "sharpeMonthly": 0.48,
     "months": 283,
-    "avgMonthlyPct": 0.49,
-    "medianMonthlyPct": 0.42,
-    "positiveMonthsPct": 53,
+    "avgMonthlyPct": 0.53,
+    "medianMonthlyPct": 0.41,
+    "positiveMonthsPct": 53.4,
     "worstMonthPct": -11.24,
-    "bestMonthPct": 9.12,
+    "bestMonthPct": 10.07,
     "yearly": {
       "2003": 0.4,
-      "2004": 11.7,
-      "2005": 8.8,
-      "2006": 26.8,
-      "2007": 0.9,
-      "2008": 6.9,
-      "2009": 14.2,
-      "2010": -19.3,
-      "2011": -0.6,
-      "2012": 3.1,
-      "2013": 22.7,
-      "2014": 12.6,
-      "2015": 6.5,
-      "2016": 9,
-      "2017": 9.8,
-      "2018": -10.6,
-      "2019": 4.8,
-      "2020": -0.7,
-      "2021": 22.9,
+      "2004": 8.5,
+      "2005": 9.3,
+      "2006": 27.1,
+      "2007": 3.2,
+      "2008": 5.7,
+      "2009": 13.7,
+      "2010": -19.2,
+      "2011": 2.8,
+      "2012": 4.7,
+      "2013": 18.4,
+      "2014": 18.2,
+      "2015": 10,
+      "2016": 9.1,
+      "2017": 15.5,
+      "2018": -10.3,
+      "2019": 7.8,
+      "2020": 1.5,
+      "2021": 16.6,
       "2022": -1.1,
-      "2023": 0.8,
-      "2024": 3.1,
-      "2025": 9.1,
-      "2026": -8.3
+      "2023": 0.1,
+      "2024": 2.6,
+      "2025": 8.6,
+      "2026": -10
     },
     "riskPct": 1,
     "maxOpen": 5,
     "maxOpenRiskPct": 5,
-    "tradesTaken": 3040,
-    "tradesSkipped": 3865
+    "tradesTaken": 3064,
+    "tradesSkipped": 3923
   }
 }
