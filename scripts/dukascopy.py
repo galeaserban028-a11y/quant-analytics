@@ -199,8 +199,8 @@ def download_pair(pair, y0, y1, workers=2):
     jobs = []
     for y in range(y0, y1 + 1):
         for m in range(12):
-            if dt.datetime(y, m + 1, 1, tzinfo=dt.timezone.utc) > now:
-                break
+            if dt.datetime(y, m + 1, 1, tzinfo=dt.timezone.utc) > now or (y, m) == (now.year, now.month - 1):
+                break  # luna în curs nu are încă fișier orar complet
             jobs.append((y, m))
     bid, ask = {}, {}
     with cf.ThreadPoolExecutor(max_workers=workers) as ex:
@@ -210,7 +210,12 @@ def download_pair(pair, y0, y1, workers=2):
             futs[ex.submit(month_hours, pair, y, m, 'ASK')] = ('ASK', y, m)
         for f in cf.as_completed(futs):
             side, y, m = futs[f]
-            for r in f.result():
+            try:
+                rows = f.result()
+            except Exception as e:  # o lună lipsă nu trebuie să piardă toată bucata
+                print(f'::warning::{pair} {y}-{m + 1:02d} {side}: {e}')
+                continue
+            for r in rows:
                 (bid if side == 'BID' else ask)[r[0]] = r
     hours = []
     for t in sorted(set(bid) & set(ask)):
