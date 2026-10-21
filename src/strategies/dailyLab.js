@@ -328,7 +328,9 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
     const stop = dir === 'LONG' ? entry - p.stopAtr * atr : entry + p.stopAtr * atr;
     const risk = Math.abs(entry - stop);
     const commission = ((inst.commissionPips || 0) * inst.pipSize + (inst.commissionPct || 0) * entry) * costMult;
-    pos = { dir, entry, stop, risk, openedAt, costR: commission / risk };
+    // take-profit opțional, fix la intrare: p.tpR × riscul (ordin limită la broker); ieșirea normală rămâne activă
+    const tp = p.tpR ? (dir === 'LONG' ? entry + p.tpR * risk : entry - p.tpR * risk) : null;
+    pos = { dir, entry, stop, risk, tp, openedAt, costR: commission / risk };
   };
 
   for (let i = 0; i < bars.length; i++) {
@@ -347,6 +349,8 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
       const exHigh = long ? bar.high : bar.high + spread;
       const exOpen = long ? bar.open : bar.open + spread;
       if (long ? exLow <= pos.stop : exHigh >= pos.stop) finish(long ? Math.min(pos.stop, exOpen) : Math.max(pos.stop, exOpen), 'STOP', closeTime);
+      // take-profit atins în cursul zilei (după verificarea stopului: prudent dacă amândouă s-ar atinge în aceeași zi)
+      else if (pos.tp != null && (long ? exHigh >= pos.tp : exLow <= pos.tp)) finish(long ? Math.max(pos.tp, exOpen) : Math.min(pos.tp, exOpen), 'TP', closeTime);
     }
     if (i < rules.warm) continue;
     if (pos) {

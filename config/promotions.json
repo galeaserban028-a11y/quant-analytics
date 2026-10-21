@@ -65,31 +65,32 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-21T01:09:19.772Z",
+    "generatedAt": "2026-10-21T10:15:01.024Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
-      "trades": 6987,
-      "wins": 4352,
-      "losses": 2635,
-      "winRatePct": 62.3,
-      "avgWinR": 0.573,
-      "avgLossR": 0.775,
-      "expectancyR": 0.064,
+      "trades": 6819,
+      "wins": 4253,
+      "losses": 2566,
+      "winRatePct": 62.4,
+      "avgWinR": 0.57,
+      "avgLossR": 0.781,
+      "expectancyR": 0.061,
       "expectancyCI95": [
-        0.047,
-        0.084
+        0.043,
+        0.079
       ],
-      "tStat": 7.01,
-      "totalR": 450.57,
-      "profitFactor": 1.22,
-      "maxDrawdownR": 30.39,
+      "tStat": 6.66,
+      "totalR": 418.49,
+      "profitFactor": 1.21,
+      "maxDrawdownR": 33.61,
       "maxLosingStreak": 11,
       "outcomes": {
-        "TARGET": 4760,
-        "STOP": 1693,
-        "TIME": 433,
-        "END_OF_DATA": 101
+        "TARGET": 4487,
+        "STOP": 1659,
+        "TIME": 418,
+        "END_OF_DATA": 96,
+        "TP": 159
       }
     },
     "overrides": {
@@ -110,7 +111,8 @@
               "exitLen": 5,
               "stopAtr": 2,
               "maxDays": 10,
-              "allowShort": false
+              "allowShort": false,
+              "tpR": 1.5
             }
           },
           {
@@ -123,7 +125,8 @@
               "exitLen": 5,
               "stopAtr": 2,
               "maxDays": 10,
-              "allowShort": false
+              "allowShort": false,
+              "tpR": 1.5
             }
           },
           {
@@ -136,7 +139,8 @@
               "trendLen": 0,
               "stopAtr": 2,
               "maxDays": 10,
-              "allowShort": false
+              "allowShort": false,
+              "tpR": 1.5
             }
           },
           {
@@ -148,7 +152,8 @@
               "lookback": 10,
               "stopAtr": 2,
               "maxDays": 10,
-              "allowShort": false
+              "allowShort": false,
+              "tpR": 1.5
             }
           }
         ],
@@ -174,7 +179,7 @@
           "FRA40|d7",
           "AUS200|d7"
         ],
-        "expectedR": 0.064
+        "expectedR": 0.061
       }
     }
   },

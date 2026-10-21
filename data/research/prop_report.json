@@ -4,27 +4,28 @@
     "rsi2": {
       "level": "LIVE",
       "oos": {
-        "trades": 2126,
-        "wins": 1375,
-        "losses": 751,
-        "winRatePct": 64.7,
-        "avgWinR": 0.431,
-        "avgLossR": 0.678,
-        "expectancyR": 0.04,
+        "trades": 2013,
+        "wins": 1304,
+        "losses": 709,
+        "winRatePct": 64.8,
+        "avgWinR": 0.438,
+        "avgLossR": 0.685,
+        "expectancyR": 0.042,
         "expectancyCI95": [
-          0.012,
-          0.067
+          0.014,
+          0.07
         ],
-        "tStat": 2.88,
-        "totalR": 84.19,
+        "tStat": 2.96,
+        "totalR": 84.85,
         "profitFactor": 1.17,
-        "maxDrawdownR": 26.42,
+        "maxDrawdownR": 22.63,
         "maxLosingStreak": 8,
         "outcomes": {
-          "TARGET": 1675,
-          "STOP": 403,
+          "TARGET": 1575,
+          "STOP": 387,
           "TIME": 12,
-          "END_OF_DATA": 36
+          "END_OF_DATA": 32,
+          "TP": 7
         }
       },
       "params": {
@@ -79,7 +80,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.099,
+          "oos": 0.096,
           "n": 127
         },
         {
@@ -238,7 +239,7 @@
           "benched": [
             "AUS200"
           ],
-          "oos": -0.054,
+          "oos": -0.055,
           "n": 106
         },
         {
@@ -253,7 +254,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": -0.057,
+          "oos": -0.054,
           "n": 64
         },
         {
@@ -293,15 +294,15 @@
           "params": {
             "kind": "rsi2",
             "trendLen": 200,
-            "entryRsi": 20,
-            "exitLen": 3,
+            "entryRsi": 5,
+            "exitLen": 5,
             "stopAtr": 2,
             "maxDays": 10,
-            "allowShort": false
+            "allowShort": true
           },
           "benched": [],
-          "oos": -0.024,
-          "n": 150
+          "oos": -0.032,
+          "n": 34
         },
         {
           "test": "2020-01-03",
@@ -314,11 +315,9 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [
-            "US30"
-          ],
-          "oos": -0.005,
-          "n": 35
+          "benched": [],
+          "oos": -0.026,
+          "n": 38
         },
         {
           "test": "2021-01-02",
@@ -402,7 +401,7 @@
             "UK100",
             "FRA40"
           ],
-          "oos": 0.145,
+          "oos": 0.133,
           "n": 62
         },
         {
@@ -428,27 +427,28 @@
     "down": {
       "level": "LIVE",
       "oos": {
-        "trades": 1378,
-        "wins": 912,
-        "losses": 466,
-        "winRatePct": 66.2,
-        "avgWinR": 0.399,
-        "avgLossR": 0.621,
-        "expectancyR": 0.054,
+        "trades": 1384,
+        "wins": 910,
+        "losses": 474,
+        "winRatePct": 65.8,
+        "avgWinR": 0.416,
+        "avgLossR": 0.647,
+        "expectancyR": 0.052,
         "expectancyCI95": [
-          0.022,
-          0.086
+          0.02,
+          0.085
         ],
-        "tStat": 3.35,
-        "totalR": 73.99,
-        "profitFactor": 1.26,
+        "tStat": 3.16,
+        "totalR": 72.17,
+        "profitFactor": 1.24,
         "maxDrawdownR": 13.68,
         "maxLosingStreak": 9,
         "outcomes": {
-          "TARGET": 1129,
-          "STOP": 218,
-          "TIME": 7,
-          "END_OF_DATA": 24
+          "TARGET": 1114,
+          "STOP": 236,
+          "TIME": 6,
+          "END_OF_DATA": 24,
+          "TP": 4
         }
       },
       "params": {
@@ -657,7 +657,7 @@
           "benched": [
             "AUS200"
           ],
-          "oos": 0.116,
+          "oos": 0.114,
           "n": 58
         },
         {
@@ -674,7 +674,7 @@
           "benched": [
             "AUS200"
           ],
-          "oos": -0.059,
+          "oos": -0.061,
           "n": 43
         },
         {
@@ -733,13 +733,13 @@
             "trendLen": 200,
             "nDays": 3,
             "exitLen": 5,
-            "stopAtr": 3,
+            "stopAtr": 2,
             "maxDays": 10,
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.105,
-          "n": 67
+          "oos": 0.139,
+          "n": 69
         },
         {
           "test": "2020-01-03",
@@ -748,13 +748,13 @@
             "trendLen": 100,
             "nDays": 3,
             "exitLen": 5,
-            "stopAtr": 3,
+            "stopAtr": 2,
             "maxDays": 10,
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.07,
-          "n": 67
+          "oos": 0.017,
+          "n": 71
         },
         {
           "test": "2021-01-02",
@@ -835,7 +835,7 @@
           "benched": [
             "FRA40"
           ],
-          "oos": 0.069,
+          "oos": 0.058,
           "n": 69
         },
         {
@@ -861,27 +861,28 @@
     "bb": {
       "level": "LIVE",
       "oos": {
-        "trades": 1698,
-        "wins": 1014,
-        "losses": 684,
-        "winRatePct": 59.7,
-        "avgWinR": 0.716,
-        "avgLossR": 0.855,
-        "expectancyR": 0.083,
+        "trades": 1716,
+        "wins": 1027,
+        "losses": 689,
+        "winRatePct": 59.8,
+        "avgWinR": 0.711,
+        "avgLossR": 0.861,
+        "expectancyR": 0.08,
         "expectancyCI95": [
-          0.04,
-          0.127
+          0.041,
+          0.119
         ],
-        "tStat": 3.95,
-        "totalR": 141.39,
-        "profitFactor": 1.24,
-        "maxDrawdownR": 30.39,
+        "tStat": 3.86,
+        "totalR": 137.15,
+        "profitFactor": 1.23,
+        "maxDrawdownR": 32.59,
         "maxLosingStreak": 7,
         "outcomes": {
-          "TARGET": 937,
-          "TIME": 261,
-          "STOP": 488,
-          "END_OF_DATA": 12
+          "TARGET": 883,
+          "TIME": 257,
+          "STOP": 492,
+          "END_OF_DATA": 12,
+          "TP": 72
         }
       },
       "params": {
@@ -958,7 +959,7 @@
             "SPX500",
             "GER40"
           ],
-          "oos": 0.251,
+          "oos": 0.239,
           "n": 85
         },
         {
@@ -970,11 +971,11 @@
             "trendLen": 200,
             "stopAtr": 2,
             "maxDays": 10,
-            "allowShort": false
+            "allowShort": true
           },
           "benched": [],
-          "oos": 0.016,
-          "n": 66
+          "oos": -0.002,
+          "n": 81
         },
         {
           "test": "2008-01-03",
@@ -988,8 +989,8 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": -0.114,
-          "n": 223
+          "oos": -0.12,
+          "n": 225
         },
         {
           "test": "2009-01-02",
@@ -1035,7 +1036,7 @@
             "allowShort": true
           },
           "benched": [],
-          "oos": 0.22,
+          "oos": 0.225,
           "n": 95
         },
         {
@@ -1045,13 +1046,15 @@
             "len": 10,
             "k": 2,
             "trendLen": 200,
-            "stopAtr": 3,
+            "stopAtr": 2,
             "maxDays": 10,
             "allowShort": true
           },
-          "benched": [],
-          "oos": 0.121,
-          "n": 41
+          "benched": [
+            "JP225"
+          ],
+          "oos": 0.217,
+          "n": 40
         },
         {
           "test": "2013-01-02",
@@ -1084,7 +1087,7 @@
           "benched": [
             "AUS200"
           ],
-          "oos": 0.04,
+          "oos": 0.029,
           "n": 35
         },
         {
@@ -1099,8 +1102,8 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.193,
-          "n": 129
+          "oos": 0.223,
+          "n": 131
         },
         {
           "test": "2016-01-03",
@@ -1117,7 +1120,7 @@
             "FRA40",
             "EU50"
           ],
-          "oos": 0.134,
+          "oos": 0.108,
           "n": 95
         },
         {
@@ -1135,7 +1138,7 @@
             "FRA40",
             "AUS200"
           ],
-          "oos": 0.337,
+          "oos": 0.301,
           "n": 44
         },
         {
@@ -1149,9 +1152,11 @@
             "maxDays": 10,
             "allowShort": false
           },
-          "benched": [],
-          "oos": -0.315,
-          "n": 33
+          "benched": [
+            "JP225"
+          ],
+          "oos": -0.278,
+          "n": 29
         },
         {
           "test": "2019-01-03",
@@ -1165,7 +1170,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.154,
+          "oos": 0.133,
           "n": 75
         },
         {
@@ -1180,8 +1185,8 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": -0.083,
-          "n": 117
+          "oos": -0.097,
+          "n": 121
         },
         {
           "test": "2021-01-02",
@@ -1195,7 +1200,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.414,
+          "oos": 0.396,
           "n": 34
         },
         {
@@ -1225,7 +1230,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.144,
+          "oos": 0.13,
           "n": 11
         },
         {
@@ -1242,7 +1247,7 @@
           "benched": [
             "US2000"
           ],
-          "oos": 0.297,
+          "oos": 0.269,
           "n": 53
         },
         {
@@ -1257,7 +1262,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.258,
+          "oos": 0.243,
           "n": 69
         },
         {
@@ -1280,27 +1285,28 @@
     "d7": {
       "level": "LIVE",
       "oos": {
-        "trades": 1785,
-        "wins": 1051,
-        "losses": 734,
-        "winRatePct": 58.9,
-        "avgWinR": 0.772,
-        "avgLossR": 0.899,
-        "expectancyR": 0.085,
+        "trades": 1706,
+        "wins": 1012,
+        "losses": 694,
+        "winRatePct": 59.3,
+        "avgWinR": 0.735,
+        "avgLossR": 0.892,
+        "expectancyR": 0.073,
         "expectancyCI95": [
-          0.042,
-          0.128
+          0.029,
+          0.114
         ],
-        "tStat": 3.89,
-        "totalR": 151,
-        "profitFactor": 1.23,
-        "maxDrawdownR": 27.11,
+        "tStat": 3.39,
+        "totalR": 124.31,
+        "profitFactor": 1.2,
+        "maxDrawdownR": 33.61,
         "maxLosingStreak": 11,
         "outcomes": {
-          "TARGET": 1019,
-          "STOP": 584,
-          "TIME": 153,
-          "END_OF_DATA": 29
+          "TARGET": 915,
+          "STOP": 544,
+          "TP": 76,
+          "TIME": 143,
+          "END_OF_DATA": 28
         }
       },
       "params": {
@@ -1337,7 +1343,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.025,
+          "oos": 0.021,
           "n": 72
         },
         {
@@ -1351,7 +1357,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.115,
+          "oos": 0.097,
           "n": 92
         },
         {
@@ -1365,7 +1371,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.296,
+          "oos": 0.279,
           "n": 109
         },
         {
@@ -1379,22 +1385,22 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": 0.129,
+          "oos": 0.126,
           "n": 76
         },
         {
           "test": "2008-01-03",
           "params": {
             "kind": "d7",
-            "trendLen": 100,
+            "trendLen": 200,
             "lookback": 10,
             "stopAtr": 2,
             "maxDays": 15,
             "allowShort": false
           },
           "benched": [],
-          "oos": -0.276,
-          "n": 16
+          "oos": -0.6,
+          "n": 3
         },
         {
           "test": "2009-01-02",
@@ -1421,7 +1427,7 @@
             "allowShort": false
           },
           "benched": [],
-          "oos": -0.468,
+          "oos": -0.47,
           "n": 49
         },
         {
@@ -1454,7 +1460,7 @@
             "EU50",
             "JP225"
           ],
-          "oos": 0.08,
+          "oos": 0.05,
           "n": 46
         },
         {
@@ -1463,15 +1469,15 @@
             "kind": "d7",
             "trendLen": 100,
             "lookback": 7,
-            "stopAtr": 2,
+            "stopAtr": 3,
             "maxDays": 15,
             "allowShort": false
           },
           "benched": [
             "JP225"
           ],
-          "oos": 0.101,
-          "n": 128
+          "oos": 0.05,
+          "n": 116
         },
         {
           "test": "2014-01-02",
@@ -1485,11 +1491,12 @@
           },
           "benched": [
             "UK100",
+            "FRA40",
             "EU50",
             "AUS200"
           ],
-          "oos": 0.097,
-          "n": 78
+          "oos": 0.057,
+          "n": 69
         },
         {
           "test": "2015-01-03",
@@ -1504,7 +1511,7 @@
           "benched": [
             "AUS200"
           ],
-          "oos": -0.147,
+          "oos": -0.15,
           "n": 108
         },
         {
@@ -1518,10 +1525,11 @@
             "allowShort": false
           },
           "benched": [
+            "UK100",
             "JP225"
           ],
-          "oos": 0.047,
-          "n": 93
+          "oos": 0.021,
+          "n": 79
         },
         {
           "test": "2017-01-02",
@@ -1537,7 +1545,7 @@
             "GER40",
             "AUS200"
           ],
-          "oos": 0.381,
+          "oos": 0.328,
           "n": 75
         },
         {
@@ -1564,27 +1572,25 @@
             "maxDays": 15,
             "allowShort": false
           },
-          "benched": [
-            "FRA40"
-          ],
-          "oos": 0.11,
-          "n": 73
+          "benched": [],
+          "oos": 0.04,
+          "n": 84
         },
         {
           "test": "2020-01-03",
           "params": {
             "kind": "d7",
-            "trendLen": 100,
+            "trendLen": 200,
             "lookback": 10,
             "stopAtr": 2,
             "maxDays": 15,
             "allowShort": false
           },
           "benched": [
-            "FRA40"
+            "JP225"
           ],
-          "oos": 0.102,
-          "n": 76
+          "oos": 0.121,
+          "n": 36
         },
         {
           "test": "2021-01-02",
@@ -1600,7 +1606,7 @@
             "GER40",
             "US2000"
           ],
-          "oos": 0.09,
+          "oos": 0.086,
           "n": 158
         },
         {
@@ -1614,10 +1620,11 @@
             "allowShort": false
           },
           "benched": [
+            "GER40",
             "FRA40"
           ],
-          "oos": -0.315,
-          "n": 18
+          "oos": -0.223,
+          "n": 16
         },
         {
           "test": "2023-01-03",
@@ -1665,7 +1672,7 @@
             "JP225",
             "US2000"
           ],
-          "oos": 0.21,
+          "oos": 0.195,
           "n": 85
         },
         {
@@ -1682,34 +1689,35 @@
             "GER40",
             "FRA40"
           ],
-          "oos": 0.06,
+          "oos": 0.09,
           "n": 64
         }
       ]
     }
   },
   "combined": {
-    "trades": 6987,
-    "wins": 4352,
-    "losses": 2635,
-    "winRatePct": 62.3,
-    "avgWinR": 0.573,
-    "avgLossR": 0.775,
-    "expectancyR": 0.064,
+    "trades": 6819,
+    "wins": 4253,
+    "losses": 2566,
+    "winRatePct": 62.4,
+    "avgWinR": 0.57,
+    "avgLossR": 0.781,
+    "expectancyR": 0.061,
     "expectancyCI95": [
-      0.047,
-      0.084
+      0.043,
+      0.079
     ],
-    "tStat": 7.01,
-    "totalR": 450.57,
-    "profitFactor": 1.22,
-    "maxDrawdownR": 30.39,
+    "tStat": 6.66,
+    "totalR": 418.49,
+    "profitFactor": 1.21,
+    "maxDrawdownR": 33.61,
     "maxLosingStreak": 11,
     "outcomes": {
-      "TARGET": 4760,
-      "STOP": 1693,
-      "TIME": 433,
-      "END_OF_DATA": 101
+      "TARGET": 4487,
+      "STOP": 1659,
+      "TIME": 418,
+      "END_OF_DATA": 96,
+      "TP": 159
     }
   },
   "ranking": [
@@ -1720,22 +1728,22 @@
       "rules": "FundingPips 2-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 49,
-      "failPct": 4.6,
-      "timeoutPct": 46.4,
-      "stuckPct": 46.4,
-      "lostPct": 51,
+      "passPct": 48.5,
+      "failPct": 7.7,
+      "timeoutPct": 43.8,
+      "stuckPct": 43.6,
+      "lostPct": 51.3,
       "medianDaysToPass": 188,
-      "passWithin90Pct": 4.5,
-      "passWithin180Pct": 23.4,
-      "passWithin365Pct": 40.7,
-      "fundedSurvivalPct": 84.8,
-      "avgPayoutFirstMonths": 953,
-      "expectedValuePerAttempt": 403,
+      "passWithin90Pct": 5,
+      "passWithin180Pct": 23,
+      "passWithin365Pct": 39.2,
+      "fundedSurvivalPct": 85.5,
+      "avgPayoutFirstMonths": 971,
+      "expectedValuePerAttempt": 407,
       "fee": 66,
       "passPctRange": [
-        42.7,
-        53.8
+        41.1,
+        52.6
       ],
       "orderSeeds": 8
     },
@@ -1746,22 +1754,22 @@
       "rules": "The5ers High Stakes 2-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 49,
-      "failPct": 4.6,
-      "timeoutPct": 46.4,
-      "stuckPct": 46.4,
-      "lostPct": 51,
+      "passPct": 48.5,
+      "failPct": 7.7,
+      "timeoutPct": 43.8,
+      "stuckPct": 43.6,
+      "lostPct": 51.3,
       "medianDaysToPass": 188,
-      "passWithin90Pct": 4.5,
-      "passWithin180Pct": 23.4,
-      "passWithin365Pct": 40.7,
-      "fundedSurvivalPct": 84.8,
-      "avgPayoutFirstMonths": 953,
-      "expectedValuePerAttempt": 391,
+      "passWithin90Pct": 5,
+      "passWithin180Pct": 23,
+      "passWithin365Pct": 39.2,
+      "fundedSurvivalPct": 85.5,
+      "avgPayoutFirstMonths": 971,
+      "expectedValuePerAttempt": 395,
       "fee": 78,
       "passPctRange": [
-        42.7,
-        53.8
+        41.1,
+        52.6
       ],
       "orderSeeds": 8
     },
@@ -1772,22 +1780,22 @@
       "rules": "FundedNext Stellar 2-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 48.3,
-      "failPct": 4.6,
-      "timeoutPct": 47.2,
-      "stuckPct": 47.2,
-      "lostPct": 51.8,
-      "medianDaysToPass": 196,
-      "passWithin90Pct": 3.6,
-      "passWithin180Pct": 21.5,
-      "passWithin365Pct": 40,
-      "fundedSurvivalPct": 85.7,
-      "avgPayoutFirstMonths": 913,
-      "expectedValuePerAttempt": 343,
+      "passPct": 47.8,
+      "failPct": 7.8,
+      "timeoutPct": 44.4,
+      "stuckPct": 44.2,
+      "lostPct": 52,
+      "medianDaysToPass": 195,
+      "passWithin90Pct": 3.7,
+      "passWithin180Pct": 21.6,
+      "passWithin365Pct": 38.6,
+      "fundedSurvivalPct": 87.5,
+      "avgPayoutFirstMonths": 981,
+      "expectedValuePerAttempt": 372,
       "fee": 99,
       "passPctRange": [
-        42.5,
-        54
+        40.5,
+        52.8
       ],
       "orderSeeds": 8
     },
@@ -1798,22 +1806,22 @@
       "rules": "FTMO 1-Step",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 51.1,
-      "failPct": 8.3,
-      "timeoutPct": 40.7,
-      "stuckPct": 16.1,
-      "lostPct": 24.3,
-      "medianDaysToPass": 217,
-      "passWithin90Pct": 4.2,
-      "passWithin180Pct": 20.5,
-      "passWithin365Pct": 38.9,
-      "fundedSurvivalPct": 86.9,
-      "avgPayoutFirstMonths": 805,
-      "expectedValuePerAttempt": 263,
+      "passPct": 51.9,
+      "failPct": 9.8,
+      "timeoutPct": 38.3,
+      "stuckPct": 15.8,
+      "lostPct": 25.6,
+      "medianDaysToPass": 219,
+      "passWithin90Pct": 4.7,
+      "passWithin180Pct": 20.9,
+      "passWithin365Pct": 37.6,
+      "fundedSurvivalPct": 84.6,
+      "avgPayoutFirstMonths": 830,
+      "expectedValuePerAttempt": 282,
       "fee": 150,
       "passPctRange": [
-        39.5,
-        56.8
+        47.4,
+        54.8
       ],
       "orderSeeds": 8
     },
@@ -1824,22 +1832,22 @@
       "rules": "FTMO 2-Step (Swing)",
       "riskPct": 4,
       "attempts": 511,
-      "passPct": 44.9,
-      "failPct": 4.9,
-      "timeoutPct": 50.3,
-      "stuckPct": 50.2,
-      "lostPct": 55.1,
-      "medianDaysToPass": 216,
-      "passWithin90Pct": 2.2,
-      "passWithin180Pct": 17.2,
-      "passWithin365Pct": 35.1,
-      "fundedSurvivalPct": 86,
-      "avgPayoutFirstMonths": 909,
-      "expectedValuePerAttempt": 242,
+      "passPct": 45.6,
+      "failPct": 7.9,
+      "timeoutPct": 46.5,
+      "stuckPct": 46.1,
+      "lostPct": 54,
+      "medianDaysToPass": 214,
+      "passWithin90Pct": 2.7,
+      "passWithin180Pct": 17.6,
+      "passWithin365Pct": 34.7,
+      "fundedSurvivalPct": 87.6,
+      "avgPayoutFirstMonths": 935,
+      "expectedValuePerAttempt": 260,
       "fee": 170,
       "passPctRange": [
-        37.6,
-        50.3
+        39.7,
+        50.5
       ],
       "orderSeeds": 8
     }
@@ -1861,7 +1869,8 @@
           "exitLen": 5,
           "stopAtr": 2,
           "maxDays": 10,
-          "allowShort": false
+          "allowShort": false,
+          "tpR": 1.5
         }
       },
       {
@@ -1874,7 +1883,8 @@
           "exitLen": 5,
           "stopAtr": 2,
           "maxDays": 10,
-          "allowShort": false
+          "allowShort": false,
+          "tpR": 1.5
         }
       },
       {
@@ -1887,7 +1897,8 @@
           "trendLen": 0,
           "stopAtr": 2,
           "maxDays": 10,
-          "allowShort": false
+          "allowShort": false,
+          "tpR": 1.5
         }
       },
       {
@@ -1899,7 +1910,8 @@
           "lookback": 10,
           "stopAtr": 2,
           "maxDays": 10,
-          "allowShort": false
+          "allowShort": false,
+          "tpR": 1.5
         }
       }
     ],
@@ -1925,51 +1937,51 @@
       "FRA40|d7",
       "AUS200|d7"
     ],
-    "expectedR": 0.064
+    "expectedR": 0.061
   },
   "portfolio": {
     "startEquity": 10000,
-    "endEquity": 36016.83,
-    "totalReturnPct": 260.17,
-    "cagrPct": 5.58,
-    "maxDrawdownPct": 26.31,
-    "sharpeMonthly": 0.48,
+    "endEquity": 34184.41,
+    "totalReturnPct": 241.84,
+    "cagrPct": 5.35,
+    "maxDrawdownPct": 26.81,
+    "sharpeMonthly": 0.46,
     "months": 283,
-    "avgMonthlyPct": 0.53,
-    "medianMonthlyPct": 0.41,
-    "positiveMonthsPct": 53.4,
-    "worstMonthPct": -11.24,
+    "avgMonthlyPct": 0.51,
+    "medianMonthlyPct": 0.58,
+    "positiveMonthsPct": 54.4,
+    "worstMonthPct": -11.61,
     "bestMonthPct": 10.07,
     "yearly": {
       "2003": 0.4,
-      "2004": 8.5,
-      "2005": 9.3,
-      "2006": 27.1,
-      "2007": 3.2,
-      "2008": 5.7,
-      "2009": 13.7,
+      "2004": 8.2,
+      "2005": 8.9,
+      "2006": 26.4,
+      "2007": 1.2,
+      "2008": 6.3,
+      "2009": 13.9,
       "2010": -19.2,
       "2011": 2.8,
-      "2012": 4.7,
-      "2013": 18.4,
-      "2014": 18.2,
-      "2015": 10,
-      "2016": 9.1,
-      "2017": 15.5,
+      "2012": 5.9,
+      "2013": 15.8,
+      "2014": 19.1,
+      "2015": 15.9,
+      "2016": 6.6,
+      "2017": 14.7,
       "2018": -10.3,
-      "2019": 7.8,
-      "2020": 1.5,
-      "2021": 16.6,
-      "2022": -1.1,
-      "2023": 0.1,
+      "2019": 15.1,
+      "2020": -6.2,
+      "2021": 16.5,
+      "2022": -0.4,
+      "2023": -0.1,
       "2024": 2.6,
-      "2025": 8.6,
-      "2026": -10
+      "2025": 5.1,
+      "2026": -10.4
     },
     "riskPct": 1,
     "maxOpen": 5,
     "maxOpenRiskPct": 5,
-    "tradesTaken": 3064,
-    "tradesSkipped": 3923
+    "tradesTaken": 3023,
+    "tradesSkipped": 3796
   }
 }

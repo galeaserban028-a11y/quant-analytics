@@ -47,6 +47,9 @@ const PROP_MODES = {
   rapid: { risks: [5], safeties: [0.9], maxOpens: [5] }
 };
 const AGENTS_CONFIG = require('../../config/agents_config.json');
+// Take-profit fix la 1,5 × riscul (testat walk-forward pe 21 oct. 2026: la fel de bun ca fără TP, atins în ~2% din
+// tranzacții; TP mai apropiat strică: la 0,5R trecerea scade de la 48% la 28%). Ieșirea principală rămâne regula strategiei.
+const TP_R = 1.5;
 
 /** Strategiile candidate și grilele lor (alegerea parametrilor se face DOAR pe anii de antrenare). */
 const STRATEGIES = {
@@ -174,7 +177,7 @@ function pickBest(table, maxFailPct = 5, evTolerance = 0.05) {
 }
 
 /** Simulatorul folosit în validare: execuție prudentă (a doua zi la deschidere). */
-const prudentSim = (data, inst, params, o) => lab.simulate(data, inst, params, Object.assign({}, o, { execution: 'nextOpen' }));
+const prudentSim = (data, inst, params, o) => lab.simulate(data, inst, params.tpR === undefined ? Object.assign({}, params, { tpR: TP_R }) : params, Object.assign({}, o, { execution: 'nextOpen' }));
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -218,7 +221,7 @@ async function main() {
     riskPct: top.riskPct,
     safety: top.safety,
     maxOpen: top.maxOpen,
-    strategies: accepted.map(([kind, r]) => ({ kind, name: r.name, params: r.params })),
+    strategies: accepted.map(([kind, r]) => ({ kind, name: r.name, params: Object.assign({}, r.params, { tpR: TP_R }) })),
     symbols: Object.keys(data),
     benched: agents.filter((a) => a.status === 'BANCĂ').map((a) => a.id),
     expectedR: combined.expectancyR // folosit de frâna de urgență live

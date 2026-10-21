@@ -3,6 +3,11 @@ name: APEX test Telegram
 
 on:
   workflow_dispatch:
+    inputs:
+      sample:
+        description: 'Trimite și un semnal de test (true/false)'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -19,7 +24,9 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node scripts/telegram-check.js
+        run: |
+          node scripts/telegram-check.js
+          if [ "${{ github.event.inputs.sample }}" = "true" ]; then node scripts/telegram-sample.js; fi
       - name: Salvează rezultatul
         run: |
           git config user.name "apex-bot"
