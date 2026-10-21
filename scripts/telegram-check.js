@@ -36,6 +36,17 @@ function call(method, token, body) {
     out.getMeError = me.json && !me.json.ok ? me.json.description : (me.error || null);
   }
   if (token && out.tokenValid) {
+    const wh = await call('getWebhookInfo', token);
+    out.webhookSet = Boolean(wh.json && wh.json.ok && wh.json.result.url);
+    const up = await call('getUpdates', token);
+    out.updatesOk = Boolean(up.json && up.json.ok);
+    out.updatesError = up.json && !up.json.ok ? up.json.description : null;
+    const res = (up.json && up.json.result) || [];
+    out.updatesCount = res.length;
+    out.updateKinds = Array.from(new Set(res.map((u) => Object.keys(u).filter((k) => k !== 'update_id').join('+'))));
+    out.privateChatsSeen = new Set(res.map((u) => { const m = u.message || u.edited_message || u.my_chat_member; return m && m.chat && m.chat.type === 'private' ? m.chat.id : null; }).filter(Boolean)).size;
+  }
+  if (token && out.tokenValid) {
     const { resolveChatId } = require('../src/notify/telegram');
     const useChat = await resolveChatId(token, chat);
     out.chatSource = !useChat ? 'negăsit (trimite /start botului)' : (useChat === chat ? 'secretul TELEGRAM_CHAT_ID' : 'găsit automat din conversația cu botul');
