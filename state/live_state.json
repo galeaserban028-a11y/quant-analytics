@@ -502,13 +502,54 @@
   "fxLondon": {
     "v": 1,
     "startedAt": 1792545128919,
-    "trades": [],
+    "trades": [
+      {
+        "pair": "EURUSD",
+        "day": 1792540800000,
+        "live": false,
+        "direction": "SHORT",
+        "entry": 1.1220825910568237,
+        "stop": 1.1234692335128784,
+        "exit": 1.1234692335128784,
+        "outcome": "STOP",
+        "resultR": -1.0865,
+        "enteredAt": 1792569600000
+      },
+      {
+        "pair": "GBPUSD",
+        "day": 1792540800000,
+        "live": false,
+        "direction": "LONG",
+        "entry": 1.3381328582763672,
+        "stop": 1.3365768194198608,
+        "exit": 1.3394770622253418,
+        "outcome": "TIME",
+        "resultR": 0.7867,
+        "enteredAt": 1792566000000
+      },
+      {
+        "pair": "USDJPY",
+        "day": 1792540800000,
+        "live": false,
+        "direction": "SHORT",
+        "entry": 158.0240020751953,
+        "stop": 158.39199829101562,
+        "exit": 158.197998046875,
+        "outcome": "TIME",
+        "resultR": -0.5054,
+        "enteredAt": 1792576800000
+      }
+    ],
     "skips": {},
-    "settled": {},
+    "settled": {
+      "EURUSD": 1792540800000,
+      "GBPUSD": 1792540800000,
+      "USDJPY": 1792540800000
+    },
     "graduated": null,
     "paused": false,
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-21T19:44:03.318Z"
+  "savedAt": "2026-10-21T20:00:01.224Z"
 }
