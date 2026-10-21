@@ -19,11 +19,12 @@ const { escapeHtml, roTime } = require('../notify/telegram');
 
 const DAY = 864e5;
 const PAIRS = ['EURUSD', 'GBPUSD', 'USDJPY'];
-// Absolvirea: istoricul (2017–2025, pe ani nevăzuți) arată deja avantaj (t ≈ 3,4). Antrenamentul live verifică altceva:
-// că pe prețurile de acum, cu costurile presupuse, rezultatul rămâne clar pozitiv. ~3 luni de tranzacții, media ≥ +0,03R.
-const MIN_TRADES = 120;
+// Absolvirea, înăsprită pe 21 oct. 2026: cu AUDUSD adăugat în cercetare, avantajul pe istoric a scăzut la ~+0,01R
+// (nedovedit), deci rezultatul inițial pe 3 perechi putea fi noroc de selecție. Live cerem dovadă statistică proprie:
+// cel puțin 250 de tranzacții (~6 luni), media ≥ +0,03R ȘI t ≥ 2 (șansă de ~2,5% să absolve din noroc).
+const MIN_TRADES = 250;
 const MIN_MEAN = 0.03;
-const T_MIN = 0.5;
+const T_MIN = 2.0;
 
 function stats(trades) {
   const r = trades.map((t) => t.resultR);
