@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-21T09:58:49.718Z",
+  "at": "2026-10-21T10:00:59.381Z",
   "tokenPresent": true,
   "tokenHadSpaces": true,
   "tokenFormatOk": true,
@@ -9,6 +9,7 @@
   "tokenValid": true,
   "botUsername": "@SniperulMeubot",
   "getMeError": null,
+  "chatSource": "negăsit (trimite /start botului)",
   "sendOk": false,
-  "sendError": "Forbidden: the bot can't send messages to the bot"
+  "sendError": "nicio conversație privată găsită"
 }
