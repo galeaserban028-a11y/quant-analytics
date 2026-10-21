@@ -351,12 +351,12 @@ test('live: pornire tăcută → semnal nou cu lot și stop → mesaj de ieșire
   assert.equal(r.events[0].event, 'ENTRY');
   assert.ok(r.events[0].lots >= 0.01);
   assert.ok(r.events[0].riskUsd <= 300 + 1e-6, 'riscul nu depășește 3% din cont');
-  assert.match(msgs[1], /SEMNAL PROP: EURUSD/);
-  assert.match(msgs[1], /CUMPĂRĂ/);
+  assert.match(msgs[1], /BUY EURUSD<\/b>/);
+  assert.match(msgs[1], /Entry: <b>[\d.]+<\/b>\nSL: <b>[\d.]+<\/b>/);
   assert.match(msgs[1], /Lot: <b>\d+\.\d\d<\/b>/);
-  assert.match(msgs[1], /pips<\/b> SUB/);
-  assert.match(msgs[1], /Gardian:/);
-  assert.match(msgs[1], /Presupus: 1 lot = 10\.00 \$ pe pip/, 'mesajul arată valoarea pip-ului, de verificat în platformă');
+  assert.match(msgs[1], /TF: D1/);
+  assert.match(msgs[1], /risc [\d.]+ \$/);
+  assert.match(msgs[1], /1 lot = 10\.00 \$ pe pip/, 'mesajul arată valoarea pip-ului, de verificat în platformă');
 
   // 2b) aceeași lumânare din nou (rulare orară): nimic nou
   r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch: feedOf(bars), now: tLast + 2 * 3600e3, env });
@@ -370,7 +370,7 @@ test('live: pornire tăcută → semnal nou cu lot și stop → mesaj de ieșire
   assert.equal(r.events[0].event, 'EXIT');
   assert.ok(r.events[0].r > 0);
   assert.ok(bus.state.prop.balance > 10000);
-  assert.match(msgs[2], /ÎNCHIDE ACUM/);
+  assert.match(msgs[2], /ÎNCHIDE EURUSD<\/b> — ACUM/);
   assert.equal(Object.keys(bus.state.prop.positions).length, 0);
 });
 
@@ -588,12 +588,12 @@ test('live: două strategii pe același indice → două poziții separate, lot 
   const entries = r.events.filter((e) => e.event === 'ENTRY');
   assert.equal(entries.length, 2, JSON.stringify(r.events));
   assert.deepEqual(Object.keys(bus.state.prop.positions).sort(), ['GER40|down', 'GER40|rsi2']);
-  const sig = msgs.filter((m) => /SEMNAL PROP: GER40/.test(m));
+  const sig = msgs.filter((m) => /BUY GER40<\/b>/.test(m));
   assert.equal(sig.length, 1, 'doi traderi pe același indice deodată ⇒ UN singur semnal');
-  assert.ok(/2 traderi de acord: .*Tudor \(3 zile de scădere\)/.test(sig[0]), sig[0]);
+  assert.ok(/Traderi: .*Tudor/.test(sig[0]), sig[0]);
   const lots = Object.values(bus.state.prop.positions).reduce((t, p) => t + p.lots, 0);
-  assert.ok(sig[0].includes(`Lot TOTAL: <b>${lots.toFixed(2)}</b>`) || /poziții separate/.test(sig[0]), sig[0]);
-  assert.ok(/puncte<\/b> SUB/.test(sig[0]));
+  assert.ok(sig[0].includes(`Lot: <b>${lots.toFixed(2)}</b>`) || /Poziția 2/.test(sig[0]), sig[0]);
+  assert.ok(/SL: <b>|SL <b>/.test(sig[0]));
   const totalRisk = Object.values(bus.state.prop.positions).reduce((s, p) => s + p.riskUsd, 0);
   assert.ok(totalRisk <= 10000 * 0.05 * 0.8 + 1e-6, 'Gardianul împarte bugetul zilnic între poziții');
   assert.equal(bus.state.prop.fxRates.EURUSD, 1.1);
@@ -839,12 +839,12 @@ test('live: ieșirea unui singur trader dintr-un indice ocupat de doi spune exac
   await flushSymbol({ sym: 'GER40', inst: INSTR.GER40, acct, rules, label: 'APEX PROP', barClose: Date.UTC(2026, 0, 5, 16, 30), outEntries: [], notify: async (t) => { msgs.push(t); },
     outExits: [{ who: 'Radu (Pullback RSI(2))', prev: { direction: 'LONG', lots: 0.35 }, r: 0.4, pnl: 60, why: 'prețul a revenit', outcome: 'EXIT' }] });
   assert.equal(msgs.length, 1);
-  assert.ok(/ÎNCHIDE 0\.35 loturi/.test(msgs[0]), msgs[0]);
-  assert.ok(/Rămâne deschis pe GER40: 0\.40 loturi \(Tudor\)/.test(msgs[0]), msgs[0]);
+  assert.ok(/ÎNCHIDE GER40<\/b> · doar 0\.35 loturi/.test(msgs[0]), msgs[0]);
+  assert.ok(/Rămâne deschis: 0\.40 loturi \(Tudor\)/.test(msgs[0]), msgs[0]);
   msgs.length = 0;
   await flushSymbol({ sym: 'GER40', inst: INSTR.GER40, acct: Object.assign({}, acct, { positions: {} }), rules, label: 'APEX PROP', barClose: 0, outEntries: [], notify: async (t) => { msgs.push(t); },
     outExits: [{ who: 'Radu (Pullback RSI(2))', prev: { direction: 'LONG', lots: 0.35 }, r: -1, pnl: -150, why: 'stop-ul a fost atins', outcome: 'STOP' }] });
-  assert.ok(!/ÎNCHIDE/.test(msgs[0]) && /Nu faci nimic/.test(msgs[0]), 'la stop nu ai nimic de închis');
+  assert.ok(!/ÎNCHIDE/.test(msgs[0]) && /a atins stop loss \(s-a închis singur\)/.test(msgs[0]), 'la stop nu ai nimic de închis');
 });
 
 test('gardian: opțiunile gapFactor și fundedRiskPct (implicit oprite) micșorează riscul exact cum spun', () => {

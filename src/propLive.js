@@ -126,21 +126,25 @@ const lotsTxt = (x) => x.toFixed(2);
  * TOTAL; la ieșire, mesajul spune exact ce lot închizi și ce rămâne deschis.
  */
 async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, outEntries, notify }) {
-  const tag = label === 'APEX PROP' ? 'PROP' : 'FOREX';
-  const unit = inst.category === 'FX' ? 'pips' : 'puncte';
+  const tag = label === 'APEX PROP' ? '' : ' (Forex)';
+  const unit = inst.category === 'FX' ? 'pip' : 'punct';
+  const name = (w) => escapeHtml((w || '').split(' (')[0]);
   const newKeys = new Set(outEntries.map((e) => e.key));
   const stillOpen = () => Object.entries(acct.positions).filter(([k]) => k.split('|')[0] === sym && !newKeys.has(k)).map(([, p]) => p);
   if (outExits.length) {
     const left = stillOpen();
-    const lines = [`⏹️ <b>${tag}: ${escapeHtml(sym)}</b> ${outExits[0].prev.direction === 'LONG' ? '(cumpărare)' : '(vânzare)'}`];
-    for (const x of outExits) {
-      const why = x.why.replace(/ — ÎNCHIDE ACUM$/, '');
-      const action = x.outcome === 'STOP' || x.outcome === 'TP' ? 'Nu faci nimic.' : `<b>ÎNCHIDE ${x.prev.lots != null && (left.length || outExits.length > 1) ? lotsTxt(x.prev.lots) + ' loturi' : 'ACUM'}</b>.`;
-      lines.push(`• ${escapeHtml(x.who)}: ${why}. ${action} Rezultat estimat: <b>${x.r >= 0 ? '+' : ''}${x.r.toFixed(2)}R ≈ ${money(x.pnl)}</b>`);
+    const res = (x) => `${x.r >= 0 ? '+' : ''}${x.r.toFixed(2)}R ≈ ${money(x.pnl)}`;
+    const auto = outExits.filter((x) => x.outcome === 'STOP' || x.outcome === 'TP');
+    const manual = outExits.filter((x) => x.outcome !== 'STOP' && x.outcome !== 'TP');
+    const lines = [];
+    if (manual.length) {
+      const lots = manual.reduce((t, x) => t + (x.prev.lots || 0), 0);
+      lines.push(`🔴 <b>ÎNCHIDE ${escapeHtml(sym)}${tag}</b>${left.length ? ` · doar ${lots.toFixed(2)} loturi` : ''} — ACUM`);
+      for (const x of manual) lines.push(`${name(x.who)}: ${res(x)}`);
     }
-    if (left.length) lines.push(`Rămâne deschis pe ${escapeHtml(sym)}: ${lotsTxt(left.reduce((t, p) => t + (p.lots || 0), 0))} loturi (${left.map((p) => escapeHtml((p.who || '').split(' (')[0])).join(', ')}). Pe acelea NU le închide.`);
-    else if (outExits.filter((x) => x.outcome !== 'STOP' && x.outcome !== 'TP').length > 1) lines.push(`➡️ Închizi TOT ce ai pe ${escapeHtml(sym)}.`);
-    lines.push(progressLine(acct, rules));
+    for (const x of auto) lines.push(`${x.outcome === 'TP' ? '✅' : '⛔'} <b>${escapeHtml(sym)}${tag}</b> a atins ${x.outcome === 'TP' ? 'take profit' : 'stop loss'} (s-a închis singur) · ${name(x.who)}: ${res(x)}`);
+    if (left.length) lines.push(`Rămâne deschis: ${left.reduce((t, p) => t + (p.lots || 0), 0).toFixed(2)} loturi (${left.map((p) => name(p.who)).join(', ')})`);
+    lines.push(`Sold estimat: ${money(acct.balance)}`);
     await notify(lines.join('\n'));
   }
   const groups = {};
@@ -150,27 +154,21 @@ async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, 
     const totalLots = es.reduce((t, e) => t + e.lot.lots, 0);
     const totalRisk = es.reduce((t, e) => t + e.lot.actualRiskUsd, 0);
     const sameStop = es.every((e) => Math.abs(e.position.stop - es[0].position.stop) < inst.pipSize / 2);
-    const pts = (e) => (e.stopDist / inst.pipSize).toFixed(inst.pipSize >= 1 ? 0 : 1);
-    const lines = [`📈 <b>SEMNAL ${tag}: ${escapeHtml(sym)}</b> ${long ? '🟢 CUMPĂRĂ (Buy)' : '🔴 VINDE (Sell)'} la prețul pieței, ACUM`];
-    if (es.length === 1) lines.push(`🧠 Trader: ${escapeHtml(es[0].who)}`);
-    else lines.push(`🧠 ${es.length} traderi de acord: ${es.map((e) => `${escapeHtml(e.who)} ${lotsTxt(e.lot.lots)}`).join(' · ')}`);
+    const px = (v) => fmtPx(v, inst);
+    const lines = [`${long ? '🟢 <b>BUY' : '🔴 <b>SELL'} ${escapeHtml(sym)}</b>${tag} — ACUM, la prețul pieței`];
+    lines.push(`Entry: <b>${px(es[0].position.entry)}</b>`);
     if (sameStop) {
-      lines.push(`📦 Lot${es.length > 1 ? ' TOTAL' : ''}: <b>${lotsTxt(totalLots)}</b> (risc ${money(totalRisk)} = ${(totalRisk / acct.initial * 100).toFixed(2)}% din cont)${es.length > 1 ? '. Îl poți deschide ca o singură poziție; la ieșire îți spun exact cât închizi.' : ''}`);
-      lines.push(`🛑 Stop loss: la <b>${pts(es[0])} ${unit}</b> ${long ? 'SUB' : 'PESTE'} prețul tău de intrare`);
-      if (es[0].position.tp != null) lines.push(`🎯 Take profit: la <b>${(Math.abs(es[0].position.tp - es[0].position.entry) / inst.pipSize).toFixed(inst.pipSize >= 1 ? 0 : 1)} ${unit}</b> ${long ? 'PESTE' : 'SUB'} prețul tău de intrare`);
-      lines.push(`📍 Preț de referință (închiderea de azi): ${fmtPx(es[0].position.entry, inst)} → stop ≈ ${fmtPx(es[0].position.stop, inst)}${es[0].position.tp != null ? ` · take profit ≈ ${fmtPx(es[0].position.tp, inst)}` : ''}`);
+      lines.push(`SL: <b>${px(es[0].position.stop)}</b>`);
+      if (es[0].position.tp != null) lines.push(`TP: <b>${px(es[0].position.tp)}</b>`);
+      lines.push(`Lot: <b>${totalLots.toFixed(2)}</b> (risc ${money(totalRisk)})`);
     } else {
-      lines.push(`📦 Deschide ${es.length} poziții separate (stopuri diferite), risc total ${money(totalRisk)} = ${(totalRisk / acct.initial * 100).toFixed(2)}% din cont:`);
-      es.forEach((e, k) => lines.push(`  ${k + 1}) lot <b>${lotsTxt(e.lot.lots)}</b>, stop la <b>${pts(e)} ${unit}</b> ${long ? 'SUB' : 'PESTE'} intrare (≈ ${fmtPx(e.position.stop, inst)}) · ${escapeHtml((e.who || '').split(' (')[0])}`));
-      lines.push(`📍 Preț de referință (închiderea de azi): ${fmtPx(es[0].position.entry, inst)}`);
+      es.forEach((e, k) => lines.push(`Poziția ${k + 1}: lot <b>${e.lot.lots.toFixed(2)}</b> · SL <b>${px(e.position.stop)}</b>${e.position.tp != null ? ` · TP <b>${px(e.position.tp)}</b>` : ''}`));
+      lines.push(`Risc total: ${money(totalRisk)}`);
     }
+    lines.push(`TF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)`);
+    if (es.length > 1) lines.push(`Traderi: ${es.map((e) => name(e.who)).join(', ')}`);
     const pu = es[0].pointUsd;
-    lines.push(`🔎 Presupus: 1 lot = ${pu < 1 ? pu.toFixed(3) : pu.toFixed(2)} $ pe ${inst.category === 'FX' ? 'pip' : 'punct'}. Verifică în platformă (specificațiile contractului); dacă diferă, NU intra și setează PROP_CONTRACT_SIZES.${totalLots > 20 ? ' ⚠️ Lot neobișnuit de mare: verifică de două ori!' : ''}`);
-    lines.push(es[0].position.tp != null ? '🚪 Ieșirea principală: primești mesaj de ÎNCHIDERE când prețul revine (de obicei în 1–5 zile). Take profit-ul e doar o plasă de siguranță, atinsă rar.' : '🎯 Fără take-profit fix: primești mesaj de ÎNCHIDERE (de obicei în 1–5 zile).');
-    lines.push(`🕯️ Timeframe: D1 (grafic zilnic) · poziția se ține cel mult ${(es[0].maxDays || 10)} zile`);
-    lines.push(`⏱️ ${inst.category === 'FX' ? 'Ziua Forex' : 'Bursa'} s-a închis la ${roTime(barClose)} (ora României). Intră cât mai repede; dacă au trecut peste 12 ore, sari peste.`);
-    lines.push(progressLine(acct, rules));
-    lines.push(roomLine(acct, rules));
+    lines.push(`<i>Verifică o dată în platformă: 1 lot = ${pu < 1 ? pu.toFixed(3) : pu.toFixed(2)} $ pe ${unit}. Dacă au trecut peste 12 ore de la ${roTime(barClose)}, sari peste.</i>${totalLots > 20 ? ' ⚠️ Lot neobișnuit de mare!' : ''}`);
     await notify(lines.join('\n'));
   }
 }

@@ -168,8 +168,8 @@ test('live Forex: Academia oprită = tăcere; agenții ELITĂ trimit pe perechea
   const r = await runFxCycle({ config: cfg, instruments: INSTR, bus, notify, fetch: feed(bars), now: tLast + 3600e3, env: {} });
   assert.deepEqual(r.events.map((e) => e.event), ['ENTRY', 'SKIP']);
   assert.equal(r.events[1].reason, 'PERECHE_OCUPATĂ');
-  assert.match(msgs[msgs.length - 1], /SEMNAL FOREX: EURUSD/);
-  assert.match(msgs[msgs.length - 1], /Trader: Andrei Popescu/);
+  assert.match(msgs[msgs.length - 1], /BUY EURUSD<\/b> \(Forex\)|SELL EURUSD<\/b> \(Forex\)/);
+  assert.match(msgs[msgs.length - 1], /Entry: <b>/);
   assert.ok(bus.state.fx && !bus.state.prop, 'starea Forex e separată de cea a indicilor');
 });
 
