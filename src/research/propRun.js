@@ -242,7 +242,7 @@ async function main() {
   }
 
   console.log(`\nPortofoliu: ${combined.trades} tranzacții, E=${fmt(combined.expectancyR)}R → ${level}`);
-  for (const r of ranking) console.log(`  ${r.rules.padEnd(28)} risc ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poziții): trece ${r.passPct}% | pică ${r.failPct}% | zile mediane ${r.medianDaysToPass} | ≤6 luni ${r.passWithin180Pct}% | EV ${r.expectedValuePerAttempt}$`);
+  for (const r of ranking) console.log(`  ${r.rules.padEnd(28)} risc ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poziții): trece ${r.passPct}% | pică ${r.failPct}% + blocat ${r.stuckPct}% = pierdut ${r.lostPct}% | zile mediane ${r.medianDaysToPass} | ≤6 luni ${r.passWithin180Pct}% | EV ${r.expectedValuePerAttempt}$`);
 
   const L = [];
   L.push(`# Raport — Departamentul PROP (indici, grafic zilnic, ${Object.keys(STRATEGIES).length} strategii candidate)`);
@@ -265,9 +265,9 @@ async function main() {
   L.push('');
   L.push(`## 2. Șansele la examen (${top.attempts || 0} date de start, orizont 3 ani, apoi 12 luni pe contul finanțat)`);
   L.push('');
-  L.push('| Firmă | Risc | Trece | Pică | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |');
+  L.push('| Firmă | Risc | Trece | Pică + blocat lângă limită (taxa pierdută) | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |');
   L.push('|---|---|---|---|---|---|---|---|---|');
-  for (const r of ranking) L.push(`| ${r.rules} | ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poz.) | **${r.passPct}%** | ${r.failPct}% | ${r.medianDaysToPass ?? '–'} | ${r.passWithin180Pct}% | ${r.passWithin365Pct}% | ${r.fee}$ | ${r.expectedValuePerAttempt}$ |`);
+  for (const r of ranking) L.push(`| ${r.rules} | ${r.riskPct}% (siguranță ${r.safety}, max ${r.maxOpen} poz.) | **${r.passPct}%** | ${r.lostPct}% (${r.failPct}% + ${r.stuckPct}%) | ${r.medianDaysToPass ?? '–'} | ${r.passWithin180Pct}% | ${r.passWithin365Pct}% | ${r.fee}$ | ${r.expectedValuePerAttempt}$ |`);
   L.push('');
   if (top.rules) L.push(`**Recomandare:** ${top.rules}, risc ${top.riskPct}% pe tranzacție, Gardianul Prop activ.`);
   L.push('');
@@ -314,7 +314,7 @@ async function main() {
     config: proposed,
     agents, staff: STAFF,
     strategies: Object.fromEntries(Object.entries(results).map(([k, r]) => [k, { name: r.name, level: r.level, params: r.params, oos: { trades: r.oos.trades, winRatePct: r.oos.winRatePct, expectancyR: r.oos.expectancyR, ci: r.oos.expectancyCI95 } }])),
-    exam: [top].concat(ranking.filter((r) => r !== top)).filter((r) => r && r.key).map((r) => ({ key: r.key, name: r.rules, riskPct: r.riskPct, safety: r.safety, maxOpen: r.maxOpen, passPct: r.passPct, failPct: r.failPct, timeoutPct: r.timeoutPct, medianDaysToPass: r.medianDaysToPass, passWithin180Pct: r.passWithin180Pct, passWithin365Pct: r.passWithin365Pct, fee: r.fee, ev: r.expectedValuePerAttempt })),
+    exam: [top].concat(ranking.filter((r) => r !== top)).filter((r) => r && r.key).map((r) => ({ key: r.key, name: r.rules, riskPct: r.riskPct, safety: r.safety, maxOpen: r.maxOpen, passPct: r.passPct, failPct: r.failPct, stuckPct: r.stuckPct, lostPct: r.lostPct, timeoutPct: r.timeoutPct, medianDaysToPass: r.medianDaysToPass, passWithin180Pct: r.passWithin180Pct, passWithin365Pct: r.passWithin365Pct, fee: r.fee, ev: r.expectedValuePerAttempt })),
     scenario
   }, null, 2));
   console.log('Raport: data/research/RAPORT_PROP.md');

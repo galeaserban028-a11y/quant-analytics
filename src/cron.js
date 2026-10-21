@@ -22,6 +22,14 @@ const { runPropCycle, propSummary } = require('./propLive');
 const fs = require('fs');
 const { runFxCycle, fetchFxDaily } = require('./fxLive');
 const { runVirtualCycle } = require('./academy/virtualLive');
+const { runLondonCycle } = require('./academy/londonLive');
+const { getJson } = require('./data/http');
+const { parseYahooChart, validOhlc } = require('./data/dailySources');
+/** Lumânări orare Yahoo (ultimele ~60 de zile), pentru strategia Londra. */
+async function fetchHoursYahoo(pair, inst) {
+  const d = await getJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(inst.yahoo)}?interval=1h&range=60d`, { retries: 1 });
+  return validOhlc(parseYahooChart(d)).map((b) => ({ t: b.timestamp, o: b.open, h: b.high, l: b.low, c: b.close }));
+}
 const { loadRates } = require('./data/rates');
 const ACADEMY_FILE = path.join(__dirname, '..', 'data', 'research', 'academy.json');
 const FX_INSTRUMENTS = require('../config/forex_instruments.json');
@@ -63,6 +71,13 @@ async function main() {
       console.log(`${new Date(now).toISOString()} | APEX CAPITAL (fictiv) | ${JSON.stringify(vr)}`);
     } catch (err) { console.log('APEX Capital: eroare', err.message); }
   }
+
+  // COMPANIA FOREX „Londra”: antrenament LIVE pe bani fictivi (zilnic după 20:00 UTC); semnale reale doar după absolvire
+  try {
+    const canNotify = LIVE && process.env.TELEGRAM_TOKEN && (process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID);
+    const lr = await runLondonCycle({ bus, instruments: FX_INSTRUMENTS, fetchHours: fetchHoursYahoo, notify: canNotify ? notify : null, now, env: process.env });
+    if (lr.settled || lr.plans || Object.keys(lr.errors).length) console.log(`${new Date(now).toISOString()} | FOREX LONDRA (antrenament) | ${JSON.stringify(lr)}`);
+  } catch (err) { console.log('Forex Londra: eroare', err.message); }
 
   // Dacă trebuie să trimită pe Telegram dar lipsesc datele, NU avansăm starea (altfel s-ar pierde mesaje)
   if (LIVE && (!process.env.TELEGRAM_TOKEN || !(process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID))) {

@@ -143,8 +143,14 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
 
   <div class="part">
     <h2>Școala Forex · 300 de agenți, doar pe hârtie</h2>
-    <p class="lead">Aceștia NU îți trimit semnale. E o școală: agenții învață pe perechi valutare, cu bani fictivi, iar o dată pe lună sunt verificați. Pe Forex, până acum niciun grup nu a arătat avantaj real, așa că școala tace. Dacă elita lor trece vreodată testele, sistemul te anunță pe Telegram.</p>
+    <p class="lead">Compania Forex are două părți. Strategia „Londra” (mai jos) a trecut testele pe istorie și se antrenează acum live. Școala de 300 de agenți (pe grafic zilnic) învață cu bani fictivi: pe Forex zilnic niciun grup nu a arătat avantaj real, așa că tace. Oricare dintre ele dovedește că face profit, îți trimite semnale reale.</p>
   </div>
+
+  <section aria-labelledby="h-london">
+    <h2 id="h-london">Strategia „Londra” · antrenament live pe bani fictivi</h2>
+    <p class="lead">Singura strategie Forex care a trecut testele pe istorie: spargerea intervalului asiatic la deschiderea Londrei (EURUSD, GBPUSD, USDJPY). Câștig mediu pe ani nevăzuți: +0,07 din risc pe tranzacție, dar sensibil la costuri. De aceea întâi se antrenează live, pe prețuri reale și bani fictivi. După cel puțin 120 de tranzacții cu media peste +0,03, îți trimite semnale reale (pentru un cont separat).</p>
+    <div class="tiles" id="london"></div>
+  </section>
 
   <div class="verdict" id="verdict"></div>
 
@@ -353,9 +359,11 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     const ps = propState();
     const working = team ? team.agents.filter((a) => a.status !== 'BANCĂ').length : 0;
     const liveTxt = ps && ps.initialized ? (ps.paused ? 'Frâna de urgență e trasă: nu trimite intrări noi.' : 'Rulează acum și trimite semnale pe Telegram.') : 'Gata de lucru. Pornește imediat ce pui cheile Telegram în GitHub.';
-    box.append(el('div', { class: 'box', 'data-on': '1' }, [el('span', { class: 'tag', text: 'Semnale reale' }), el('b', { text: `Echipa de indici · ${team ? team.agents.length : 40} de traderi (${working} lucrează)` }), el('span', { text: 'Singura variantă care a trecut toate testele: câștig mic, dar dovedit, pe 23 de ani de date nevăzute.' }), el('span', { class: 'muted', text: liveTxt })]));
-    const on = academy && academy.enabled;
-    box.append(el('div', { class: 'box', 'data-on': on ? '1' : '0' }, [el('span', { class: 'tag', text: on ? 'Semnale reale' : 'Doar pe hârtie' }), el('b', { text: `Școala Forex · ${academy ? academy.population.length : 300} de agenți` }), el('span', { text: on ? 'Elita a dovedit avantaj și trimite semnale.' : 'Învață cu bani fictivi. Nu trimite semnale, pentru că pe Forex nu a arătat avantaj real.' }), el('span', { class: 'muted', text: 'Reverificată automat pe 1 ale fiecărei luni.' })]));
+    box.append(el('div', { class: 'box', 'data-on': '1' }, [el('span', { class: 'tag', text: 'Semnale reale' }), el('b', { text: `Echipa de indici · ${team ? team.agents.length : 40} de traderi (${working} lucrează)` }), el('span', { text: 'Validată pe 23 de ani de date nevăzute: câștig mic, dar dovedit. La examen: treci ~45% din încercări.' }), el('span', { class: 'muted', text: liveTxt })]));
+    const lb = state && state.fxLondon;
+    const lon = lb && lb.graduated && !lb.paused;
+    const nL = lb ? (lb.trades || []).length : 0;
+    box.append(el('div', { class: 'box', 'data-on': lon ? '1' : '0' }, [el('span', { class: 'tag', text: lon ? 'Semnale reale' : 'Antrenament live' }), el('b', { text: 'Compania Forex · strategia „Londra”' }), el('span', { text: lon ? 'A absolvit antrenamentul live și trimite semnale reale (cont separat).' : `A trecut testele pe istorie; acum se antrenează live pe bani fictivi (${nL}/120 tranzacții).` }), el('span', { class: 'muted', text: `Școala zilnică de ${academy ? academy.population.length : 300} de agenți: doar pe hârtie, fără avantaj dovedit.` })]));
   }
 
   function renderPropAcct() {
@@ -562,6 +570,20 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     }
   }
 
+  function renderLondon() {
+    const box = document.getElementById('london');
+    box.replaceChildren();
+    const b = state && state.fxLondon;
+    const tile = (lbl, big, sub) => box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: lbl }), el('span', { class: 'big num', text: big }), el('span', { class: 'lbl', text: sub })]));
+    if (!b) { tile('Stare', 'Pornește', 'Prima zi de antrenament se înregistrează după 20:00 UTC (23:00 ora României).'); tile('Necesar pentru semnale reale', '120', 'tranzacții live pe hârtie, cu media ≥ +0,03R'); return; }
+    const tr = b.trades || [];
+    const n = tr.length, sum = tr.reduce((a, t) => a + (t.resultR || 0), 0), mean = n ? sum / n : 0;
+    tile('Stare', b.graduated ? (b.paused ? 'Pauză' : 'Absolvit') : 'Antrenament', b.graduated ? 'Trimite semnale reale la 07:00 UTC' : 'Doar pe hârtie, fără semnale');
+    tile('Tranzacții live', `${n} / 120`, n ? `${tr.filter((t) => t.resultR > 0).length} câștigătoare` : 'Încă niciuna');
+    tile('Media pe tranzacție', `${signed(mean, 3)}R`, 'Ținta pentru absolvire: ≥ +0,030R');
+    tile('Total (bani fictivi, risc 0,5%)', money(sum * 50), `${signed(sum, 1)}R pe un cont de 10.000 $`);
+  }
+
   function renderHeader() {
     const live = document.getElementById('live');
     live.dataset.mode = mode;
@@ -569,7 +591,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     document.getElementById('liveText').textContent = mode === 'live' ? `Live · stare ${saved ? roDateTime(saved) : '—'} · reîmprospătare la fiecare minut` : mode === 'snap' ? `Instantaneu din ${academy ? roDate(academy.generatedAt) : '—'}` : 'Datele nu s-au încărcat';
   }
 
-  function renderAll() { renderHeader(); renderSummary(); renderPropAcct(); renderTeam(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderCapital(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
+  function renderAll() { renderHeader(); renderSummary(); renderPropAcct(); renderTeam(); renderLondon(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderCapital(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
 
   async function load() {
     const [a, s, t] = await Promise.all([fetchFirst(SOURCES.academy), fetchFirst(SOURCES.state), fetchFirst(SOURCES.team)]);

@@ -105,6 +105,8 @@ function simulateChallenges(trades, rules, cfg, opts = {}) {
     passPctRange: [Math.min(...passes), Math.max(...passes)],
     failPct: Number(avg('failPct').toFixed(1)),
     timeoutPct: Number(avg('timeoutPct').toFixed(1)),
+    stuckPct: Number(avg('stuckPct').toFixed(1)),
+    lostPct: Number(avg('lostPct').toFixed(1)),
     medianDaysToPass: Math.round(avg('medianDaysToPass')) || null,
     passWithin90Pct: Number(avg('passWithin90Pct').toFixed(1)),
     passWithin180Pct: Number(avg('passWithin180Pct').toFixed(1)),
@@ -134,11 +136,17 @@ function simulateOnce(trades, rules, cfg, opts, seed) {
   for (let start = first; start + horizon + fundedMs <= last; start += step) {
     let ts = start;
     let outcome = 'PASS';
+    let stuck = false;
     const phaseDays = [];
     for (const target of rules.phases) {
       const r = runAccount(sorted, rules, cfg, { startTs: ts, endTs: start + horizon, target, initial });
       phaseDays.push((r.endTs - ts) / DAY);
-      if (r.outcome !== 'PASS') { outcome = r.outcome; ts = r.endTs; break; }
+      if (r.outcome !== 'PASS') {
+        outcome = r.outcome; ts = r.endTs;
+        // „blocat”: nu a picat formal, dar a rămas lângă limita totală, unde Gardianul mai permite doar poziții minuscule
+        stuck = r.outcome === 'TIMEOUT' && r.balance < initial * (1 - rules.maxLoss * 0.75);
+        break;
+      }
       ts = r.endTs;
     }
     let funded = null;
@@ -154,7 +162,7 @@ function simulateOnce(trades, rules, cfg, opts, seed) {
       }
       funded = { payout, survived: alive };
     }
-    runs.push({ start, outcome, daysToFinish: phaseDays.reduce((s, v) => s + v, 0), funded });
+    runs.push({ start, outcome, stuck, daysToFinish: phaseDays.reduce((s, v) => s + v, 0), funded });
   }
 
   const n = runs.length;
@@ -172,6 +180,9 @@ function simulateOnce(trades, rules, cfg, opts, seed) {
     passPct: Number((passProb * 100).toFixed(1)),
     failPct: Number((fail.length / Math.max(1, n) * 100).toFixed(1)),
     timeoutPct: Number(((n - pass.length - fail.length) / Math.max(1, n) * 100).toFixed(1)),
+    // practic pierdut: picat formal + blocat lângă limită (taxa e pierdută în ambele cazuri)
+    stuckPct: Number((runs.filter((r) => r.stuck).length / Math.max(1, n) * 100).toFixed(1)),
+    lostPct: Number(((fail.length + runs.filter((r) => r.stuck).length) / Math.max(1, n) * 100).toFixed(1)),
     medianDaysToPass: pass.length ? Math.round(med(pass.map((r) => r.daysToFinish))) : null,
     // cât de repede: procent din TOATE încercările care trec în ≤ 90 / 180 / 365 de zile
     passWithin90Pct: Number((pass.filter((r) => r.daysToFinish <= 90).length / Math.max(1, n) * 100).toFixed(1)),

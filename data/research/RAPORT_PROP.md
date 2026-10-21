@@ -1,6 +1,6 @@
 # Raport — Departamentul PROP (indici, grafic zilnic, 4 strategii candidate)
 
-Generat: 2026-10-20T18:30:35.118Z · 10 indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere
+Generat: 2026-10-21T01:09:19.769Z · 10 indici · walk-forward anual (antrenare 3 ani → test 1 an) · execuție prudentă: a doua zi la deschidere
 
 ## 1. Strategiile (out-of-sample)
 
@@ -18,12 +18,13 @@ Respinse după testare: Forex (fără avantaj real pe date Dukascopy), IBS (≈0
 
 ## 2. Șansele la examen (511 date de start, orizont 3 ani, apoi 12 luni pe contul finanțat)
 
-| Firmă | Risc | Trece | Pică | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |
+| Firmă | Risc | Trece | Pică + blocat lângă limită (taxa pierdută) | Zile mediane | Trece în ≤6 luni | Trece în ≤1 an | Taxă ~10k | Valoare așteptată |
 |---|---|---|---|---|---|---|---|---|
-| The5ers High Stakes 2-Step | 4% (siguranță 0.8, max 5 poz.) | **49%** | 4.6% | 188 | 23.4% | 40.7% | 95$ | 374$ |
-| FundedNext Stellar 2-Step | 4% (siguranță 0.8, max 5 poz.) | **48.3%** | 4.6% | 196 | 21.5% | 40% | 99$ | 343$ |
-| FTMO 1-Step | 4% (siguranță 0.8, max 5 poz.) | **51.1%** | 8.3% | 217 | 20.5% | 38.9% | 150$ | 263$ |
-| FTMO 2-Step (Swing) | 4% (siguranță 0.8, max 5 poz.) | **44.9%** | 4.9% | 216 | 17.2% | 35.1% | 170$ | 242$ |
+| FundingPips 2-Step | 4% (siguranță 0.8, max 5 poz.) | **49%** | 51% (4.6% + 46.4%) | 188 | 23.4% | 40.7% | 66$ | 403$ |
+| The5ers High Stakes 2-Step | 4% (siguranță 0.8, max 5 poz.) | **49%** | 51% (4.6% + 46.4%) | 188 | 23.4% | 40.7% | 78$ | 391$ |
+| FundedNext Stellar 2-Step | 4% (siguranță 0.8, max 5 poz.) | **48.3%** | 51.8% (4.6% + 47.2%) | 196 | 21.5% | 40% | 99$ | 343$ |
+| FTMO 1-Step | 4% (siguranță 0.8, max 5 poz.) | **51.1%** | 24.3% (8.3% + 16.1%) | 217 | 20.5% | 38.9% | 150$ | 263$ |
+| FTMO 2-Step (Swing) | 4% (siguranță 0.8, max 5 poz.) | **44.9%** | 55.1% (4.9% + 50.2%) | 216 | 17.2% | 35.1% | 170$ | 242$ |
 
 **Recomandare:** The5ers High Stakes 2-Step, risc 4% pe tranzacție, Gardianul Prop activ.
 

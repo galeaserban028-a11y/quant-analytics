@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T18:30:35.120Z",
+  "generatedAt": "2026-10-21T01:09:19.771Z",
   "nextSchool": "2026-11-01T02:30:00.000Z",
   "config": {
     "enabled": true,
@@ -1296,12 +1296,31 @@
       "maxOpen": 5,
       "passPct": 49,
       "failPct": 4.6,
+      "stuckPct": 46.4,
+      "lostPct": 51,
       "timeoutPct": 46.4,
       "medianDaysToPass": 188,
       "passWithin180Pct": 23.4,
       "passWithin365Pct": 40.7,
-      "fee": 95,
-      "ev": 374
+      "fee": 78,
+      "ev": 391
+    },
+    {
+      "key": "FUNDINGPIPS_2STEP",
+      "name": "FundingPips 2-Step",
+      "riskPct": 4,
+      "safety": 0.8,
+      "maxOpen": 5,
+      "passPct": 49,
+      "failPct": 4.6,
+      "stuckPct": 46.4,
+      "lostPct": 51,
+      "timeoutPct": 46.4,
+      "medianDaysToPass": 188,
+      "passWithin180Pct": 23.4,
+      "passWithin365Pct": 40.7,
+      "fee": 66,
+      "ev": 403
     },
     {
       "key": "FUNDEDNEXT_STELLAR_2STEP",
@@ -1311,6 +1330,8 @@
       "maxOpen": 5,
       "passPct": 48.3,
       "failPct": 4.6,
+      "stuckPct": 47.2,
+      "lostPct": 51.8,
       "timeoutPct": 47.2,
       "medianDaysToPass": 196,
       "passWithin180Pct": 21.5,
@@ -1326,6 +1347,8 @@
       "maxOpen": 5,
       "passPct": 51.1,
       "failPct": 8.3,
+      "stuckPct": 16.1,
+      "lostPct": 24.3,
       "timeoutPct": 40.7,
       "medianDaysToPass": 217,
       "passWithin180Pct": 20.5,
@@ -1341,6 +1364,8 @@
       "maxOpen": 5,
       "passPct": 44.9,
       "failPct": 4.9,
+      "stuckPct": 50.2,
+      "lostPct": 55.1,
       "timeoutPct": 50.3,
       "medianDaysToPass": 216,
       "passWithin180Pct": 17.2,
@@ -1356,7 +1381,7 @@
       "safety": 0.8,
       "maxOpen": 5
     },
-    "fee": 95,
+    "fee": 78,
     "challengeMonth": {
       "months": 1224,
       "p10": -602,
@@ -1398,7 +1423,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
           "cumPayoutAvg": 0,
-          "netAvg": -95
+          "netAvg": -78
         },
         {
           "month": 2,
@@ -1410,7 +1435,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
           "cumPayoutAvg": 0,
-          "netAvg": -95
+          "netAvg": -78
         },
         {
           "month": 3,
@@ -1422,7 +1447,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
           "cumPayoutAvg": 0,
-          "netAvg": -95
+          "netAvg": -78
         },
         {
           "month": 4,
@@ -1434,7 +1459,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
           "cumPayoutAvg": 5,
-          "netAvg": -90
+          "netAvg": -73
         },
         {
           "month": 5,
@@ -1446,7 +1471,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
           "cumPayoutAvg": 13,
-          "netAvg": -82
+          "netAvg": -65
         },
         {
           "month": 6,
@@ -1458,7 +1483,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
           "cumPayoutAvg": 36,
-          "netAvg": -59
+          "netAvg": -42
         },
         {
           "month": 7,
@@ -1470,7 +1495,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 0,
           "cumPayoutAvg": 58,
-          "netAvg": -37
+          "netAvg": -20
         },
         {
           "month": 8,
@@ -1482,7 +1507,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 309,
           "cumPayoutAvg": 81,
-          "netAvg": -14
+          "netAvg": 3
         },
         {
           "month": 9,
@@ -1494,7 +1519,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 502,
           "cumPayoutAvg": 111,
-          "netAvg": 16
+          "netAvg": 33
         },
         {
           "month": 10,
@@ -1506,7 +1531,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 634,
           "cumPayoutAvg": 139,
-          "netAvg": 44
+          "netAvg": 61
         },
         {
           "month": 11,
@@ -1518,7 +1543,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 674,
           "cumPayoutAvg": 166,
-          "netAvg": 71
+          "netAvg": 88
         },
         {
           "month": 12,
@@ -1530,7 +1555,7 @@
           "cumPayoutMedian": 0,
           "cumPayoutP90": 699,
           "cumPayoutAvg": 195,
-          "netAvg": 100
+          "netAvg": 117
         }
       ]
     }
