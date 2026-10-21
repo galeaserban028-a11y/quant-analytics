@@ -440,5 +440,16 @@
     "recent": {},
     "initialized": true
   },
-  "savedAt": "2026-10-21T00:32:17.144Z"
+  "fxLondon": {
+    "v": 1,
+    "startedAt": 1792545128919,
+    "trades": [],
+    "skips": {},
+    "settled": {},
+    "graduated": null,
+    "paused": false,
+    "sentPlan": {},
+    "sentClose": {}
+  },
+  "savedAt": "2026-10-21T01:12:08.926Z"
 }
