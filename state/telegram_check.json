@@ -1,12 +1,14 @@
 {
-  "at": "2026-10-21T09:36:46.745Z",
+  "at": "2026-10-21T09:44:19.948Z",
   "tokenPresent": true,
-  "tokenHadSpaces": false,
+  "tokenHadSpaces": true,
   "tokenFormatOk": true,
   "chatPresent": true,
   "chatHadSpaces": false,
   "chatLooksNumeric": true,
-  "tokenValid": false,
-  "botUsername": null,
-  "getMeError": "Unauthorized"
+  "tokenValid": true,
+  "botUsername": "@SniperulMeubot",
+  "getMeError": null,
+  "sendOk": false,
+  "sendError": "Forbidden: the bot can't send messages to the bot"
 }
