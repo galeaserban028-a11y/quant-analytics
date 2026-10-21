@@ -89,13 +89,14 @@ def day_minutes(pair, y, m0, d, side):
     return parse_bi5(fetch(url), start, pair)
 
 
-def download_m15(pair, y0, y1, now=None):
+def download_m15(pair, y0, y1, now=None, month=None):
     """Lumânări de 15 minute (mid = media bid/ask, spread = ask − bid la închidere), din fișierele zilnice cu minute.
     Sare peste weekend și peste ziua de azi; o zi lipsă nu oprește descărcarea."""
     now = now or dt.datetime.now(dt.timezone.utc)
     out = {}
-    d = dt.date(y0, 1, 1)
-    end = min(dt.date(y1, 12, 31), now.date() - dt.timedelta(days=1))
+    d = dt.date(y0, month or 1, 1)
+    last = dt.date(y1, 12, 31) if not month else (dt.date(y0 + (month == 12), month % 12 + 1, 1) - dt.timedelta(days=1))
+    end = min(last, now.date() - dt.timedelta(days=1))
     while d <= end:
         if d.weekday() < 5 or d.weekday() == 6:  # duminică seara se deschide piața
             sides = {}
@@ -348,6 +349,7 @@ def main(argv=None):
     ap.add_argument('--out', default='data/fx/dk')
     ap.add_argument('--since', default='', help='YYYY-MM: descarcă doar de la luna aceasta încoace (implică --merge)')
     ap.add_argument('--merge', action='store_true', help='lipește anii descărcați peste fișierul existent (pentru actualizarea lunară)')
+    ap.add_argument('--month', type=int, default=0, help='m15: doar luna aceasta (1–12) din anul --from')
     ap.add_argument('--part', action='store_true', help='h1: scrie bucata de ani în h1/PERECHE_ANUL.csv.gz')
     ap.add_argument('--tf', default='d1', choices=['d1', 'h1', 'm15'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
     a = ap.parse_args(argv)
@@ -380,12 +382,12 @@ def main(argv=None):
                 ok += 1
                 continue
             if a.tf == 'm15':
-                rows = download_m15(p, a.y0, a.y1)
-                if len(rows) < 1000:
+                rows = download_m15(p, a.y0, a.y1, month=a.month or None)
+                if len(rows) < (100 if a.month else 1000):
                     print(f'::error::{p}: prea puține lumânări M15 ({len(rows)})')
                     continue
                 dec = 3 if (p.endswith('JPY') or 'IDX' in p) else 5
-                write_csv_gz(os.path.join(a.out, 'm15', f'{p}_{a.y0}.csv.gz'), rows, dec + 1)
+                write_csv_gz(os.path.join(a.out, 'm15', f'{p}_{a.y0}' + (f'_{a.month:02d}' if a.month else '') + '.csv.gz'), rows, dec + 1)
                 print(f'::notice::{p}: {len(rows)} lumânări M15 ({a.y0}–{a.y1}) în {time.time() - t0:.0f}s')
                 ok += 1
                 continue

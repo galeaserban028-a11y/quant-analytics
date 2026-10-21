@@ -1,5 +1,5 @@
 # Istoric pe 15 MINUTE de la Dukascopy (din minute, bid/ask reale), pentru cercetarea de scalping.
-# Fișierele cu minute sunt zilnice (2 pe zi), deci lucrăm pe câte un an per job; fiecare an se salvează singur.
+# Rapid: câte O LUNĂ pe job, până la 20 de joburi în paralel; fiecare lună se salvează imediat.
 name: APEX date M15 (scalping)
 
 on:
@@ -9,10 +9,14 @@ on:
         description: 'Instrumente'
         required: false
         default: 'EURUSD,GBPUSD,USA500IDXUSD,DEUIDXEUR'
-      years:
-        description: 'Anii'
+      from:
+        description: 'Prima lună (AAAA-LL)'
         required: false
-        default: '2022,2023,2024,2025'
+        default: '2022-01'
+      to:
+        description: 'Ultima lună (AAAA-LL)'
+        required: false
+        default: '2025-12'
 
 permissions:
   contents: write
@@ -22,37 +26,46 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pairs: ${{ steps.p.outputs.pairs }}
-      years: ${{ steps.p.outputs.years }}
+      months: ${{ steps.p.outputs.months }}
     steps:
       - id: p
         run: |
           echo "pairs=$(echo '${{ github.event.inputs.pairs }}' | python3 -c 'import sys,json; print(json.dumps([x.strip() for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
-          echo "years=$(echo '${{ github.event.inputs.years }}' | python3 -c 'import sys,json; print(json.dumps([int(x) for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
+          echo "months=$(python3 -c "
+          import json
+          a,b='${{ github.event.inputs.from }}','${{ github.event.inputs.to }}'
+          y,m=map(int,a.split('-')); Y,Mo=map(int,b.split('-')); out=[]
+          while (y,m)<=(Y,Mo):
+              out.append(f'{y}-{m:02d}'); m+=1
+              if m==13: y,m=y+1,1
+          print(json.dumps(out))")" >> "$GITHUB_OUTPUT"
   fetch:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: 340
+    timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 20
       matrix:
         pair: ${{ fromJSON(needs.plan.outputs.pairs) }}
-        year: ${{ fromJSON(needs.plan.outputs.years) }}
+        month: ${{ fromJSON(needs.plan.outputs.months) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Descarcă ${{ matrix.pair }} ${{ matrix.year }} (M15)
+      - name: Descarcă ${{ matrix.pair }} ${{ matrix.month }} (M15)
         env:
-          DK_PACE: '1.5'
-        run: python3 scripts/dukascopy.py --tf m15 --pairs ${{ matrix.pair }} --from ${{ matrix.year }} --to ${{ matrix.year }} --out data/fx/dk
+          DK_PACE: '1.0'
+        run: |
+          Y=${{ matrix.month }}; Y=${Y%-*}; M=${{ matrix.month }}; M=$((10#${M#*-}))
+          python3 scripts/dukascopy.py --tf m15 --pairs ${{ matrix.pair }} --from $Y --to $Y --month $M --out data/fx/dk
       - name: Salvează
         run: |
           git config user.name "apex-bot"
           git config user.email "apex-bot@users.noreply.github.com"
           git add data/fx/dk/m15
           if git diff --cached --quiet; then echo "Nimic nou."; exit 0; fi
-          git commit -m "date M15 Dukascopy ${{ matrix.pair }} ${{ matrix.year }}"
-          for i in 1 2 3 4 5 6 7 8; do git pull --rebase && git push && exit 0; sleep $((RANDOM % 20 + 5)); done
+          git commit -m "date M15 ${{ matrix.pair }} ${{ matrix.month }}"
+          for i in $(seq 1 15); do git pull --rebase && git push && exit 0; sleep $((RANDOM % 30 + 5)); done
           exit 1
