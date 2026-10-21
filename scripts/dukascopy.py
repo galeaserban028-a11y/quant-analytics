@@ -89,6 +89,38 @@ def day_minutes(pair, y, m0, d, side):
     return parse_bi5(fetch(url), start, pair)
 
 
+def download_m15(pair, y0, y1, now=None):
+    """Lumânări de 15 minute (mid = media bid/ask, spread = ask − bid la închidere), din fișierele zilnice cu minute.
+    Sare peste weekend și peste ziua de azi; o zi lipsă nu oprește descărcarea."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    out = {}
+    d = dt.date(y0, 1, 1)
+    end = min(dt.date(y1, 12, 31), now.date() - dt.timedelta(days=1))
+    while d <= end:
+        if d.weekday() < 5 or d.weekday() == 6:  # duminică seara se deschide piața
+            sides = {}
+            for side in ('BID', 'ASK'):
+                try:
+                    sides[side] = day_minutes(pair, d.year, d.month - 1, d.day, side)
+                except Exception as e:
+                    print(f'::warning::{pair} {d} {side}: {e}')
+                    sides[side] = []
+            bid = {r[0]: r for r in sides['BID']}
+            ask = {r[0]: r for r in sides['ASK']}
+            for t in sorted(set(bid) & set(ask)):
+                b, a = bid[t], ask[t]
+                k = t - t % 900
+                mid = ((b[1] + a[1]) / 2, (b[2] + a[2]) / 2, (b[3] + a[3]) / 2, (b[4] + a[4]) / 2)
+                sp = max(0.0, a[4] - b[4])
+                x = out.get(k)
+                if x is None:
+                    out[k] = [k, mid[0], mid[1], mid[2], mid[3], sp, 1]
+                else:
+                    x[2] = max(x[2], mid[1]); x[3] = min(x[3], mid[2]); x[4] = mid[3]; x[5] += sp; x[6] += 1
+        d += dt.timedelta(days=1)
+    return [[k * 1000, x[1], x[2], x[3], x[4], x[5] / x[6]] for k, x in sorted(out.items())]
+
+
 def to_utc_days(rows):
     """Lumânări mai mici (ore/minute) → lumânări zilnice UTC, în același format ca fișierele anuale."""
     days = {}
@@ -317,7 +349,7 @@ def main(argv=None):
     ap.add_argument('--since', default='', help='YYYY-MM: descarcă doar de la luna aceasta încoace (implică --merge)')
     ap.add_argument('--merge', action='store_true', help='lipește anii descărcați peste fișierul existent (pentru actualizarea lunară)')
     ap.add_argument('--part', action='store_true', help='h1: scrie bucata de ani în h1/PERECHE_ANUL.csv.gz')
-    ap.add_argument('--tf', default='d1', choices=['d1', 'h1'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
+    ap.add_argument('--tf', default='d1', choices=['d1', 'h1', 'm15'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
     a = ap.parse_args(argv)
     pairs = PAIRS if a.all else [p.strip().upper() for p in a.pairs.split(',') if p.strip()]
     ok = 0
@@ -345,6 +377,16 @@ def main(argv=None):
                 first = dt.datetime.fromtimestamp(d1[0][0] / 1000, dt.timezone.utc).date()
                 last = dt.datetime.fromtimestamp(d1[-1][0] / 1000, dt.timezone.utc).date()
                 print(f'::notice::{p}: {len(d1)} zile ({first} → {last}) în {time.time() - t0:.0f}s')
+                ok += 1
+                continue
+            if a.tf == 'm15':
+                rows = download_m15(p, a.y0, a.y1)
+                if len(rows) < 1000:
+                    print(f'::error::{p}: prea puține lumânări M15 ({len(rows)})')
+                    continue
+                dec = 3 if (p.endswith('JPY') or 'IDX' in p) else 5
+                write_csv_gz(os.path.join(a.out, 'm15', f'{p}_{a.y0}.csv.gz'), rows, dec + 1)
+                print(f'::notice::{p}: {len(rows)} lumânări M15 ({a.y0}–{a.y1}) în {time.time() - t0:.0f}s')
                 ok += 1
                 continue
             hours = download_pair(p, a.y0, a.y1)

@@ -1,0 +1,58 @@
+# Istoric pe 15 MINUTE de la Dukascopy (din minute, bid/ask reale), pentru cercetarea de scalping.
+# Fișierele cu minute sunt zilnice (2 pe zi), deci lucrăm pe câte un an per job; fiecare an se salvează singur.
+name: APEX date M15 (scalping)
+
+on:
+  workflow_dispatch:
+    inputs:
+      pairs:
+        description: 'Instrumente'
+        required: false
+        default: 'EURUSD,GBPUSD,USA500IDXUSD,DEUIDXEUR'
+      years:
+        description: 'Anii'
+        required: false
+        default: '2022,2023,2024,2025'
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      pairs: ${{ steps.p.outputs.pairs }}
+      years: ${{ steps.p.outputs.years }}
+    steps:
+      - id: p
+        run: |
+          echo "pairs=$(echo '${{ github.event.inputs.pairs }}' | python3 -c 'import sys,json; print(json.dumps([x.strip() for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
+          echo "years=$(echo '${{ github.event.inputs.years }}' | python3 -c 'import sys,json; print(json.dumps([int(x) for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
+  fetch:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        pair: ${{ fromJSON(needs.plan.outputs.pairs) }}
+        year: ${{ fromJSON(needs.plan.outputs.years) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Descarcă ${{ matrix.pair }} ${{ matrix.year }} (M15)
+        env:
+          DK_PACE: '1.5'
+        run: python3 scripts/dukascopy.py --tf m15 --pairs ${{ matrix.pair }} --from ${{ matrix.year }} --to ${{ matrix.year }} --out data/fx/dk
+      - name: Salvează
+        run: |
+          git config user.name "apex-bot"
+          git config user.email "apex-bot@users.noreply.github.com"
+          git add data/fx/dk/m15
+          if git diff --cached --quiet; then echo "Nimic nou."; exit 0; fi
+          git commit -m "date M15 Dukascopy ${{ matrix.pair }} ${{ matrix.year }}"
+          for i in 1 2 3 4 5 6 7 8; do git pull --rebase && git push && exit 0; sleep $((RANDOM % 20 + 5)); done
+          exit 1
