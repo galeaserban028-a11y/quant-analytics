@@ -98,6 +98,8 @@ function formatTrendExit(symbol, inst, closed) {
  */
 function sendTelegram(text, { enabled = false, token = process.env.TELEGRAM_TOKEN, chatId = process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID } = {}) {
   return new Promise((resolve) => {
+    token = token ? String(token).trim() : token; // spațiile sau rândurile noi lipite din greșeală în secrete
+    chatId = chatId ? String(chatId).trim() : chatId;
     if (!enabled || !token || !chatId) return resolve({ sent: false, mode: 'DRY_RUN' });
     const payload = JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true });
     const req = https.request(`https://api.telegram.org/bot${token}/sendMessage`, {
