@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Bucla live: rulează câte un ciclu (node src/cron.js) la fiecare 5 minute, până aproape de limita de 6 ore a unui
+# Bucla live: rulează câte un ciclu (node src/cron.js) la fiecare minut, până aproape de limita de 6 ore a unui
 # job GitHub, salvând starea după fiecare ciclu. La final, workflow-ul se repornește singur.
 # Înainte de fiecare ciclu aduce ultimele modificări (config, rezultatele școlii lunare, cod nou).
 set -u
-INTERVAL=${LOOP_INTERVAL:-300}
+INTERVAL=${LOOP_INTERVAL:-60}   # un ciclu pe minut (datele se descarcă tot doar după închiderea burselor)
 END=$(( $(date +%s) + ${LOOP_SECONDS:-20400} ))   # ~5h40m
 git config user.name "apex-bot"
 git config user.email "apex-bot@users.noreply.github.com"
