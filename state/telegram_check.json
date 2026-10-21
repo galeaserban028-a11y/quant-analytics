@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-21T10:00:59.381Z",
+  "at": "2026-10-21T10:02:21.513Z",
   "tokenPresent": true,
   "tokenHadSpaces": true,
   "tokenFormatOk": true,
@@ -9,7 +9,15 @@
   "tokenValid": true,
   "botUsername": "@SniperulMeubot",
   "getMeError": null,
-  "chatSource": "negăsit (trimite /start botului)",
-  "sendOk": false,
-  "sendError": "nicio conversație privată găsită"
+  "webhookSet": false,
+  "updatesOk": true,
+  "updatesError": null,
+  "updatesCount": 1,
+  "updateKinds": [
+    "message"
+  ],
+  "privateChatsSeen": 1,
+  "chatSource": "găsit automat din conversația cu botul",
+  "sendOk": true,
+  "sendError": null
 }
