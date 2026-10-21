@@ -35,8 +35,11 @@ function call(method, token, body) {
     out.botUsername = me.json && me.json.ok ? '@' + me.json.result.username : null;
     out.getMeError = me.json && !me.json.ok ? me.json.description : (me.error || null);
   }
-  if (token && chat && out.tokenValid) {
-    const r = await call('sendMessage', token, { chat_id: chat, text: '✅ Test APEX: legătura cu Telegram funcționează. De acum primești aici semnalele.' });
+  if (token && out.tokenValid) {
+    const { resolveChatId } = require('../src/notify/telegram');
+    const useChat = await resolveChatId(token, chat);
+    out.chatSource = !useChat ? 'negăsit (trimite /start botului)' : (useChat === chat ? 'secretul TELEGRAM_CHAT_ID' : 'găsit automat din conversația cu botul');
+    const r = useChat ? await call('sendMessage', token, { chat_id: useChat, text: '✅ Test APEX: legătura cu Telegram funcționează. De acum primești aici semnalele.' }) : { json: { ok: false, description: 'nicio conversație privată găsită' } };
     out.sendOk = Boolean(r.json && r.json.ok);
     out.sendError = r.json && !r.json.ok ? r.json.description : (r.error || null);
   }

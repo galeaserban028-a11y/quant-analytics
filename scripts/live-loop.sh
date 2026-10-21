@@ -13,7 +13,7 @@ while [ "$(date +%s)" -lt "$END" ]; do
   n=$((n + 1))
   git pull -q --rebase --autostash origin main || echo "::warning::git pull a eșuat la ciclul $n"
   if ! timeout 240 node src/cron.js; then echo "::warning::ciclul $n a eșuat (continuăm)"; fi
-  git add state/live_state.json
+  git add state/live_state.json; [ -f state/telegram_chat.enc ] && git add state/telegram_chat.enc
   if ! git diff --cached --quiet; then
     git commit -q -m "stare live $(date -u +%Y-%m-%dT%H:%MZ)"
     for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q origin main && break; sleep $((RANDOM % 10 + 3)); done

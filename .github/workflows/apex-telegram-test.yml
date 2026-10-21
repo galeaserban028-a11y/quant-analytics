@@ -24,6 +24,6 @@ jobs:
         run: |
           git config user.name "apex-bot"
           git config user.email "apex-bot@users.noreply.github.com"
-          git add state/telegram_check.json
+          git add state/telegram_check.json state/telegram_chat.enc 2>/dev/null || git add state/telegram_check.json
           git commit -m "test Telegram $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for i in 1 2 3 4 5; do git pull --rebase && git push && exit 0; sleep 5; done

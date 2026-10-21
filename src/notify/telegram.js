@@ -93,13 +93,69 @@ function formatTrendExit(symbol, inst, closed) {
   return `⏹️ <b>${escapeHtml(symbol)}</b> trend: IEȘIRE (${why}) @ <code>${fmt(closed.exitPrice, d)}</code> — ${r}`;
 }
 
+/* ID-ul de chat găsit automat: dacă TELEGRAM_CHAT_ID lipsește sau nu e un număr (ex. a fost pus numele botului),
+ * îl luăm din ultima conversație privată cu botul (după ce utilizatorul i-a trimis /start) și îl păstrăm CRIPTAT
+ * cu o cheie derivată din token: în repo-ul public, fără token nu poate fi citit. */
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const CHAT_FILE = process.env.TELEGRAM_CHAT_FILE || path.join(__dirname, '..', '..', 'state', 'telegram_chat.enc');
+const keyOf = (token) => crypto.createHash('sha256').update('apex-chat|' + token).digest();
+function saveChat(token, chatId, file = CHAT_FILE) {
+  const iv = crypto.randomBytes(12);
+  const c = crypto.createCipheriv('aes-256-gcm', keyOf(token), iv);
+  const enc = Buffer.concat([c.update(String(chatId), 'utf8'), c.final()]);
+  fs.writeFileSync(file, [iv, c.getAuthTag(), enc].map((b) => b.toString('base64')).join('.') + '\n');
+}
+function loadChat(token, file = CHAT_FILE) {
+  try {
+    const [iv, tag, enc] = fs.readFileSync(file, 'utf8').trim().split('.').map((x) => Buffer.from(x, 'base64'));
+    const d = crypto.createDecipheriv('aes-256-gcm', keyOf(token), iv);
+    d.setAuthTag(tag);
+    return Buffer.concat([d.update(enc), d.final()]).toString('utf8');
+  } catch (_) { return null; }
+}
+function apiGet(token, method) {
+  return new Promise((resolve) => {
+    const req = https.get(`https://api.telegram.org/bot${token}/${method}`, { timeout: 10000 }, (res) => {
+      let b = ''; res.on('data', (c) => { b += c; }); res.on('end', () => { try { resolve(JSON.parse(b)); } catch (_) { resolve(null); } });
+    });
+    req.on('timeout', () => req.destroy(new Error('TIMEOUT')));
+    req.on('error', () => resolve(null));
+  });
+}
+/** ID-ul ultimei conversații private cu botul (din mesajele primite în ultimele 24 de ore), sau null. */
+async function detectChat(token) {
+  const u = await apiGet(token, 'getUpdates');
+  if (!u || !u.ok || !Array.isArray(u.result)) return null;
+  for (let i = u.result.length - 1; i >= 0; i--) {
+    const m = u.result[i].message || u.result[i].edited_message || u.result[i].my_chat_member;
+    const chat = m && m.chat;
+    if (chat && chat.type === 'private' && !(m.from && m.from.is_bot)) return String(chat.id);
+  }
+  return null;
+}
+const memo = new Map();
+async function resolveChatId(token, configured) {
+  const c = configured ? String(configured).trim() : '';
+  if (/^-?\d+$/.test(c) && !token.startsWith(c + ':')) return c; // număr valid și nu e ID-ul botului
+  if (memo.has(token)) return memo.get(token);
+  let id = loadChat(token);
+  if (!id) {
+    id = await detectChat(token);
+    if (id) { try { saveChat(token, id); } catch (_) { /* fără salvare: îl găsim din nou data viitoare */ } }
+  }
+  if (id) memo.set(token, id);
+  return id;
+}
+
 /**
  * Trimite un mesaj. Implicit DRY-RUN: trimite cu adevărat doar dacă enabled=true ȘI există token + chat id.
  */
-function sendTelegram(text, { enabled = false, token = process.env.TELEGRAM_TOKEN, chatId = process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID } = {}) {
+async function sendTelegram(text, { enabled = false, token = process.env.TELEGRAM_TOKEN, chatId = process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID } = {}) {
+  token = token ? String(token).trim() : token; // spațiile sau rândurile noi lipite din greșeală în secrete
+  if (enabled && token) chatId = await resolveChatId(token, chatId);
   return new Promise((resolve) => {
-    token = token ? String(token).trim() : token; // spațiile sau rândurile noi lipite din greșeală în secrete
-    chatId = chatId ? String(chatId).trim() : chatId;
     if (!enabled || !token || !chatId) return resolve({ sent: false, mode: 'DRY_RUN' });
     const payload = JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true });
     const req = https.request(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -118,4 +174,4 @@ function sendTelegram(text, { enabled = false, token = process.env.TELEGRAM_TOKE
   });
 }
 
-module.exports = { roTime, escapeHtml, formatSignal, formatEvent, sendTelegram, formatTrendEntry, formatTrendTrail, formatTrendExit };
+module.exports = { resolveChatId, detectChat, saveChat, loadChat, roTime, escapeHtml, formatSignal, formatEvent, sendTelegram, formatTrendEntry, formatTrendTrail, formatTrendExit };
