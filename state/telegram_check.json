@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-21T09:36:13.711Z",
+  "tokenPresent": true,
+  "tokenHadSpaces": false,
+  "tokenFormatOk": true,
+  "chatPresent": true,
+  "chatHadSpaces": true,
+  "chatLooksNumeric": true,
+  "tokenValid": false,
+  "botUsername": null,
+  "getMeError": "Unauthorized"
+}
