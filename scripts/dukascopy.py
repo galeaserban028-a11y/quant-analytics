@@ -35,8 +35,8 @@ REC = struct.Struct('>iiiiif')
 
 def scale(pair):
     # indicii CFD Dukascopy (ex. USA500IDXUSD, DEUIDXEUR) au prețuri cu 3 zecimale
-    if 'IDX' in pair:
-        return 1000.0
+    if 'IDX' in pair or pair.startswith('XAU') or pair.startswith('XAG'):
+        return 1000.0  # aurul și argintul au și ele 3 zecimale la Dukascopy
     return 1000.0 if pair.endswith('JPY') else 100000.0
 
 
@@ -386,7 +386,7 @@ def main(argv=None):
                 if len(rows) < (100 if a.month else 1000):
                     print(f'::error::{p}: prea puține lumânări M15 ({len(rows)})')
                     continue
-                dec = 3 if (p.endswith('JPY') or 'IDX' in p) else 5
+                dec = 3 if (p.endswith('JPY') or 'IDX' in p or p.startswith('XA')) else 5
                 write_csv_gz(os.path.join(a.out, 'm15', f'{p}_{a.y0}' + (f'_{a.month:02d}' if a.month else '') + '.csv.gz'), rows, dec + 1)
                 print(f'::notice::{p}: {len(rows)} lumânări M15 ({a.y0}–{a.y1}) în {time.time() - t0:.0f}s')
                 ok += 1
