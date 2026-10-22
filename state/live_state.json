@@ -95,7 +95,7 @@
       "USDJPY": 158.26800537109375,
       "AUDUSD": 0.6982800960540771
     },
-    "fxFetchedAt": 1792694825812
+    "fxFetchedAt": 1792698203435
   },
   "fx": null,
   "fxVirtual": {
@@ -674,5 +674,5 @@
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-22T19:32:07.245Z"
+  "savedAt": "2026-10-22T19:43:24.263Z"
 }
