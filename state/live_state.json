@@ -1099,13 +1099,41 @@
   "orb": {
     "v": 1,
     "startedAt": 1792754700784,
-    "trades": [],
+    "trades": [
+      {
+        "sym": "SPX500",
+        "day": "2026-10-23",
+        "live": false,
+        "direction": "LONG",
+        "entry": 7637.18017578125,
+        "stop": 7615.68994140625,
+        "exit": 7615.68994140625,
+        "outcome": "STOP",
+        "resultR": -1.0372,
+        "enteredAt": 1792764000000
+      },
+      {
+        "sym": "NAS100",
+        "day": "2026-10-23",
+        "live": false,
+        "direction": "LONG",
+        "entry": 29005.447265625,
+        "stop": 28830.16796875,
+        "exit": 29044.568359375,
+        "outcome": "TIME",
+        "resultR": 0.2089,
+        "enteredAt": 1792764000000
+      }
+    ],
     "skips": {},
-    "settled": {},
+    "settled": {
+      "SPX500": "2026-10-23",
+      "NAS100": "2026-10-23"
+    },
     "graduated": null,
     "paused": false,
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-23T20:00:38.338Z"
+  "savedAt": "2026-10-23T20:15:38.091Z"
 }
