@@ -52,13 +52,27 @@ async function main() {
   const bus = new MarketStateBus(config, { snapshotPath: STATE_PATH });
   const st = bus.state.trend;
   const sent = [];
-  const notify = async (text) => {
+  // Ore liniștite: între 23:00 și 08:00 (ora României) mesajele obișnuite așteaptă și pleacă la 08:00.
+  // Alertele urgente (🚨 ⛔ ⚠️) pleacă oricând. Intrările sunt oricum pentru deschiderea bursei de a doua zi.
+  const roHour = roHourAndDate(now).hour;
+  const quiet = roHour >= 23 || roHour < 8;
+  st.outbox = st.outbox || [];
+  const send = async (text) => {
     const res = await sendTelegram(text, { enabled: LIVE });
     sent.push(res.sent ? 'trimis' : (res.mode || res.statusCode));
     console.log(`[telegram ${res.sent ? 'OK' : (res.mode || res.statusCode)}] ${text.replace(/<[^>]+>/g, '').split('\n')[0]}`);
     if (LIVE && !res.sent) console.log('  eroare Telegram:', res.body || res.error || '');
     return res;
   };
+  const notify = async (text) => {
+    if (quiet && !/[🚨⛔⚠️]/u.test(text.slice(0, 4))) { st.outbox.push({ at: now, text }); console.log(`[telegram AMÂNAT până la 08:00] ${text.replace(/<[^>]+>/g, '').split('\n')[0]}`); return { sent: true, queued: true }; }
+    return send(text);
+  };
+  if (!quiet && st.outbox.length && LIVE && process.env.TELEGRAM_TOKEN) {
+    const box = st.outbox.splice(0, st.outbox.length);
+    await send(`📬 <b>Mesajele din timpul nopții (${box.length})</b>. Intrările sunt pentru deschiderea bursei de azi.`);
+    for (let i = 0; i < box.length; i++) { const r = await send(box[i].text); if (!r.sent) { st.outbox = box.slice(i).concat(st.outbox); break; } }
+  }
 
   // Datele Forex se descarcă o singură dată pe rulare și se împart între Academia reală și APEX Capital (fictiv)
   const fxMemo = new Map();

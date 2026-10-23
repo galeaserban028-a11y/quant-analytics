@@ -36,6 +36,9 @@ const D1_DIR = path.join(DATA_DIR, 'fx', 'd1');
 const INSTRUMENTS = require('../../config/forex_instruments.json');
 const DAY = 864e5;
 const UNIVERSE = ['INDEX'];
+// Japonia și Australia se deschid noaptea în România (01:00–02:00), iar testele presupun intrarea la deschidere:
+// semnalele lor nu pot fi executate cum au fost testate. Fără ele: trece ~50% (vs 47%), puțin mai lent (testat 23 oct. 2026).
+const EXCLUDE = ['JP225', 'AUS200'];
 // Banca: judecată pe ultimii 5 ani (testat walk-forward pe 20 oct. 2026 față de 3 ani: aceeași valoare așteptată,
 // trecere 53% vs 48%, picare 2,3% vs 3,7%, median 240 vs 251 zile; o fereastră mai lungă = mai puțin zgomot).
 const BENCH_RULE = { years: 5, belowR: -0.05, minTrades: 15 };
@@ -183,7 +186,7 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   const data = {};
   for (const [s, inst] of Object.entries(INSTRUMENTS)) {
-    if (s.startsWith('_') || !UNIVERSE.includes(inst.category)) continue;
+    if (s.startsWith('_') || !UNIVERSE.includes(inst.category) || EXCLUDE.includes(s)) continue;
     try {
       const c = await loadDaily(s, inst, Boolean(args.refresh));
       if (c.length > 1500) data[s] = c; else console.log(`  ${s}: prea puține date (${c.length})`);

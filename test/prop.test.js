@@ -352,7 +352,7 @@ test('live: pornire tăcută → semnal nou cu lot și stop → mesaj de ieșire
   assert.ok(r.events[0].lots >= 0.01);
   assert.ok(r.events[0].riskUsd <= 300 + 1e-6, 'riscul nu depășește 3% din cont');
   assert.match(msgs[1], /BUY EURUSD<\/b>/);
-  assert.match(msgs[1], /Entry: <b>[\d.]+<\/b>\nSL: <b>[\d.]+<\/b>/);
+  assert.match(msgs[1], /Entry: la prețul pieței \(referință [\d.]+\)\nSL: <b>[\d.]+<\/b>/);
   assert.match(msgs[1], /Lot: <b>\d+\.\d\d<\/b>/);
   assert.match(msgs[1], /TF: D1/);
   assert.match(msgs[1], /risc [\d.]+ \$/);
@@ -878,4 +878,38 @@ test('laborator: exitMode „upclose” iese la prima închidere pe plus; implic
   assert.equal(r.exit(229, { dir: 'LONG' }), true);
   const own = lab.makeRules(up, { kind: 'rsi2', trendLen: 200, entryRsi: 20, exitLen: 5, stopAtr: 2 });
   assert.equal(typeof own.exit, 'function');
+});
+
+test('live: o sursă de date rămasă în urmă (o zi mai veche) e ignorată: fără intrări sau ieșiri false', async () => {
+  const { config, bus, msgs, notify } = liveFixture();
+  config.propDesk.symbols = ['GER40'];
+  config.propDesk.strategies = [{ kind: 'down', name: '3 zile de scădere', params: { trendLen: 200, nDays: 3, exitLen: 3, stopAtr: 2, maxDays: 10 } }];
+  const base = pullbackSeries().map((b) => ({ timestamp: b.timestamp + 7 * 3600e3, open: b.open * 15000, high: b.high * 15000, low: b.low * 15000, close: b.close * 15000, volume: 0 }));
+  const lastB = base[base.length - 1];
+  const third = { timestamp: lastB.timestamp + DAY, open: lastB.close, high: lastB.close + 10, low: lastB.close - 160, close: lastB.close - 150, volume: 0 };
+  const bars = base.concat([third]);
+  const eur = Array.from({ length: 5 }, (_, k) => ({ timestamp: T0 + k * DAY, open: 1.1, high: 1.1, low: 1.1, close: 1.1, volume: 0 }));
+  const fetch = async (sym) => (sym === 'EURUSD' ? { candles: eur } : { candles: fetch.n.map((b) => Object.assign({}, b)) });
+  const closeLast = ds.sessionCloseUtc(third.timestamp, INSTR.GER40);
+  fetch.n = bars.slice(0, -2);
+  await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast - 2 * DAY + 20 * 60e3, env: {} });
+  fetch.n = bars;
+  const r1 = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast + 15 * 60e3, env: {} });
+  assert.equal(r1.events.filter((e) => e.event === 'ENTRY').length, 1, 'semnalul real');
+  const n = msgs.length;
+  fetch.n = bars.slice(0, -1); // sursa de rezervă, cu o zi în urmă
+  const r2 = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast + 3 * 3600e3, env: {} });
+  assert.equal(r2.events.length, 0, JSON.stringify(r2.events));
+  assert.equal(msgs.length, n, 'niciun mesaj fals');
+  assert.equal(Object.keys(bus.state.prop.positions).length, 1, 'poziția rămâne');
+  fetch.n = bars; // sursa principală revine
+  const r3 = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast + 6 * 3600e3, env: {} });
+  assert.equal(r3.events.length, 0, 'nicio reintrare falsă');
+});
+
+test('live: semnalele pe indici spun ora deschiderii bursei (cum e testat), iar ziua de luni după un semnal de vineri', () => {
+  const { nextOpenUtc } = require('../src/propLive');
+  const fri = Date.UTC(2026, 9, 23, 15, 50); // vineri, după închiderea DAX
+  assert.equal(new Date(nextOpenUtc(INSTR.GER40, fri)).toISOString(), '2026-10-26T08:00:00.000Z', 'luni 09:00 Frankfurt (10:00 România)');
+  assert.equal(new Date(nextOpenUtc(INSTR.SPX500, Date.UTC(2026, 9, 21, 20, 20))).toISOString(), '2026-10-22T13:30:00.000Z', 'a doua zi 09:30 New York');
 });

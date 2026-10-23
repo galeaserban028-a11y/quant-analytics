@@ -65,32 +65,32 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-21T10:15:01.024Z",
+    "generatedAt": "2026-10-23T09:16:28.096Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
-      "trades": 6819,
-      "wins": 4253,
-      "losses": 2566,
-      "winRatePct": 62.4,
-      "avgWinR": 0.57,
-      "avgLossR": 0.781,
-      "expectancyR": 0.061,
+      "trades": 5548,
+      "wins": 3490,
+      "losses": 2058,
+      "winRatePct": 62.9,
+      "avgWinR": 0.549,
+      "avgLossR": 0.756,
+      "expectancyR": 0.065,
       "expectancyCI95": [
-        0.043,
-        0.079
+        0.045,
+        0.084
       ],
-      "tStat": 6.66,
-      "totalR": 418.49,
-      "profitFactor": 1.21,
-      "maxDrawdownR": 33.61,
-      "maxLosingStreak": 11,
+      "tStat": 6.54,
+      "totalR": 359.31,
+      "profitFactor": 1.23,
+      "maxDrawdownR": 25.08,
+      "maxLosingStreak": 9,
       "outcomes": {
-        "TARGET": 4487,
-        "STOP": 1659,
-        "TIME": 418,
-        "END_OF_DATA": 96,
-        "TP": 159
+        "TARGET": 3727,
+        "STOP": 1266,
+        "TIME": 363,
+        "END_OF_DATA": 84,
+        "TP": 108
       }
     },
     "overrides": {
@@ -149,9 +149,9 @@
             "params": {
               "kind": "d7",
               "trendLen": 200,
-              "lookback": 10,
-              "stopAtr": 2,
-              "maxDays": 10,
+              "lookback": 7,
+              "stopAtr": 3,
+              "maxDays": 15,
               "allowShort": false,
               "tpR": 1.5
             }
@@ -165,21 +165,17 @@
           "UK100",
           "FRA40",
           "EU50",
-          "JP225",
-          "AUS200",
           "US2000"
         ],
         "benched": [
           "UK100|rsi2",
           "FRA40|rsi2",
-          "AUS200|rsi2",
           "UK100|down",
           "FRA40|down",
           "FRA40|bb",
-          "FRA40|d7",
-          "AUS200|d7"
+          "UK100|d7"
         ],
-        "expectedR": 0.061
+        "expectedR": 0.065
       }
     }
   },

@@ -169,7 +169,7 @@ test('live Forex: Academia oprită = tăcere; agenții ELITĂ trimit pe perechea
   assert.deepEqual(r.events.map((e) => e.event), ['ENTRY', 'SKIP']);
   assert.equal(r.events[1].reason, 'PERECHE_OCUPATĂ');
   assert.match(msgs[msgs.length - 1], /BUY EURUSD<\/b> \(Forex\)|SELL EURUSD<\/b> \(Forex\)/);
-  assert.match(msgs[msgs.length - 1], /Entry: <b>/);
+  assert.match(msgs[msgs.length - 1], /Entry: la prețul pieței \(referință [\d.]+\)/);
   assert.ok(bus.state.fx && !bus.state.prop, 'starea Forex e separată de cea a indicilor');
 });
 

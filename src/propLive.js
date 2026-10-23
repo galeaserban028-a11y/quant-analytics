@@ -119,6 +119,32 @@ function shouldFetch(acct, sym, inst, now) {
 }
 
 const lotsTxt = (x) => x.toFixed(2);
+const { zonedToUtc } = require('./data/dailySources');
+/** Ora de deschidere a bursei (locală) pentru fiecare fus orar al indicilor. */
+const OPEN_LOCAL = { 'America/New_York': '09:30', 'Europe/Berlin': '09:00', 'Europe/Paris': '09:00', 'Europe/London': '08:00', 'Asia/Tokyo': '09:00', 'Australia/Sydney': '10:00' };
+/** Următoarea deschidere a bursei după momentul `after` (zile lucrătoare). Toate testele presupun intrarea/ieșirea atunci. */
+function nextOpenUtc(inst, after) {
+  const tz = inst.closeTz, hm = OPEN_LOCAL[tz];
+  if (!tz || !hm) return null;
+  const [hh, mm] = hm.split(':').map(Number);
+  for (let k = 0; k < 6; k++) {
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' }).formatToParts(new Date(after + k * DAY_MS));
+    const g = (t) => day.find((x) => x.type === t).value;
+    if (g('weekday') === 'Sat' || g('weekday') === 'Sun') continue;
+    const t = zonedToUtc(Number(g('year')), Number(g('month')), Number(g('day')), hh, mm, tz);
+    if (t > after) return t;
+  }
+  return null;
+}
+/** Cum apare indicele de obicei pe platformele firmelor (MT4/MT5, cTrader). */
+const ALIASES = { US30: 'US30 / DJ30 / WS30', NAS100: 'NAS100 / US100 / USTEC', SPX500: 'US500 / SPX500', US2000: 'US2000 / RUSS2000', GER40: 'GER40 / DE40 / DAX40', UK100: 'UK100 / FTSE100', FRA40: 'FRA40 / FR40 / CAC40', EU50: 'EU50 / EUSTX50 / STOXX50', JP225: 'JP225 / JPN225', AUS200: 'AUS200 / ASX200' };
+const whenTxt = (t) => {
+  if (!t) return null;
+  const now = Date.now();
+  const sameDay = new Date(t).toLocaleDateString('ro-RO', { timeZone: 'Europe/Bucharest' }) === new Date(now).toLocaleDateString('ro-RO', { timeZone: 'Europe/Bucharest' });
+  const hm = new Date(t).toLocaleTimeString('ro-RO', { timeZone: 'Europe/Bucharest', hour: '2-digit', minute: '2-digit' });
+  return `${sameDay ? 'azi' : roTime(t).split(',')[0]} la ${hm}`;
+};
 
 /**
  * Mesajele unui instrument la o rulare: întâi ieșirile, apoi intrările, câte UN mesaj pentru fiecare.
@@ -139,7 +165,8 @@ async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, 
     const lines = [];
     if (manual.length) {
       const lots = manual.reduce((t, x) => t + (x.prev.lots || 0), 0);
-      lines.push(`🔴 <b>ÎNCHIDE ${escapeHtml(sym)}${tag}</b>${left.length ? ` · doar ${lots.toFixed(2)} loturi` : ''} — ACUM`);
+      const closeAt = inst.category === 'FX' ? null : nextOpenUtc(inst, barClose);
+      lines.push(`🔴 <b>ÎNCHIDE ${escapeHtml(sym)}${tag}</b>${left.length ? ` · doar ${lots.toFixed(2)} loturi` : ''} — ${closeAt ? `${whenTxt(closeAt)} (deschiderea bursei) sau mai devreme` : 'ACUM'}`);
       for (const x of manual) lines.push(`${name(x.who)}: ${res(x)}`);
     }
     for (const x of auto) lines.push(`${x.outcome === 'TP' ? '✅' : '⛔'} <b>${escapeHtml(sym)}${tag}</b> a atins ${x.outcome === 'TP' ? 'take profit' : 'stop loss'} (s-a închis singur) · ${name(x.who)}: ${res(x)}`);
@@ -155,8 +182,10 @@ async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, 
     const totalRisk = es.reduce((t, e) => t + e.lot.actualRiskUsd, 0);
     const sameStop = es.every((e) => Math.abs(e.position.stop - es[0].position.stop) < inst.pipSize / 2);
     const px = (v) => fmtPx(v, inst);
-    const lines = [`${long ? '🟢 <b>BUY' : '🔴 <b>SELL'} ${escapeHtml(sym)}</b>${tag} — ACUM, la prețul pieței`];
-    lines.push(`Entry: <b>${px(es[0].position.entry)}</b>`);
+    const openAt = inst.category === 'FX' ? null : nextOpenUtc(inst, barClose);
+    const lines = [`${long ? '🟢 <b>BUY' : '🔴 <b>SELL'} ${escapeHtml(sym)}</b>${tag}${openAt ? ` — intră ${whenTxt(openAt)} (deschiderea bursei)` : ' — ACUM, la prețul pieței'}`];
+    if (ALIASES[sym]) lines.push(`<i>Pe platformă: ${ALIASES[sym]}</i>`);
+    lines.push(`Entry: la prețul pieței (referință ${px(es[0].position.entry)})`);
     if (sameStop) {
       lines.push(`SL: <b>${px(es[0].position.stop)}</b>`);
       if (es[0].position.tp != null) lines.push(`TP: <b>${px(es[0].position.tp)}</b>`);
@@ -168,7 +197,7 @@ async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, 
     lines.push(`TF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)`);
     if (es.length > 1) lines.push(`Traderi: ${es.map((e) => name(e.who)).join(', ')}`);
     const pu = es[0].pointUsd;
-    lines.push(`<i>Verifică o dată în platformă: 1 lot = ${pu < 1 ? pu.toFixed(3) : pu.toFixed(2)} $ pe ${unit}. Dacă au trecut peste 12 ore de la ${roTime(barClose)}, sari peste.</i>${totalLots > 20 ? ' ⚠️ Lot neobișnuit de mare!' : ''}`);
+    lines.push(`<i>Verifică o dată în platformă: 1 lot = ${pu < 1 ? pu.toFixed(3) : pu.toFixed(2)} $ pe ${unit}. ${openAt ? 'Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.' : 'Dacă au trecut peste 12 ore, sari peste.'}</i>${totalLots > 20 ? ' ⚠️ Lot neobișnuit de mare!' : ''}`);
     await notify(lines.join('\n'));
   }
 }
@@ -254,6 +283,9 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
     const lastBar = candles[candles.length - 1];
     const barClose = barCloseOf(lastBar, inst);
     if (acct.lastBarClose[sym] === barClose) continue; // nimic nou închis
+    // Sursa de rezervă poate fi în urmă cu o zi (ex. Stooq noaptea, când Yahoo nu răspunde). NU reprocesăm zile vechi:
+    // altfel ar apărea intrări și ieșiri false, la ore aiurea (eroare reală, 21–23 oct. 2026, pe EU50).
+    if (acct.lastBarClose[sym] && barClose < acct.lastBarClose[sym]) { report.errors[sym] = 'DATE_ÎNTÂRZIATE (sursa e în urmă; ignorată)'; continue; }
     acct.lastBarClose[sym] = barClose;
     prices[sym] = lastBar.close;
     const stale = now - barClose > FRESH_MS;
@@ -463,4 +495,4 @@ function propSummary(acct, config) {
   return `💼 <b>Contul de prop</b> (${rules.name})\n${progressLine(acct, rules)}\n${roomLine(acct, rules)}\n` + (pos.length ? `Poziții deschise:\n${lines.join('\n')}` : 'Nicio poziție deschisă.');
 }
 
-module.exports = { flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };
+module.exports = { nextOpenUtc, flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };

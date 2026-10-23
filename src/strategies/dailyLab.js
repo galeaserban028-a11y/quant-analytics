@@ -322,6 +322,8 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
 
   // execution: 'close' (la închiderea zilei semnalului) sau 'nextOpen' (a doua zi la deschidere: cum execută un om dimineața)
   const nextOpen = opts.execution === 'nextOpen';
+  // 'nextClose': intrare/ieșire la ÎNCHIDEREA zilei următoare (ex. Japonia/Australia, executate dimineața în România)
+  const nextClose = opts.execution === 'nextClose';
   let pendingEntry = null, pendingExit = null;
   const openPos = (dir, px, atr, openedAt) => {
     const entry = dir === 'LONG' ? px + spread : px;
@@ -343,6 +345,8 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
       if (!pos && pendingEntry) openPos(pendingEntry.dir, bar.open, pendingEntry.atr, bar.timestamp);
       pendingEntry = null;
     }
+    if (nextClose && pos && pendingExit) { finish(pos.dir === 'LONG' ? bar.close : bar.close + spread, pendingExit, closeTime); pendingExit = null; }
+    if (nextClose && !pos && pendingEntry) { openPos(pendingEntry.dir, bar.close, pendingEntry.atr, closeTime); pendingEntry = null; continue; }
     if (pos) {
       const long = pos.dir === 'LONG';
       const exLow = long ? bar.low : bar.low + spread;
@@ -358,7 +362,7 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
       const hit = rules.exit(i, pos);
       if (hit || held >= p.maxDays) {
         const outcome = hit ? 'TARGET' : 'TIME';
-        if (nextOpen) pendingExit = outcome;
+        if (nextOpen || nextClose) pendingExit = outcome;
         else finish(pos.dir === 'LONG' ? bar.close : bar.close + spread, outcome, closeTime);
       }
     }
@@ -367,7 +371,7 @@ function simulateBars(symbol, bars, inst, params, opts = {}) {
       if (dir) {
         const atr = computeATR(bars.slice(Math.max(0, i - 15), i + 1), 14);
         if (Number.isFinite(atr) && atr > 0) {
-          if (nextOpen) pendingEntry = { dir, atr };
+          if (nextOpen || nextClose) pendingEntry = { dir, atr };
           else openPos(dir, bar.close, atr, closeTime);
         }
       }
