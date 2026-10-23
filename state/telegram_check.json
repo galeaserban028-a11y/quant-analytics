@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-21T10:25:43.810Z",
+  "at": "2026-10-23T09:20:19.697Z",
   "tokenPresent": true,
   "tokenHadSpaces": true,
   "tokenFormatOk": true,
@@ -12,11 +12,9 @@
   "webhookSet": false,
   "updatesOk": true,
   "updatesError": null,
-  "updatesCount": 1,
-  "updateKinds": [
-    "message"
-  ],
-  "privateChatsSeen": 1,
+  "updatesCount": 0,
+  "updateKinds": [],
+  "privateChatsSeen": 0,
   "chatSource": "găsit automat din conversația cu botul",
   "sendOk": true,
   "sendError": null
