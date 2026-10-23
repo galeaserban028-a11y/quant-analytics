@@ -12,7 +12,12 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-10-23",
-    "outbox": []
+    "outbox": [
+      {
+        "at": 1792786837390,
+        "text": "🟢 <b>BUY SPX500</b> — intră 26.10 la 15:30 (deschiderea bursei)\n<i>Pe platformă: US500 / SPX500</i>\nEntry: la prețul pieței (referință 7624.3)\nSL: <b>7479.9</b>\nLot: <b>0.03</b> (risc 4 $)\nTF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)\n<i>Verifică o dată în platformă: 1 lot = 0.100 $ pe punct. Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.</i>"
+      }
+    ]
   },
   "prop": {
     "v": 2,
@@ -40,6 +45,20 @@
         "who": "Cosmin (Minimul de N zile)",
         "riskUsd": 195.37769131996282,
         "lots": 0.18
+      },
+      "SPX500|rsi2": {
+        "symbol": "SPX500",
+        "direction": "LONG",
+        "entry": 7624.28017578125,
+        "initialStop": 7479.892898995536,
+        "stop": 7479.892898995536,
+        "openedAt": 1792848600000,
+        "desk": "RSI2",
+        "strategy": "rsi2",
+        "agent": null,
+        "who": "Mihai (Pullback RSI(2))",
+        "riskUsd": 4.33161830357144,
+        "lots": 0.03
       }
     },
     "skipped": {
@@ -50,27 +69,28 @@
       "EU50|bb": 1792738800000,
       "UK100|rsi2": 1792825200000,
       "UK100|d7": 1792825200000,
-      "FRA40|bb": 1792825200000
+      "FRA40|bb": 1792825200000,
+      "SPX500|bb": 1792848600000
     },
     "lastBarClose": {
-      "US30": 1792699200000,
-      "NAS100": 1792699200000,
-      "SPX500": 1792699200000,
+      "US30": 1792785600000,
+      "NAS100": 1792785600000,
+      "SPX500": 1792785600000,
       "GER40": 1792769400000,
       "UK100": 1792769400000,
       "FRA40": 1792769400000,
       "EU50": 1792769400000,
-      "US2000": 1792699200000
+      "US2000": 1792785600000
     },
     "lastFetch": {
-      "US30": 1792784017741,
-      "NAS100": 1792784017741,
-      "SPX500": 1792784017741,
+      "US30": 1792786837390,
+      "NAS100": 1792786837390,
+      "SPX500": 1792786837390,
       "GER40": 1792784017741,
       "UK100": 1792784017741,
       "FRA40": 1792784017741,
       "EU50": 1792784017741,
-      "US2000": 1792784017741
+      "US2000": 1792786837390
     },
     "initialized": true,
     "history": [],
@@ -1135,5 +1155,5 @@
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-23T20:15:38.091Z"
+  "savedAt": "2026-10-23T20:20:39.125Z"
 }
