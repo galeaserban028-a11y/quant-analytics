@@ -26,6 +26,21 @@ const { nameFor } = require('./research/team');
 
 const DAY_MS = 864e5;
 const FRESH_MS = 36 * 3600e3; // o lumânare închisă acum mai mult de 36h (ex. sistem oprit) nu mai produce intrări
+/**
+ * Ultima închidere de bursă care TREBUIA să fi avut loc până acum (zi lucrătoare, după ora de închidere + marja).
+ * O intrare nouă pleacă doar dacă vine din exact această zi: o zi mai veche înseamnă date întârziate, deci semnal vechi.
+ */
+function expectedLastClose(inst, now) {
+  if (!inst.closeTz || !inst.closeTime) return null;
+  for (let k = 0; k < 7; k++) {
+    const t = now - k * DAY_MS;
+    const wd = new Intl.DateTimeFormat('en-US', { timeZone: inst.closeTz, weekday: 'short' }).format(new Date(t));
+    if (wd === 'Sat' || wd === 'Sun') continue;
+    const c = todayCloseUtc(inst, t);
+    if (c + CLOSE_BUFFER_MS <= now) return c;
+  }
+  return null;
+}
 const SAME_POS_MS = 30 * 3600e3; // sursele (Yahoo/Stooq) etichetează aceeași zi la ore diferite
 const REFETCH_MS = 55 * 60e3; // în afara ferestrei de după închidere, cel mult o descărcare pe oră
 const DUE_WINDOW_MS = 4 * 3600e3; // fereastra de după închidere în care verificăm la fiecare rulare
@@ -288,7 +303,9 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
     if (acct.lastBarClose[sym] && barClose < acct.lastBarClose[sym]) { report.errors[sym] = 'DATE_ÎNTÂRZIATE (sursa e în urmă; ignorată)'; continue; }
     acct.lastBarClose[sym] = barClose;
     prices[sym] = lastBar.close;
-    const stale = now - barClose > FRESH_MS;
+    const expected = expectedLastClose(inst, now);
+    // semnal vechi: lumânarea procesată e mai veche decât ultima închidere care a avut loc (date întârziate, sărbătoare etc.)
+    const stale = now - barClose > FRESH_MS || (expected != null && barClose < expected - 3600e3);
 
     const outExits = [], outEntries = []; // mesajele se trimit la final, câte UNUL pe instrument (nu câte unul pe trader)
     for (const st of strategies) {
@@ -495,4 +512,4 @@ function propSummary(acct, config) {
   return `💼 <b>Contul de prop</b> (${rules.name})\n${progressLine(acct, rules)}\n${roomLine(acct, rules)}\n` + (pos.length ? `Poziții deschise:\n${lines.join('\n')}` : 'Nicio poziție deschisă.');
 }
 
-module.exports = { nextOpenUtc, flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };
+module.exports = { expectedLastClose, nextOpenUtc, flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };

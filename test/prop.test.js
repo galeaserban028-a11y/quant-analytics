@@ -913,3 +913,27 @@ test('live: semnalele pe indici spun ora deschiderii bursei (cum e testat), iar 
   assert.equal(new Date(nextOpenUtc(INSTR.GER40, fri)).toISOString(), '2026-10-26T08:00:00.000Z', 'luni 09:00 Frankfurt (10:00 România)');
   assert.equal(new Date(nextOpenUtc(INSTR.SPX500, Date.UTC(2026, 9, 21, 20, 20))).toISOString(), '2026-10-22T13:30:00.000Z', 'a doua zi 09:30 New York');
 });
+
+test('live: o intrare pleacă doar din ultima zi de bursă încheiată; date cu o zi în urmă nu dau semnal (nici la prima apariție)', async () => {
+  const { expectedLastClose } = require('../src/propLive');
+  const wed = Date.UTC(2026, 9, 21, 19, 18); // miercuri 22:18 România, după închiderea DAX de miercuri
+  assert.equal(new Date(expectedLastClose(INSTR.GER40, wed)).toISOString(), '2026-10-21T15:30:00.000Z');
+  const satMorning = Date.UTC(2026, 9, 24, 8, 0);
+  assert.equal(new Date(expectedLastClose(INSTR.GER40, satMorning)).toISOString(), '2026-10-23T15:30:00.000Z', 'sâmbătă: ultima închidere e vineri');
+  // scenariul real: contul pornit, apoi sosesc doar date până ieri (sursa de rezervă) → niciun semnal
+  const { config, bus, msgs, notify } = liveFixture();
+  config.propDesk.symbols = ['GER40'];
+  config.propDesk.strategies = [{ kind: 'down', name: '3 zile de scădere', params: { trendLen: 200, nDays: 3, exitLen: 3, stopAtr: 2, maxDays: 10 } }];
+  const base = pullbackSeries().map((b) => ({ timestamp: b.timestamp + 7 * 3600e3, open: b.open * 15000, high: b.high * 15000, low: b.low * 15000, close: b.close * 15000, volume: 0 }));
+  const lastB = base[base.length - 1];
+  const third = { timestamp: lastB.timestamp + DAY, open: lastB.close, high: lastB.close + 10, low: lastB.close - 160, close: lastB.close - 150, volume: 0 };
+  const bars = base.concat([third]);
+  const eur = Array.from({ length: 5 }, (_, k) => ({ timestamp: T0 + k * DAY, open: 1.1, high: 1.1, low: 1.1, close: 1.1, volume: 0 }));
+  const fetch = async (sym) => (sym === 'EURUSD' ? { candles: eur } : { candles: fetch.n.map((b) => Object.assign({}, b)) });
+  const closeLast = ds.sessionCloseUtc(third.timestamp, INSTR.GER40);
+  fetch.n = bars.slice(0, -2);
+  await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast - 2 * DAY + 20 * 60e3, env: {} });
+  fetch.n = bars; // semnalul e pe lumânarea `third`, dar o vedem abia a doua zi după închidere
+  const r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast + DAY + 30 * 60e3, env: {} });
+  assert.equal(r.events.filter((e) => e.event === 'ENTRY').length, 0, 'semnal de ieri, văzut azi după închidere ⇒ nu se trimite');
+});
