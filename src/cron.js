@@ -23,6 +23,12 @@ const fs = require('fs');
 const { runFxCycle, fetchFxDaily } = require('./fxLive');
 const { runVirtualCycle } = require('./academy/virtualLive');
 const { runLondonCycle } = require('./academy/londonLive');
+const { runOrbCycle } = require('./academy/orbLive');
+/** Lumânări Yahoo de 15 minute (ultimele ~60 de zile), pentru scalpingul pe deschiderea bursei americane. */
+async function fetchM15Yahoo(sym, inst) {
+  const d = await getJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(inst.yahoo)}?interval=15m&range=60d`, { retries: 1 });
+  return validOhlc(parseYahooChart(d)).map((b) => ({ t: b.timestamp, o: b.open, h: b.high, l: b.low, c: b.close }));
+}
 const { getJson } = require('./data/http');
 const { parseYahooChart, validOhlc } = require('./data/dailySources');
 /** Lumânări orare Yahoo (ultimele ~60 de zile), pentru strategia Londra. */
@@ -92,6 +98,13 @@ async function main() {
     const lr = await runLondonCycle({ bus, instruments: FX_INSTRUMENTS, fetchHours: fetchHoursYahoo, notify: canNotify ? notify : null, now, env: process.env });
     if (lr.settled || lr.plans || Object.keys(lr.errors).length) console.log(`${new Date(now).toISOString()} | FOREX LONDRA (antrenament) | ${JSON.stringify(lr)}`);
   } catch (err) { console.log('Forex Londra: eroare', err.message); }
+
+  // SCALPING M15 (spargerea deschiderii, S&P 500 + Nasdaq): antrenament LIVE pe bani fictivi; semnale reale doar după absolvire
+  try {
+    const canNotify = LIVE && process.env.TELEGRAM_TOKEN;
+    const or = await runOrbCycle({ bus, instruments: FX_INSTRUMENTS, fetchBars: fetchM15Yahoo, notify: canNotify ? notify : null, now, env: process.env });
+    if (or.settled || or.plans || Object.keys(or.errors).length) console.log(`${new Date(now).toISOString()} | SCALPING M15 (antrenament) | ${JSON.stringify(or)}`);
+  } catch (err) { console.log('Scalping M15: eroare', err.message); }
 
   // Dacă trebuie să trimită pe Telegram dar lipsesc datele, NU avansăm starea (altfel s-ar pierde mesaje)
   if (LIVE && (!process.env.TELEGRAM_TOKEN || !(process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID))) {

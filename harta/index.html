@@ -155,6 +155,12 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     <p class="lead">Compania Forex are două părți. Strategia „Londra” (mai jos) a trecut testele pe istorie și se antrenează acum live. Școala de 300 de agenți (pe grafic zilnic) învață cu bani fictivi: pe Forex zilnic niciun grup nu a arătat avantaj real, așa că tace. Oricare dintre ele dovedește că face profit, îți trimite semnale reale.</p>
   </div>
 
+  <section aria-labelledby="h-orb">
+    <h2 id="h-orb">Scalping M15 · spargerea deschiderii (S&amp;P 500, Nasdaq) · antrenament live</h2>
+    <p class="lead">Intervalul primelor 30 de minute ale bursei americane (16:30–17:00 ora României); ordine peste și sub el; ieșire la ~21:00. În teste: +0,11 din risc pe tranzacție pe S&amp;P 500 și Nasdaq, dar pe Dow Jones a pierdut, deci nedovedită. Se antrenează pe bani fictivi; semnale reale doar după cel puțin 100 de tranzacții live cu media ≥ +0,05 și t ≥ 1,5.</p>
+    <div class="tiles" id="orb"></div>
+  </section>
+
   <section aria-labelledby="h-london">
     <h2 id="h-london">Strategia „Londra” · antrenament live pe bani fictivi</h2>
     <p class="lead">Spargerea intervalului asiatic la deschiderea Londrei (EURUSD, GBPUSD, USDJPY). Pe 3 perechi a trecut testele, dar cu a patra pereche (AUDUSD) avantajul aproape dispare, deci nu e dovedit. Se antrenează live, pe prețuri reale și bani fictivi; trimite semnale reale doar dacă dovedește singură: cel puțin 250 de tranzacții, media peste +0,03 și dovadă statistică (t ≥ 2).</p>
@@ -579,6 +585,20 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     }
   }
 
+  function renderOrb() {
+    const box = document.getElementById('orb');
+    box.replaceChildren();
+    const b = state && state.orb;
+    const tile = (lbl, big, sub) => box.append(el('div', { class: 'stat' }, [el('span', { class: 'lbl', text: lbl }), el('span', { class: 'big num', text: big }), el('span', { class: 'lbl', text: sub })]));
+    if (!b) { tile('Stare', 'Pornește', 'Prima zi se înregistrează după închiderea bursei americane (~23:15 ora României).'); tile('Necesar pentru semnale reale', '100', 'tranzacții live, media ≥ +0,05R, t ≥ 1,5'); return; }
+    const tr = b.trades || [];
+    const n = tr.length, sum = tr.reduce((a, t) => a + (t.resultR || 0), 0), mean = n ? sum / n : 0;
+    tile('Stare', b.graduated ? (b.paused ? 'Pauză' : 'Absolvit') : 'Antrenament', b.graduated ? 'Trimite semnale reale pe la 17:00' : 'Doar pe hârtie, fără semnale');
+    tile('Tranzacții live', `${n} / 100`, n ? `${tr.filter((t) => t.resultR > 0).length} câștigătoare` : 'Încă niciuna');
+    tile('Media pe tranzacție', `${signed(mean, 3)}R`, 'Ținta pentru absolvire: ≥ +0,050R');
+    tile('Total (bani fictivi, risc 0,5%)', money(sum * 25), `${signed(sum, 1)}R pe un cont de 5.000 $`);
+  }
+
   function renderLondon() {
     const box = document.getElementById('london');
     box.replaceChildren();
@@ -600,7 +620,7 @@ footer { font-size: 12px; color: var(--muted); max-width: 80ch }
     document.getElementById('liveText').textContent = mode === 'live' ? `Live · stare ${saved ? roDateTime(saved) : '—'} · reîmprospătare la fiecare minut` : mode === 'snap' ? `Instantaneu din ${academy ? roDate(academy.generatedAt) : '—'}` : 'Datele nu s-au încărcat';
   }
 
-  function renderAll() { renderHeader(); renderSummary(); renderPropAcct(); renderTeam(); renderLondon(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderCapital(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
+  function renderAll() { renderHeader(); renderSummary(); renderPropAcct(); renderTeam(); renderOrb(); renderLondon(); renderVerdict(); renderLife(); renderFilters(); renderFloor(); renderDetail(); renderCapital(); renderEvo(); renderSeeds(); renderFamilies(); renderFame(); }
 
   async function load() {
     const [a, s, t] = await Promise.all([fetchFirst(SOURCES.academy), fetchFirst(SOURCES.state), fetchFirst(SOURCES.team)]);
