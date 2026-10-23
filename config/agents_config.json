@@ -555,7 +555,7 @@
   "propDesk": {
     "enabled": false,
     "firm": "THE5ERS_HIGH_STAKES",
-    "accountSize": 10000,
+    "accountSize": 5000,
     "riskPct": 4,
     "safety": 0.7,
     "maxOpen": 3,
