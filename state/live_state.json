@@ -18,14 +18,11 @@
     "firm": "THE5ERS_HIGH_STAKES",
     "phase": 0,
     "initial": 10000,
-    "balance": 10221.623564728254,
+    "balance": 10000.0,
     "dayKey": "2026-10-23",
-    "dayStart": 10221.623564728254,
-    "highestEod": 10221.623564728254,
-    "tradingDays": [
-      "2026-10-22",
-      "2026-10-23"
-    ],
+    "dayStart": 10000.0,
+    "highestEod": 10000,
+    "tradingDays": [],
     "positions": {
       "EU50|bb": {
         "symbol": "EU50",
@@ -75,30 +72,7 @@
       "US2000": 1792746961390
     },
     "initialized": true,
-    "history": [
-      {
-        "sym": "EU50",
-        "strategy": "rsi2",
-        "agent": null,
-        "direction": "LONG",
-        "openedAt": 1792566000000,
-        "closedAt": 1792652400000,
-        "r": 0.5548,
-        "pnl": 221.62356472825417,
-        "outcome": "TARGET"
-      },
-      {
-        "sym": "EU50",
-        "strategy": "bb",
-        "agent": null,
-        "direction": "LONG",
-        "openedAt": 1792738800000,
-        "closedAt": 1792707445177,
-        "r": 0,
-        "pnl": 0,
-        "outcome": "NECUNOSCUT"
-      }
-    ],
+    "history": [],
     "startedAt": 1792575206243,
     "fxRates": {
       "EURUSD": 1.1234692335128784,
@@ -356,7 +330,7 @@
         "openedAt": 1792627200000,
         "risk": 500,
         "rank": "STAGIAR",
-        "name": "Oana Sârbu"
+        "name": "Oana S\u00e2rbu"
       },
       "A1928": {
         "pair": "USDCHF",
@@ -416,7 +390,7 @@
         "openedAt": 1792713600000,
         "risk": 1000.3546,
         "rank": "JUNIOR",
-        "name": "Răzvan Stan"
+        "name": "R\u0103zvan Stan"
       },
       "A1984": {
         "pair": "EURJPY",
@@ -456,7 +430,7 @@
         "openedAt": 1792713600000,
         "risk": 500.1773,
         "rank": "STAGIAR",
-        "name": "Cristian Sârbu"
+        "name": "Cristian S\u00e2rbu"
       },
       "A1861": {
         "pair": "EURGBP",
@@ -556,7 +530,7 @@
         "openedAt": 1792713600000,
         "risk": 1001.9317499999997,
         "rank": "JUNIOR",
-        "name": "Emil Lazăr"
+        "name": "Emil Laz\u0103r"
       },
       "A1834": {
         "pair": "USDJPY",
@@ -596,7 +570,7 @@
         "openedAt": 1792713600000,
         "risk": 501.1048249999999,
         "rank": "STAGIAR",
-        "name": "Paul Lazăr"
+        "name": "Paul Laz\u0103r"
       }
     },
     "skipped": {
