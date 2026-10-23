@@ -11,16 +11,17 @@
     "skipped": {},
     "lastAsOf": {},
     "failSince": null,
-    "heartbeatDate": "2026-10-23"
+    "heartbeatDate": "2026-10-23",
+    "outbox": []
   },
   "prop": {
     "v": 2,
     "firm": "THE5ERS_HIGH_STAKES",
     "phase": 0,
     "initial": 10000,
-    "balance": 10000.0,
+    "balance": 10000,
     "dayKey": "2026-10-23",
-    "dayStart": 10000.0,
+    "dayStart": 10000,
     "highestEod": 10000,
     "tradingDays": [],
     "positions": {
@@ -330,7 +331,7 @@
         "openedAt": 1792627200000,
         "risk": 500,
         "rank": "STAGIAR",
-        "name": "Oana S\u00e2rbu"
+        "name": "Oana Sârbu"
       },
       "A1928": {
         "pair": "USDCHF",
@@ -390,7 +391,7 @@
         "openedAt": 1792713600000,
         "risk": 1000.3546,
         "rank": "JUNIOR",
-        "name": "R\u0103zvan Stan"
+        "name": "Răzvan Stan"
       },
       "A1984": {
         "pair": "EURJPY",
@@ -430,7 +431,7 @@
         "openedAt": 1792713600000,
         "risk": 500.1773,
         "rank": "STAGIAR",
-        "name": "Cristian S\u00e2rbu"
+        "name": "Cristian Sârbu"
       },
       "A1861": {
         "pair": "EURGBP",
@@ -530,7 +531,7 @@
         "openedAt": 1792713600000,
         "risk": 1001.9317499999997,
         "rank": "JUNIOR",
-        "name": "Emil Laz\u0103r"
+        "name": "Emil Lazăr"
       },
       "A1834": {
         "pair": "USDJPY",
@@ -570,7 +571,7 @@
         "openedAt": 1792713600000,
         "risk": 501.1048249999999,
         "rank": "STAGIAR",
-        "name": "Paul Laz\u0103r"
+        "name": "Paul Lazăr"
       }
     },
     "skipped": {
@@ -886,31 +887,31 @@
       "NZDCAD": 1792713600000
     },
     "lastFetch": {
-      "GBPJPY": 1792743960531,
-      "EURCAD": 1792743960531,
-      "AUDCAD": 1792743960531,
-      "AUDJPY": 1792743960531,
-      "EURJPY": 1792743960531,
-      "EURGBP": 1792743960531,
-      "CHFJPY": 1792743960531,
-      "GBPUSD": 1792743960531,
-      "GBPCAD": 1792743960531,
-      "USDCAD": 1792743960531,
-      "NZDUSD": 1792743960531,
-      "AUDUSD": 1792743960531,
-      "CADJPY": 1792743960531,
-      "USDJPY": 1792743960531,
-      "AUDCHF": 1792743960531,
-      "GBPNZD": 1792743960531,
-      "USDCHF": 1792743960531,
-      "EURUSD": 1792743960531,
-      "EURNZD": 1792743960531,
-      "GBPAUD": 1792743960531,
-      "NZDJPY": 1792743960531,
-      "GBPCHF": 1792743960531,
-      "EURCHF": 1792743960531,
-      "EURAUD": 1792743960531,
-      "NZDCAD": 1792743960531
+      "GBPJPY": 1792747261122,
+      "EURCAD": 1792747261122,
+      "AUDCAD": 1792747261122,
+      "AUDJPY": 1792747261122,
+      "EURJPY": 1792747261122,
+      "EURGBP": 1792747261122,
+      "CHFJPY": 1792747261122,
+      "GBPUSD": 1792747261122,
+      "GBPCAD": 1792747261122,
+      "USDCAD": 1792747261122,
+      "NZDUSD": 1792747261122,
+      "AUDUSD": 1792747261122,
+      "CADJPY": 1792747261122,
+      "USDJPY": 1792747261122,
+      "AUDCHF": 1792747261122,
+      "GBPNZD": 1792747261122,
+      "USDCHF": 1792747261122,
+      "EURUSD": 1792747261122,
+      "EURNZD": 1792747261122,
+      "GBPAUD": 1792747261122,
+      "NZDJPY": 1792747261122,
+      "GBPCHF": 1792747261122,
+      "EURCHF": 1792747261122,
+      "EURAUD": 1792747261122,
+      "NZDCAD": 1792747261122
     },
     "sentHome": {},
     "recent": {
@@ -1073,5 +1074,5 @@
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-23T09:16:02.431Z"
+  "savedAt": "2026-10-23T09:21:07.123Z"
 }
