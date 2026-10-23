@@ -1052,5 +1052,16 @@
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-23T11:14:03.730Z"
+  "orb": {
+    "v": 1,
+    "startedAt": 1792754700784,
+    "trades": [],
+    "skips": {},
+    "settled": {},
+    "graduated": null,
+    "paused": false,
+    "sentPlan": {},
+    "sentClose": {}
+  },
+  "savedAt": "2026-10-23T11:25:00.807Z"
 }
