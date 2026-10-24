@@ -12,12 +12,7 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-10-23",
-    "outbox": [
-      {
-        "at": 1792786837390,
-        "text": "🟢 <b>BUY SPX500</b> — intră 26.10 la 15:30 (deschiderea bursei)\n<i>Pe platformă: US500 / SPX500</i>\nEntry: la prețul pieței (referință 7624.3)\nSL: <b>7479.9</b>\nLot: <b>0.03</b> (risc 4 $)\nTF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)\n<i>Verifică o dată în platformă: 1 lot = 0.100 $ pe punct. Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.</i>"
-      }
-    ]
+    "outbox": []
   },
   "prop": {
     "v": 2,
@@ -1381,5 +1376,5 @@
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-24T04:47:57.253Z"
+  "savedAt": "2026-10-24T05:00:57.514Z"
 }
