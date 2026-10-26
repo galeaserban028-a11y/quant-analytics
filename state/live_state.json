@@ -20,7 +20,7 @@
     "phase": 0,
     "initial": 5000,
     "balance": 5000,
-    "dayKey": "2026-10-26",
+    "dayKey": "2026-10-27",
     "dayStart": 5000,
     "highestEod": 5000,
     "tradingDays": [
@@ -1422,5 +1422,5 @@
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-26T21:25:42.603Z"
+  "savedAt": "2026-10-26T22:00:33.874Z"
 }
