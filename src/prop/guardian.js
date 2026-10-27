@@ -59,7 +59,10 @@ function decide(acct, rules, cfg) {
   const g = cfg.gapFactor != null ? cfg.gapFactor : 1;
   const roomDaily = (initial * rules.dailyLoss * safety - lostToday - acct.openRisk * g) / g;
 
+  const base = risk;
   risk = Math.min(risk, roomTotal, roomDaily);
+  // Opțional: nu trimite poziții minuscule (ex. 4 $ când normal riști 200 $) — doar zgomot pe Telegram
+  if (!onlyDays && cfg.minRiskFrac && risk < base * cfg.minRiskFrac) return { allow: false, riskAmount: 0, reason: roomDaily <= roomTotal ? 'LIMITA_ZILNICĂ' : 'LIMITA_TOTALĂ' };
   if (!(risk > initial * 0.0005)) return { allow: false, riskAmount: 0, reason: roomDaily <= roomTotal ? 'LIMITA_ZILNICĂ' : 'LIMITA_TOTALĂ' };
   return { allow: true, riskAmount: risk, reason: onlyDays ? 'ZILE_MINIME' : 'OK' };
 }

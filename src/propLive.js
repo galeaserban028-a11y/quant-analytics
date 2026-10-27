@@ -365,7 +365,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
       const d = decide(
         { initial: acct.initial, balance: acct.balance, dayStartBalance: acct.dayStart, openRisk, highestEod: acct.highestEod, phaseTarget: phaseTarget(acct, rules), tradingDays: acct.tradingDays.length },
         rules,
-        { riskPct: desk.riskPct, safety: desk.safety, maxOpen: desk.maxOpen, openCount: Object.keys(acct.positions).length }
+        { riskPct: desk.riskPct, safety: desk.safety, maxOpen: desk.maxOpen, openCount: Object.keys(acct.positions).length, minRiskFrac: 0.25 }
       );
       if (!d.allow) {
         acct.skipped[key] = position.openedAt;
