@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-10-27T11:38:37.162Z",
+  "bars": 5042,
+  "families": {
+    "mom": {
+      "name": "Momentum",
+      "trades": 139,
+      "winRatePct": 33.1,
+      "expectancyR": 0.08,
+      "ci": [
+        -0.086,
+        0.284
+      ],
+      "passed": false
+    },
+    "donch": {
+      "name": "Breakout Donchian",
+      "trades": 70,
+      "winRatePct": 30,
+      "expectancyR": -0.038,
+      "ci": [
+        -0.281,
+        0.263
+      ],
+      "passed": false
+    },
+    "rsi2": {
+      "name": "Pullback RSI(2)",
+      "trades": 202,
+      "winRatePct": 58.9,
+      "expectancyR": 0.032,
+      "ci": [
+        -0.057,
+        0.118
+      ],
+      "passed": false
+    },
+    "bb": {
+      "name": "Bollinger",
+      "trades": 176,
+      "winRatePct": 51.1,
+      "expectancyR": -0.028,
+      "ci": [
+        -0.16,
+        0.109
+      ],
+      "passed": false
+    },
+    "d7": {
+      "name": "Minim de N zile",
+      "trades": 83,
+      "winRatePct": 50.6,
+      "expectancyR": 0.008,
+      "ci": [
+        -0.168,
+        0.178
+      ],
+      "passed": false
+    },
+    "kc": {
+      "name": "Keltner",
+      "trades": 114,
+      "winRatePct": 53.5,
+      "expectancyR": 0.013,
+      "ci": [
+        -0.13,
+        0.166
+      ],
+      "passed": false
+    }
+  }
+}

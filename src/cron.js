@@ -24,6 +24,12 @@ const { runFxCycle, fetchFxDaily } = require('./fxLive');
 const { runVirtualCycle } = require('./academy/virtualLive');
 const { runLondonCycle } = require('./academy/londonLive');
 const { runOrbCycle } = require('./academy/orbLive');
+const { runGoldCycle } = require('./academy/goldLive');
+/** Lumânări orare ale aurului (Yahoo, ~2 ani), pentru momentum-ul pe H4. */
+async function fetchGoldHours(sym, inst) {
+  const d = await getJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(inst.yahoo)}?interval=1h&range=730d`, { retries: 1 });
+  return validOhlc(parseYahooChart(d)).map((b) => ({ t: b.timestamp, o: b.open, h: b.high, l: b.low, c: b.close }));
+}
 /** Lumânări Yahoo de 15 minute (ultimele ~60 de zile), pentru scalpingul pe deschiderea bursei americane. */
 async function fetchM15Yahoo(sym, inst) {
   const d = await getJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(inst.yahoo)}?interval=15m&range=60d`, { retries: 1 });
@@ -105,6 +111,12 @@ async function main() {
     const or = await runOrbCycle({ bus, instruments: FX_INSTRUMENTS, fetchBars: fetchM15Yahoo, notify: canNotify ? notify : null, now, env: process.env });
     if (or.settled || or.plans || Object.keys(or.errors).length) console.log(`${new Date(now).toISOString()} | SCALPING M15 (antrenament) | ${JSON.stringify(or)}`);
   } catch (err) { console.log('Scalping M15: eroare', err.message); }
+
+  // AUR, momentum H4: antrenament LIVE pe bani fictivi (o dată pe oră)
+  try {
+    const gr = await runGoldCycle({ bus, instruments: FX_INSTRUMENTS, fetchHours: fetchGoldHours, notify: LIVE && process.env.TELEGRAM_TOKEN ? notify : null, now });
+    if (gr.added || gr.error) console.log(`${new Date(now).toISOString()} | AUR H4 (antrenament) | ${JSON.stringify(gr)}`);
+  } catch (err) { console.log('Aur: eroare', err.message); }
 
   // Dacă trebuie să trimită pe Telegram dar lipsesc datele, NU avansăm starea (altfel s-ar pierde mesaje)
   if (LIVE && (!process.env.TELEGRAM_TOKEN || !(process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID))) {
