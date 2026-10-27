@@ -46,6 +46,7 @@ const { loadRates } = require('./data/rates');
 const ACADEMY_FILE = path.join(__dirname, '..', 'data', 'research', 'academy.json');
 const FX_INSTRUMENTS = require('../config/forex_instruments.json');
 const { sendTelegram, roTime } = require('./notify/telegram');
+const { weeklyReport } = require('./weeklyReport');
 
 const LIVE = process.env.LIVE_TELEGRAM === '1';
 const STATE_PATH = process.env.STATE_PATH
@@ -190,6 +191,13 @@ async function main() {
     }
     if (nErr) parts.push(`⚠️ ${nErr}/${nSym} instrumente fără date la această verificare.`);
     await notify(parts.join('\n\n'));
+  }
+
+  // Raportul de duminică (după 10:00, ora României), o dată pe săptămână
+  const wd = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Bucharest', weekday: 'short' }).format(new Date(now));
+  if (wd === 'Sun' && hour >= 10 && st.weeklyDate !== date) {
+    st.weeklyDate = date;
+    await notify(weeklyReport(bus.state, now));
   }
 
   bus.saveSnapshot();
