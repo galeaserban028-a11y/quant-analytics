@@ -1635,5 +1635,13 @@
     "sentPlan": {},
     "sentClose": {}
   },
-  "savedAt": "2026-10-27T11:30:40.498Z"
+  "gold": {
+    "v": 1,
+    "startedAt": 1793101231830,
+    "trades": [],
+    "open": null,
+    "lastFetch": 1793101231830,
+    "graduated": null
+  },
+  "savedAt": "2026-10-27T11:40:32.211Z"
 }
