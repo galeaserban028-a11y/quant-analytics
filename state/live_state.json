@@ -2,7 +2,7 @@
   "activeTrades": {},
   "closedTrades": [],
   "riskLedger": {
-    "dailyDate": "2026-10-31",
+    "dailyDate": "2026-11-01",
     "slCountBySymbol": {}
   },
   "lockouts": {},
@@ -2733,5 +2733,5 @@
     "lastFetch": 1793490116119,
     "graduated": null
   },
-  "savedAt": "2026-10-31T23:59:57.526Z"
+  "savedAt": "2026-11-01T00:00:55.832Z"
 }
