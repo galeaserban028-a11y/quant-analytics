@@ -65,31 +65,31 @@
     }
   },
   "prop": {
-    "generatedAt": "2026-10-23T09:16:28.096Z",
+    "generatedAt": "2026-11-01T10:16:15.227Z",
     "level": "LIVE",
     "validatedOOS": true,
     "oos": {
-      "trades": 5548,
-      "wins": 3490,
-      "losses": 2058,
-      "winRatePct": 62.9,
+      "trades": 5504,
+      "wins": 3469,
+      "losses": 2035,
+      "winRatePct": 63,
       "avgWinR": 0.549,
-      "avgLossR": 0.756,
-      "expectancyR": 0.065,
+      "avgLossR": 0.755,
+      "expectancyR": 0.067,
       "expectancyCI95": [
-        0.045,
-        0.084
+        0.048,
+        0.087
       ],
-      "tStat": 6.54,
-      "totalR": 359.31,
-      "profitFactor": 1.23,
+      "tStat": 6.77,
+      "totalR": 370.52,
+      "profitFactor": 1.24,
       "maxDrawdownR": 25.08,
       "maxLosingStreak": 9,
       "outcomes": {
-        "TARGET": 3727,
-        "STOP": 1266,
-        "TIME": 363,
-        "END_OF_DATA": 84,
+        "TARGET": 3707,
+        "STOP": 1250,
+        "TIME": 366,
+        "END_OF_DATA": 73,
         "TP": 108
       }
     },
@@ -175,47 +175,47 @@
           "FRA40|bb",
           "UK100|d7"
         ],
-        "expectedR": 0.065
+        "expectedR": 0.067
       }
     }
   },
   "fx": {
-    "generatedAt": "2026-10-19T01:49:01.555Z",
+    "generatedAt": "2026-11-01T10:15:38.675Z",
     "validatedOOS": false,
     "level": "NIMIC",
     "oos": [
       {
-        "trades": 647,
+        "trades": 649,
         "winRatePct": 58.9,
         "expectancyR": 0,
         "ci": [
-          -0.03,
+          -0.032,
           0.032
         ]
       },
       {
-        "trades": 598,
-        "winRatePct": 58.9,
-        "expectancyR": -0.026,
+        "trades": 605,
+        "winRatePct": 58.8,
+        "expectancyR": -0.025,
         "ci": [
           -0.065,
           0.016
         ]
       },
       {
-        "trades": 826,
-        "winRatePct": 57.1,
-        "expectancyR": -0.021,
+        "trades": 908,
+        "winRatePct": 59.9,
+        "expectancyR": -0.006,
         "ci": [
-          -0.054,
-          0.012
+          -0.039,
+          0.023
         ]
       }
     ],
     "overrides": {
       "fxDesk": {
         "enabled": false,
-        "firm": "THE5ERS_HIGH_STAKES",
+        "firm": "FUNDINGPIPS_2STEP",
         "riskPct": 3,
         "safety": 0.7,
         "maxOpen": 3,
@@ -253,21 +253,6 @@
             }
           },
           {
-            "id": "A1766",
-            "name": "Ștefan Toma",
-            "pair": "AUDCAD",
-            "family": "ibs",
-            "familyName": "Închidere la extremă (IBS)",
-            "params": {
-              "kind": "ibs",
-              "trendLen": 0,
-              "ibsEntry": 0.15,
-              "stopAtr": 3,
-              "maxDays": 3,
-              "allowShort": true
-            }
-          },
-          {
             "id": "A1828",
             "name": "Oana Ionescu",
             "pair": "AUDCAD",
@@ -281,6 +266,21 @@
               "stopAtr": 1.5,
               "maxDays": 10,
               "allowShort": false
+            }
+          },
+          {
+            "id": "A1766",
+            "name": "Ștefan Toma",
+            "pair": "AUDCAD",
+            "family": "ibs",
+            "familyName": "Închidere la extremă (IBS)",
+            "params": {
+              "kind": "ibs",
+              "trendLen": 0,
+              "ibsEntry": 0.15,
+              "stopAtr": 3,
+              "maxDays": 3,
+              "allowShort": true
             }
           },
           {
