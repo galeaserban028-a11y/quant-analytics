@@ -12,7 +12,8 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-11-01",
-    "outbox": []
+    "outbox": [],
+    "weeklyDate": "2026-11-01"
   },
   "prop": {
     "v": 2,
@@ -2733,5 +2734,5 @@
     "lastFetch": 1793516771015,
     "graduated": null
   },
-  "savedAt": "2026-11-01T07:51:16.681Z"
+  "savedAt": "2026-11-01T08:00:11.545Z"
 }
