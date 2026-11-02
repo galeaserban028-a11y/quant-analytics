@@ -21,7 +21,7 @@
     "phase": 0,
     "initial": 5000,
     "balance": 5103.170197395861,
-    "dayKey": "2026-11-02",
+    "dayKey": "2026-11-03",
     "dayStart": 5103.170197395861,
     "highestEod": 5103.170197395861,
     "tradingDays": [
@@ -2796,5 +2796,5 @@
     "lastFetch": 1793656448945,
     "graduated": null
   },
-  "savedAt": "2026-11-02T21:54:09.248Z"
+  "savedAt": "2026-11-02T22:00:08.428Z"
 }
