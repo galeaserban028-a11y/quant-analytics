@@ -2952,15 +2952,51 @@
         "outcome": "STOP",
         "resultR": -1.0358,
         "enteredAt": 1793606400000
+      },
+      {
+        "pair": "EURUSD",
+        "day": 1793664000000,
+        "live": false,
+        "direction": "LONG",
+        "entry": 1.1200717687606812,
+        "stop": 1.118067979812622,
+        "exit": 1.118067979812622,
+        "outcome": "STOP",
+        "resultR": -1.0599,
+        "enteredAt": 1793689200000
+      },
+      {
+        "pair": "GBPUSD",
+        "day": 1793664000000,
+        "live": false,
+        "direction": "LONG",
+        "entry": 1.341813564300537,
+        "stop": 1.33969247341156,
+        "exit": 1.3416695594787598,
+        "outcome": "TIME",
+        "resultR": -0.1245,
+        "enteredAt": 1793689200000
+      },
+      {
+        "pair": "USDJPY",
+        "day": 1793664000000,
+        "live": false,
+        "direction": "SHORT",
+        "entry": 157.78399658203125,
+        "stop": 157.95700073242188,
+        "exit": 157.95700073242188,
+        "outcome": "STOP",
+        "resultR": -1.0694,
+        "enteredAt": 1793689200000
       }
     ],
     "skips": {
       "INTERVAL_PREA_LARG": 4
     },
     "settled": {
-      "EURUSD": 1793577600000,
-      "GBPUSD": 1793577600000,
-      "USDJPY": 1793577600000
+      "EURUSD": 1793664000000,
+      "GBPUSD": 1793664000000,
+      "USDJPY": 1793664000000
     },
     "graduated": null,
     "paused": false,
@@ -3134,5 +3170,5 @@
     "lastFetch": 1793732756274,
     "graduated": null
   },
-  "savedAt": "2026-11-03T19:54:04.909Z"
+  "savedAt": "2026-11-03T20:00:54.573Z"
 }
