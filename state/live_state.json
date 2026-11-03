@@ -105,9 +105,9 @@
     "startedAt": 1792754041197,
     "fxRates": {
       "EURUSD": 1.1182805299758911,
-      "GBPUSD": 1.3378641605377197
+      "GBPUSD": 1.3385626077651978
     },
-    "fxFetchedAt": 1793662688904
+    "fxFetchedAt": 1793665989160
   },
   "fx": null,
   "fxVirtual": {
@@ -115,7 +115,7 @@
     "startedAt": 1792374647910,
     "schoolAt": "2026-11-01T10:15:38.675Z",
     "capital": 1000000,
-    "equity": 998083.3368530653,
+    "equity": 1000819.4122793314,
     "peak": 1002483.7999999998,
     "maxDdPct": 0.984061276482515,
     "positions": {
@@ -129,126 +129,6 @@
         "rank": "SENIOR",
         "name": "Denisa Badea"
       },
-      "A1893": {
-        "pair": "EURAUD",
-        "direction": "LONG",
-        "entry": 1.602380058441162,
-        "stop": 1.5729500181497846,
-        "openedAt": 1792540800000,
-        "risk": 1000,
-        "rank": "JUNIOR",
-        "name": "Teodora Constantin"
-      },
-      "A1907": {
-        "pair": "EURAUD",
-        "direction": "LONG",
-        "entry": 1.602380058441162,
-        "stop": 1.5631400047193253,
-        "openedAt": 1792540800000,
-        "risk": 1000,
-        "rank": "JUNIOR",
-        "name": "Denisa Mocanu"
-      },
-      "A1951": {
-        "pair": "EURAUD",
-        "direction": "LONG",
-        "entry": 1.602380058441162,
-        "stop": 1.5631400047193253,
-        "openedAt": 1792540800000,
-        "risk": 1000,
-        "rank": "JUNIOR",
-        "name": "Raluca Toma"
-      },
-      "A1908": {
-        "pair": "GBPAUD",
-        "direction": "SHORT",
-        "entry": 1.9056099653244019,
-        "stop": 1.9258699757712228,
-        "openedAt": 1792627200000,
-        "risk": 1000,
-        "rank": "JUNIOR",
-        "name": "Ramona Badea"
-      },
-      "A1776": {
-        "pair": "EURCAD",
-        "direction": "LONG",
-        "entry": 1.5712700101470947,
-        "stop": 1.5475464078521728,
-        "openedAt": 1792713600000,
-        "risk": 1000,
-        "rank": "JUNIOR",
-        "name": "Alina Coman"
-      },
-      "A1852": {
-        "pair": "EURJPY",
-        "direction": "LONG",
-        "entry": 175.66099609375,
-        "stop": 172.36250148228234,
-        "openedAt": 1792713600000,
-        "risk": 1000.3546,
-        "rank": "JUNIOR",
-        "name": "Răzvan Stan"
-      },
-      "A1984": {
-        "pair": "EURJPY",
-        "direction": "LONG",
-        "entry": 175.66099609375,
-        "stop": 173.4619996861049,
-        "openedAt": 1792713600000,
-        "risk": 500.1773,
-        "rank": "STAGIAR",
-        "name": "Adrian Tudor"
-      },
-      "A1987": {
-        "pair": "EURJPY",
-        "direction": "LONG",
-        "entry": 175.66099609375,
-        "stop": 174.01174878801618,
-        "openedAt": 1792713600000,
-        "risk": 500.1773,
-        "rank": "STAGIAR",
-        "name": "Adina Neagu"
-      },
-      "A2023": {
-        "pair": "EURJPY",
-        "direction": "LONG",
-        "entry": 175.66099609375,
-        "stop": 174.01174878801618,
-        "openedAt": 1792713600000,
-        "risk": 500.1773,
-        "rank": "STAGIAR",
-        "name": "Horia Cristea"
-      },
-      "A2041": {
-        "pair": "EURJPY",
-        "direction": "LONG",
-        "entry": 175.66099609375,
-        "stop": 173.4619996861049,
-        "openedAt": 1792713600000,
-        "risk": 500.1773,
-        "rank": "STAGIAR",
-        "name": "Cristian Sârbu"
-      },
-      "A1861": {
-        "pair": "EURGBP",
-        "direction": "LONG",
-        "entry": 0.8372600237083435,
-        "stop": 0.8255200544548035,
-        "openedAt": 1792713600000,
-        "risk": 1000.3546,
-        "rank": "JUNIOR",
-        "name": "Ana Neagu"
-      },
-      "A1834": {
-        "pair": "USDJPY",
-        "direction": "LONG",
-        "entry": 156.54499548339842,
-        "stop": 154.0635697893415,
-        "openedAt": 1792713600000,
-        "risk": 1001.9317499999997,
-        "rank": "JUNIOR",
-        "name": "Ramona Vasile"
-      },
       "A1843": {
         "pair": "USDCHF",
         "direction": "LONG",
@@ -258,16 +138,6 @@
         "risk": 1001.9317499999997,
         "rank": "JUNIOR",
         "name": "Corina Barbu"
-      },
-      "A1993": {
-        "pair": "NZDJPY",
-        "direction": "LONG",
-        "entry": 88.98300286865235,
-        "stop": 85.71300077601842,
-        "openedAt": 1792713600000,
-        "risk": 501.1048249999999,
-        "rank": "STAGIAR",
-        "name": "Sara Dobre"
       },
       "A2008": {
         "pair": "NZDCAD",
@@ -288,46 +158,6 @@
         "risk": 2004.4192999999996,
         "rank": "SENIOR",
         "name": "Sara Ionescu"
-      },
-      "A1991": {
-        "pair": "EURCAD",
-        "direction": "LONG",
-        "entry": 1.5688599559402465,
-        "stop": 1.5379342052078246,
-        "openedAt": 1792800000000,
-        "risk": 500.6010749999999,
-        "rank": "STAGIAR",
-        "name": "Teodora Oprea"
-      },
-      "A1983": {
-        "pair": "EURCAD",
-        "direction": "LONG",
-        "entry": 1.5688599559402465,
-        "stop": 1.5379342052078246,
-        "openedAt": 1792800000000,
-        "risk": 500.0973249999999,
-        "rank": "STAGIAR",
-        "name": "Dan Toma"
-      },
-      "A1489": {
-        "pair": "CHFJPY",
-        "direction": "LONG",
-        "entry": 190.15400268554689,
-        "stop": 185.79998570033484,
-        "openedAt": 1792800000000,
-        "risk": 1000.1946499999998,
-        "rank": "JUNIOR",
-        "name": "Mădălina Tudor"
-      },
-      "A1921": {
-        "pair": "CHFJPY",
-        "direction": "LONG",
-        "entry": 190.15400268554689,
-        "stop": 185.79998570033484,
-        "openedAt": 1792800000000,
-        "risk": 1000.7420499999998,
-        "rank": "JUNIOR",
-        "name": "Camelia Barbu"
       },
       "A1875": {
         "pair": "USDCAD",
@@ -368,56 +198,6 @@
         "risk": 499.68468824166985,
         "rank": "STAGIAR",
         "name": "Paul Munteanu"
-      },
-      "A1997": {
-        "pair": "AUDJPY",
-        "direction": "SHORT",
-        "entry": 110.98400115966797,
-        "stop": 112.65557207380023,
-        "openedAt": 1793145600000,
-        "risk": 499.9736455830949,
-        "rank": "STAGIAR",
-        "name": "Sebastian Dobre"
-      },
-      "A2047": {
-        "pair": "AUDJPY",
-        "direction": "SHORT",
-        "entry": 110.98400115966797,
-        "stop": 113.49135753086635,
-        "openedAt": 1793145600000,
-        "risk": 499.9736455830949,
-        "rank": "STAGIAR",
-        "name": "Maria Manole"
-      },
-      "A1920": {
-        "pair": "EURCAD",
-        "direction": "LONG",
-        "entry": 1.5602200242614745,
-        "stop": 1.5488446481050764,
-        "openedAt": 1793232000000,
-        "risk": 996.3439622648849,
-        "rank": "JUNIOR",
-        "name": "Corina Rusu"
-      },
-      "A2007": {
-        "pair": "EURCAD",
-        "direction": "LONG",
-        "entry": 1.5602200242614745,
-        "stop": 1.5488446481050764,
-        "openedAt": 1793232000000,
-        "risk": 497.97867121902243,
-        "rank": "STAGIAR",
-        "name": "Cosmin Stan"
-      },
-      "A2009": {
-        "pair": "EURCAD",
-        "direction": "LONG",
-        "entry": 1.5602200242614745,
-        "stop": 1.5488446481050764,
-        "openedAt": 1793232000000,
-        "risk": 497.78545861750865,
-        "rank": "STAGIAR",
-        "name": "Alexandru Toma"
       },
       "A1985": {
         "pair": "EURJPY",
@@ -678,23 +458,95 @@
         "risk": 997.9863497952996,
         "rank": "JUNIOR",
         "name": "Petra Moldovan"
+      },
+      "A1828": {
+        "pair": "AUDCAD",
+        "direction": "LONG",
+        "entry": 0.9787199980163575,
+        "stop": 0.9693278663642066,
+        "openedAt": 1793664000000,
+        "risk": 2995.650428331169,
+        "rank": "ELITĂ",
+        "name": "Oana Ionescu"
+      },
+      "A1738": {
+        "pair": "CHFJPY",
+        "direction": "SHORT",
+        "entry": 192.98199462890625,
+        "stop": 196.5862819126674,
+        "openedAt": 1793664000000,
+        "risk": 1000.6094231695214,
+        "rank": "JUNIOR",
+        "name": "Alina Dinu"
+      },
+      "A1905": {
+        "pair": "GBPUSD",
+        "direction": "SHORT",
+        "entry": 1.3408780097961426,
+        "stop": 1.3686391626085554,
+        "openedAt": 1793664000000,
+        "risk": 1001.2324851698513,
+        "rank": "JUNIOR",
+        "name": "Emil Marin"
+      },
+      "A1786": {
+        "pair": "AUDCHF",
+        "direction": "LONG",
+        "entry": 0.5726499768829346,
+        "stop": 0.5501670708138603,
+        "openedAt": 1793664000000,
+        "risk": 1001.8154090620014,
+        "rank": "JUNIOR",
+        "name": "Mădălina Rusu"
+      },
+      "A2044": {
+        "pair": "USDCHF",
+        "direction": "LONG",
+        "entry": 0.8184200087738037,
+        "stop": 0.8074814324842181,
+        "openedAt": 1793664000000,
+        "risk": 500.9077045310007,
+        "rank": "STAGIAR",
+        "name": "Cristian Moldovan"
+      },
+      "A1908": {
+        "pair": "GBPAUD",
+        "direction": "LONG",
+        "entry": 1.9166800372314454,
+        "stop": 1.8920899877602715,
+        "openedAt": 1793664000000,
+        "risk": 1001.2653090620014,
+        "rank": "JUNIOR",
+        "name": "Ramona Badea"
+      },
+      "A1993": {
+        "pair": "NZDJPY",
+        "direction": "LONG",
+        "entry": 88.69899865722657,
+        "stop": 85.5804269670759,
+        "openedAt": 1793664000000,
+        "risk": 500.6107061396657,
+        "rank": "STAGIAR",
+        "name": "Sara Dobre"
+      },
+      "A1833": {
+        "pair": "GBPCHF",
+        "direction": "LONG",
+        "entry": 1.0974299575805664,
+        "stop": 1.0810584434645516,
+        "openedAt": 1793664000000,
+        "risk": 1001.2214122793314,
+        "rank": "JUNIOR",
+        "name": "Ovidiu Barbu"
       }
     },
     "skipped": {
       "A1820": 1792108800000,
       "A1824": 1789689600000,
       "A1790": 1790121600000,
-      "A1841": 1792195200000,
-      "A1497": 1792800000000,
-      "A1863": 1792800000000,
-      "A1862": 1792800000000,
       "A1194": 1792800000000,
       "A1891": 1792800000000,
-      "A1910": 1792800000000,
-      "A1883": 1792800000000,
-      "A1904": 1792800000000,
       "A1895": 1793059200000,
-      "A2006": 1793232000000,
       "A2051": 1793145600000,
       "A1746": 1793318400000,
       "A1888": 1793318400000,
@@ -702,18 +554,18 @@
     },
     "agents": {
       "A1997": {
-        "n": 1,
-        "sumR": 0.4255,
-        "wins": 1,
-        "pnl": 212.75,
-        "lastAt": 1792713600000
+        "n": 2,
+        "sumR": 0.7202999999999999,
+        "wins": 2,
+        "pnl": 360.1422307178964,
+        "lastAt": 1793664000000
       },
       "A2047": {
-        "n": 1,
-        "sumR": 0.2837,
-        "wins": 1,
-        "pnl": 141.85,
-        "lastAt": 1792713600000
+        "n": 2,
+        "sumR": 0.4802,
+        "wins": 2,
+        "pnl": 240.09482135707816,
+        "lastAt": 1793664000000
       },
       "A1746": {
         "n": 1,
@@ -793,25 +645,25 @@
         "lastAt": 1792713600000
       },
       "A1920": {
-        "n": 2,
-        "sumR": -1.7802000000000002,
-        "wins": 0,
-        "pnl": -1781.128901305,
-        "lastAt": 1793232000000
+        "n": 3,
+        "sumR": -1.3486000000000002,
+        "wins": 1,
+        "pnl": -1351.1068471914757,
+        "lastAt": 1793664000000
       },
       "A2007": {
-        "n": 2,
-        "sumR": -1.7802000000000002,
-        "wins": 0,
-        "pnl": -890.36982684,
-        "lastAt": 1793232000000
+        "n": 3,
+        "sumR": -1.3486000000000002,
+        "wins": 1,
+        "pnl": -675.4422323418698,
+        "lastAt": 1793664000000
       },
       "A2009": {
-        "n": 2,
-        "sumR": -1.7802000000000002,
-        "wins": 0,
-        "pnl": -890.1752030275,
-        "lastAt": 1793232000000
+        "n": 3,
+        "sumR": -1.3486000000000002,
+        "wins": 1,
+        "pnl": -675.3309990881833,
+        "lastAt": 1793664000000
       },
       "A1738": {
         "n": 1,
@@ -1099,9 +951,370 @@
         "wins": 0,
         "pnl": 0,
         "lastAt": 1793406410683
+      },
+      "A1776": {
+        "n": 1,
+        "sumR": -0.267,
+        "wins": 0,
+        "pnl": -267,
+        "lastAt": 1793664000000
+      },
+      "A1991": {
+        "n": 1,
+        "sumR": -0.1259,
+        "wins": 0,
+        "pnl": -63.025675342499994,
+        "lastAt": 1793664000000
+      },
+      "A1983": {
+        "n": 1,
+        "sumR": -0.1259,
+        "wins": 0,
+        "pnl": -62.96225321749999,
+        "lastAt": 1793664000000
+      },
+      "A1852": {
+        "n": 1,
+        "sumR": 0.3266,
+        "wins": 1,
+        "pnl": 326.71581236000003,
+        "lastAt": 1793664000000
+      },
+      "A1984": {
+        "n": 1,
+        "sumR": 0.4899,
+        "wins": 1,
+        "pnl": 245.03685927,
+        "lastAt": 1793664000000
+      },
+      "A1987": {
+        "n": 1,
+        "sumR": 0.6532,
+        "wins": 1,
+        "pnl": 326.71581236000003,
+        "lastAt": 1793664000000
+      },
+      "A2023": {
+        "n": 1,
+        "sumR": 0.6532,
+        "wins": 1,
+        "pnl": 326.71581236000003,
+        "lastAt": 1793664000000
+      },
+      "A2041": {
+        "n": 1,
+        "sumR": 0.4899,
+        "wins": 1,
+        "pnl": 245.03685927,
+        "lastAt": 1793664000000
+      },
+      "A1861": {
+        "n": 1,
+        "sumR": -0.2792,
+        "wins": 0,
+        "pnl": -279.29900432,
+        "lastAt": 1793664000000
+      },
+      "A1489": {
+        "n": 1,
+        "sumR": 0.6226,
+        "wins": 1,
+        "pnl": 622.7211890899999,
+        "lastAt": 1793664000000
+      },
+      "A1921": {
+        "n": 1,
+        "sumR": 0.6226,
+        "wins": 1,
+        "pnl": 623.0620003299999,
+        "lastAt": 1793664000000
+      },
+      "A1834": {
+        "n": 1,
+        "sumR": 0.5818,
+        "wins": 1,
+        "pnl": 582.9238921499998,
+        "lastAt": 1793664000000
+      },
+      "A1908": {
+        "n": 1,
+        "sumR": -0.5501,
+        "wins": 0,
+        "pnl": -550.1,
+        "lastAt": 1793664000000
+      },
+      "A1993": {
+        "n": 1,
+        "sumR": -0.0876,
+        "wins": 0,
+        "pnl": -43.896782669999986,
+        "lastAt": 1793664000000
+      },
+      "A1893": {
+        "n": 1,
+        "sumR": -0.1608,
+        "wins": 0,
+        "pnl": -160.8,
+        "lastAt": 1793664000000
+      },
+      "A1907": {
+        "n": 1,
+        "sumR": -0.1206,
+        "wins": 0,
+        "pnl": -120.6,
+        "lastAt": 1793664000000
+      },
+      "A1951": {
+        "n": 1,
+        "sumR": -0.1206,
+        "wins": 0,
+        "pnl": -120.6,
+        "lastAt": 1793664000000
       }
     },
     "journal": [
+      {
+        "at": 1793664000000,
+        "id": "A1951",
+        "name": "Raluca Toma",
+        "rank": "JUNIOR",
+        "pair": "EURAUD",
+        "direction": "LONG",
+        "r": -0.121,
+        "pnl": -121,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1907",
+        "name": "Denisa Mocanu",
+        "rank": "JUNIOR",
+        "pair": "EURAUD",
+        "direction": "LONG",
+        "r": -0.121,
+        "pnl": -121,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1893",
+        "name": "Teodora Constantin",
+        "rank": "JUNIOR",
+        "pair": "EURAUD",
+        "direction": "LONG",
+        "r": -0.161,
+        "pnl": -161,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1993",
+        "name": "Sara Dobre",
+        "rank": "STAGIAR",
+        "pair": "NZDJPY",
+        "direction": "LONG",
+        "r": -0.088,
+        "pnl": -44,
+        "outcome": "TIME"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1908",
+        "name": "Ramona Badea",
+        "rank": "JUNIOR",
+        "pair": "GBPAUD",
+        "direction": "SHORT",
+        "r": -0.55,
+        "pnl": -550,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1834",
+        "name": "Ramona Vasile",
+        "rank": "JUNIOR",
+        "pair": "USDJPY",
+        "direction": "LONG",
+        "r": 0.582,
+        "pnl": 583,
+        "outcome": "TIME"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1921",
+        "name": "Camelia Barbu",
+        "rank": "JUNIOR",
+        "pair": "CHFJPY",
+        "direction": "LONG",
+        "r": 0.623,
+        "pnl": 623,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1489",
+        "name": "Mădălina Tudor",
+        "rank": "JUNIOR",
+        "pair": "CHFJPY",
+        "direction": "LONG",
+        "r": 0.623,
+        "pnl": 623,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1861",
+        "name": "Ana Neagu",
+        "rank": "JUNIOR",
+        "pair": "EURGBP",
+        "direction": "LONG",
+        "r": -0.279,
+        "pnl": -279,
+        "outcome": "TIME"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A2041",
+        "name": "Cristian Sârbu",
+        "rank": "STAGIAR",
+        "pair": "EURJPY",
+        "direction": "LONG",
+        "r": 0.49,
+        "pnl": 245,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A2023",
+        "name": "Horia Cristea",
+        "rank": "STAGIAR",
+        "pair": "EURJPY",
+        "direction": "LONG",
+        "r": 0.653,
+        "pnl": 327,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1987",
+        "name": "Adina Neagu",
+        "rank": "STAGIAR",
+        "pair": "EURJPY",
+        "direction": "LONG",
+        "r": 0.653,
+        "pnl": 327,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1984",
+        "name": "Adrian Tudor",
+        "rank": "STAGIAR",
+        "pair": "EURJPY",
+        "direction": "LONG",
+        "r": 0.49,
+        "pnl": 245,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1852",
+        "name": "Răzvan Stan",
+        "rank": "JUNIOR",
+        "pair": "EURJPY",
+        "direction": "LONG",
+        "r": 0.327,
+        "pnl": 327,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A2047",
+        "name": "Maria Manole",
+        "rank": "STAGIAR",
+        "pair": "AUDJPY",
+        "direction": "SHORT",
+        "r": 0.197,
+        "pnl": 98,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1997",
+        "name": "Sebastian Dobre",
+        "rank": "STAGIAR",
+        "pair": "AUDJPY",
+        "direction": "SHORT",
+        "r": 0.295,
+        "pnl": 147,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A2009",
+        "name": "Alexandru Toma",
+        "rank": "STAGIAR",
+        "pair": "EURCAD",
+        "direction": "LONG",
+        "r": 0.432,
+        "pnl": 215,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A2007",
+        "name": "Cosmin Stan",
+        "rank": "STAGIAR",
+        "pair": "EURCAD",
+        "direction": "LONG",
+        "r": 0.432,
+        "pnl": 215,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1983",
+        "name": "Dan Toma",
+        "rank": "STAGIAR",
+        "pair": "EURCAD",
+        "direction": "LONG",
+        "r": -0.126,
+        "pnl": -63,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1991",
+        "name": "Teodora Oprea",
+        "rank": "STAGIAR",
+        "pair": "EURCAD",
+        "direction": "LONG",
+        "r": -0.126,
+        "pnl": -63,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1920",
+        "name": "Corina Rusu",
+        "rank": "JUNIOR",
+        "pair": "EURCAD",
+        "direction": "LONG",
+        "r": 0.432,
+        "pnl": 430,
+        "outcome": "TARGET"
+      },
+      {
+        "at": 1793664000000,
+        "id": "A1776",
+        "name": "Alina Coman",
+        "rank": "JUNIOR",
+        "pair": "EURCAD",
+        "direction": "LONG",
+        "r": -0.267,
+        "pnl": -267,
+        "outcome": "TARGET"
+      },
       {
         "at": 1793404800000,
         "id": "A1773",
@@ -1896,61 +2109,62 @@
       }
     ],
     "monthly": {
-      "2026-10": -1916.66314693447
+      "2026-10": -1916.66314693447,
+      "2026-11": 2736.075426265945
     },
     "lastBarClose": {
-      "GBPJPY": 1793404800000,
-      "EURCAD": 1793404800000,
-      "AUDCAD": 1793404800000,
-      "AUDJPY": 1793404800000,
-      "EURJPY": 1793404800000,
-      "EURGBP": 1793404800000,
-      "CHFJPY": 1793404800000,
-      "GBPUSD": 1793404800000,
-      "GBPCAD": 1793404800000,
-      "USDCAD": 1793404800000,
-      "NZDUSD": 1793404800000,
-      "AUDUSD": 1793404800000,
-      "CADJPY": 1793404800000,
-      "USDJPY": 1793404800000,
-      "AUDCHF": 1793404800000,
-      "GBPNZD": 1793404800000,
-      "USDCHF": 1793404800000,
-      "EURUSD": 1793404800000,
-      "EURNZD": 1793404800000,
-      "GBPAUD": 1793404800000,
-      "NZDJPY": 1793404800000,
-      "GBPCHF": 1793404800000,
-      "EURCHF": 1793404800000,
-      "EURAUD": 1793404800000,
-      "NZDCAD": 1793404800000
+      "GBPJPY": 1793664000000,
+      "EURCAD": 1793664000000,
+      "AUDCAD": 1793664000000,
+      "AUDJPY": 1793664000000,
+      "EURJPY": 1793664000000,
+      "EURGBP": 1793664000000,
+      "CHFJPY": 1793664000000,
+      "GBPUSD": 1793664000000,
+      "GBPCAD": 1793664000000,
+      "USDCAD": 1793664000000,
+      "NZDUSD": 1793664000000,
+      "AUDUSD": 1793664000000,
+      "CADJPY": 1793664000000,
+      "USDJPY": 1793664000000,
+      "AUDCHF": 1793664000000,
+      "GBPNZD": 1793664000000,
+      "USDCHF": 1793664000000,
+      "EURUSD": 1793664000000,
+      "EURNZD": 1793664000000,
+      "GBPAUD": 1793664000000,
+      "NZDJPY": 1793664000000,
+      "GBPCHF": 1793664000000,
+      "EURCHF": 1793664000000,
+      "EURAUD": 1793664000000,
+      "NZDCAD": 1793664000000
     },
     "lastFetch": {
-      "GBPJPY": 1793662688904,
-      "EURCAD": 1793662688904,
-      "AUDCAD": 1793662688904,
-      "AUDJPY": 1793662688904,
-      "EURJPY": 1793662688904,
-      "EURGBP": 1793662688904,
-      "CHFJPY": 1793662688904,
-      "GBPUSD": 1793662688904,
-      "GBPCAD": 1793662688904,
-      "USDCAD": 1793662688904,
-      "NZDUSD": 1793662688904,
-      "AUDUSD": 1793662688904,
-      "CADJPY": 1793662688904,
-      "USDJPY": 1793662688904,
-      "AUDCHF": 1793662688904,
-      "GBPNZD": 1793662688904,
-      "USDCHF": 1793662688904,
-      "EURUSD": 1793662688904,
-      "EURNZD": 1793662688904,
-      "GBPAUD": 1793662688904,
-      "NZDJPY": 1793662688904,
-      "GBPCHF": 1793662688904,
-      "EURCHF": 1793662688904,
-      "EURAUD": 1793662688904,
-      "NZDCAD": 1793662688904
+      "GBPJPY": 1793665989160,
+      "EURCAD": 1793665989160,
+      "AUDCAD": 1793665989160,
+      "AUDJPY": 1793665989160,
+      "EURJPY": 1793665989160,
+      "EURGBP": 1793665989160,
+      "CHFJPY": 1793665989160,
+      "GBPUSD": 1793665989160,
+      "GBPCAD": 1793665989160,
+      "USDCAD": 1793665989160,
+      "NZDUSD": 1793665989160,
+      "AUDUSD": 1793665989160,
+      "CADJPY": 1793665989160,
+      "USDJPY": 1793665989160,
+      "AUDCHF": 1793665989160,
+      "GBPNZD": 1793665989160,
+      "USDCHF": 1793665989160,
+      "EURUSD": 1793665989160,
+      "EURNZD": 1793665989160,
+      "GBPAUD": 1793665989160,
+      "NZDJPY": 1793665989160,
+      "GBPCHF": 1793665989160,
+      "EURCHF": 1793665989160,
+      "EURAUD": 1793665989160,
+      "NZDCAD": 1793665989160
     },
     "sentHome": {},
     "recent": {
@@ -1958,12 +2172,20 @@
         {
           "at": 1792713924734,
           "r": 0.4255
+        },
+        {
+          "at": 1793665989160,
+          "r": 0.2948
         }
       ],
       "A2047": [
         {
           "at": 1792713924734,
           "r": 0.2837
+        },
+        {
+          "at": 1793665989160,
+          "r": 0.1965
         }
       ],
       "A1746": [
@@ -2052,6 +2274,10 @@
         {
           "at": 1793233339953,
           "r": -0.7727
+        },
+        {
+          "at": 1793665989160,
+          "r": 0.4316
         }
       ],
       "A2007": [
@@ -2062,6 +2288,10 @@
         {
           "at": 1793233339953,
           "r": -0.7727
+        },
+        {
+          "at": 1793665989160,
+          "r": 0.4316
         }
       ],
       "A2009": [
@@ -2072,6 +2302,10 @@
         {
           "at": 1793233339953,
           "r": -0.7727
+        },
+        {
+          "at": 1793665989160,
+          "r": 0.4316
         }
       ],
       "A1738": [
@@ -2354,6 +2588,108 @@
         {
           "at": 1793406410683,
           "r": 0
+        }
+      ],
+      "A1776": [
+        {
+          "at": 1793665989160,
+          "r": -0.267
+        }
+      ],
+      "A1991": [
+        {
+          "at": 1793665989160,
+          "r": -0.1259
+        }
+      ],
+      "A1983": [
+        {
+          "at": 1793665989160,
+          "r": -0.1259
+        }
+      ],
+      "A1852": [
+        {
+          "at": 1793665989160,
+          "r": 0.3266
+        }
+      ],
+      "A1984": [
+        {
+          "at": 1793665989160,
+          "r": 0.4899
+        }
+      ],
+      "A1987": [
+        {
+          "at": 1793665989160,
+          "r": 0.6532
+        }
+      ],
+      "A2023": [
+        {
+          "at": 1793665989160,
+          "r": 0.6532
+        }
+      ],
+      "A2041": [
+        {
+          "at": 1793665989160,
+          "r": 0.4899
+        }
+      ],
+      "A1861": [
+        {
+          "at": 1793665989160,
+          "r": -0.2792
+        }
+      ],
+      "A1489": [
+        {
+          "at": 1793665989160,
+          "r": 0.6226
+        }
+      ],
+      "A1921": [
+        {
+          "at": 1793665989160,
+          "r": 0.6226
+        }
+      ],
+      "A1834": [
+        {
+          "at": 1793665989160,
+          "r": 0.5818
+        }
+      ],
+      "A1908": [
+        {
+          "at": 1793665989160,
+          "r": -0.5501
+        }
+      ],
+      "A1993": [
+        {
+          "at": 1793665989160,
+          "r": -0.0876
+        }
+      ],
+      "A1893": [
+        {
+          "at": 1793665989160,
+          "r": -0.1608
+        }
+      ],
+      "A1907": [
+        {
+          "at": 1793665989160,
+          "r": -0.1206
+        }
+      ],
+      "A1951": [
+        {
+          "at": 1793665989160,
+          "r": -0.1206
         }
       ]
     },
@@ -2796,5 +3132,5 @@
     "lastFetch": 1793663109212,
     "graduated": null
   },
-  "savedAt": "2026-11-03T00:14:09.598Z"
+  "savedAt": "2026-11-03T00:33:15.187Z"
 }
