@@ -3248,12 +3248,12 @@
       }
     ],
     "skips": {
-      "INTERVAL_PREA_LARG": 4
+      "INTERVAL_PREA_LARG": 7
     },
     "settled": {
-      "EURUSD": 1793664000000,
-      "GBPUSD": 1793664000000,
-      "USDJPY": 1793664000000
+      "EURUSD": 1793750400000,
+      "GBPUSD": 1793750400000,
+      "USDJPY": 1793750400000
     },
     "graduated": null,
     "paused": false,
@@ -3451,5 +3451,5 @@
     "lastFetch": 1793819101770,
     "graduated": null
   },
-  "savedAt": "2026-11-04T19:53:12.294Z"
+  "savedAt": "2026-11-04T20:00:02.245Z"
 }
