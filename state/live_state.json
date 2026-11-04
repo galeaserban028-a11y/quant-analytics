@@ -3433,10 +3433,12 @@
         "enteredAt": 1793720700000
       }
     ],
-    "skips": {},
+    "skips": {
+      "INTERVAL_PREA_LARG": 2
+    },
     "settled": {
-      "SPX500": "2026-11-03",
-      "NAS100": "2026-11-03"
+      "SPX500": "2026-11-04",
+      "NAS100": "2026-11-04"
     },
     "graduated": null,
     "paused": false,
@@ -3451,5 +3453,5 @@
     "lastFetch": 1793825762737,
     "graduated": null
   },
-  "savedAt": "2026-11-04T20:56:03.265Z"
+  "savedAt": "2026-11-04T21:15:03.214Z"
 }
