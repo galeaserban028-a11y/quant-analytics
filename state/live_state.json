@@ -12,12 +12,7 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-11-04",
-    "outbox": [
-      {
-        "at": 1793827202696,
-        "text": "✅ <b>US30</b> a atins take profit (s-a închis singur) · Andrei: +1.47R ≈ 283 $\nSold estimat: 5.386 $"
-      }
-    ],
+    "outbox": [],
     "weeklyDate": "2026-11-01"
   },
   "prop": {
@@ -3579,5 +3574,5 @@
     "lastFetch": 1793855618531,
     "graduated": null
   },
-  "savedAt": "2026-11-05T05:44:41.708Z"
+  "savedAt": "2026-11-05T06:00:40.727Z"
 }
