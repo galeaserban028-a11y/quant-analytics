@@ -3569,10 +3569,20 @@
   "gold": {
     "v": 1,
     "startedAt": 1793101231830,
-    "trades": [],
+    "trades": [
+      {
+        "openedAt": 1793851200000,
+        "closedAt": 1793865600000,
+        "direction": "LONG",
+        "entry": 4149.5001953125,
+        "exit": 4133,
+        "outcome": "TARGET",
+        "resultR": -0.1458
+      }
+    ],
     "open": null,
-    "lastFetch": 1793872243245,
+    "lastFetch": 1793875559532,
     "graduated": null
   },
-  "savedAt": "2026-11-05T10:38:12.308Z"
+  "savedAt": "2026-11-05T10:46:00.273Z"
 }
