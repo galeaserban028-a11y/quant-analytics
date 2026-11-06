@@ -43,6 +43,7 @@ jobs:
           PROP_CONTRACT_SIZES: ${{ vars.PROP_CONTRACT_SIZES }}
           PROP_RESUME: ${{ vars.PROP_RESUME }}
           LIVE_TELEGRAM: '1'
+          LIQ_DEMO_SIGNALS: ${{ vars.LIQ_DEMO_SIGNALS }}
           STATE_PATH: state/live_state.json
         run: bash scripts/live-loop.sh
       - name: Pornește următoarea buclă

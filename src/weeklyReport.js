@@ -9,7 +9,7 @@ const WEEK = 7 * 864e5;
 const money = (v) => `${v < 0 ? '−' : '+'}${Math.abs(v).toFixed(0)} $`;
 
 function trainStats(trades) {
-  const r = (trades || []).map((t) => t.resultR).filter((x) => typeof x === 'number');
+  const r = (trades || []).map((t) => (t.resultR != null ? t.resultR : t.r)).filter((x) => typeof x === 'number');
   const n = r.length;
   if (!n) return null;
   return { n, wins: r.filter((x) => x > 0).length, totalR: r.reduce((a, b) => a + b, 0) };
@@ -34,7 +34,7 @@ function weeklyReport(state, now) {
     const target = acct.initial * 0.08;
     lines.push(`Până la ținta examenului (+8%): ${totalPnl >= target ? 'ATINSĂ ✅' : `mai sunt ${(target - totalPnl).toFixed(0)} $`}`);
   }
-  const train = [['Scalping S&P/Nasdaq (M15)', state.orb], ['Forex Londra', state.fxLondon], ['Aur H4', state.gold]];
+  const train = [['Scalping S&P/Nasdaq (M15)', state.orb], ['Forex Londra', state.fxLondon], ['Aur H4', state.gold], ['Lichiditate aur+Nasdaq (stilul prietenului)', state.liq]];
   const tl = [];
   for (const [name, book] of train) {
     if (!book) continue;
