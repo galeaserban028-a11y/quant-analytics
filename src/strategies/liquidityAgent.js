@@ -63,16 +63,20 @@ const hourUtc = (t) => new Date(t).getUTCHours() + new Date(t).getUTCMinutes() /
  * Intrarea e la deschiderea barei i+1.
  */
 function findSignals(bars, opts = {}) {
-  const o = Object.assign({ sessionFrom: 6, sessionTo: 20, eqTol: 0.25, accN: 6, accW: 0.75 }, opts);
+  // Timeframe-uri: base = lumânările primite (M15 sau M1); lvl = unde caută lichiditatea egală și acumularea (H1 sau M15);
+  // big = lichiditatea mare (H4 sau H1); trendTf = direcția (H4 la ambele).
+  const o = Object.assign({ sessionFrom: 6, sessionTo: 20, eqTol: 0.25, accN: 6, accW: 0.75, base: M15, lvl: H, big: 4 * H, trendTf: 4 * H }, opts);
   const N = bars.length;
   if (N < 400) return [];
-  const H1 = aggregate(bars, H), H4 = aggregate(bars, 4 * H);
-  const a1 = atr(H1), a4 = atr(H4), s4 = sma(H4.map((x) => x.c), 50);
-  const h1Of = new Int32Array(N), h4Of = new Int32Array(N);
+  const H1 = aggregate(bars, o.lvl), H4 = aggregate(bars, o.big), TT = o.trendTf === o.big ? H4 : aggregate(bars, o.trendTf);
+  const a1 = atr(H1), a4 = atr(H4), sT = sma(TT.map((x) => x.c), 50);
+  const h1Of = new Int32Array(N), h4Of = new Int32Array(N), tOf = new Int32Array(N);
   H1.forEach((x, j) => { for (let i = x.i0; i <= x.i1; i++) h1Of[i] = j; });
   H4.forEach((x, j) => { for (let i = x.i0; i <= x.i1; i++) h4Of[i] = j; });
+  TT.forEach((x, j) => { for (let i = x.i0; i <= x.i1; i++) tOf[i] = j; });
+  const W_A = Math.round(48 * o.lvl / o.base), W_B = Math.round(30 * o.big / o.base);
   // trendul H4 știut la bara i: ultima lumânare H4 ÎNCHEIATĂ
-  const trend = (i) => { const j = h4Of[i] - 1; return j >= 50 && s4[j] != null ? (H4[j].c > s4[j] ? 1 : -1) : 0; };
+  const trend = (i) => { const j = tOf[i] - 1; return j >= 50 && sT[j] != null ? (TT[j].c > sT[j] ? 1 : -1) : 0; };
   const inSession = (i) => { const h = hourUtc(bars[i].t); return h >= o.sessionFrom && h < o.sessionTo; };
   const out = [];
   const add = (i, dir, stop, tpR, setup) => {
@@ -101,7 +105,7 @@ function findSignals(bars, opts = {}) {
         if (Math.abs(v1 - v2) > o.eqTol * a) continue;
         const lvl = dir > 0 ? Math.min(v1, v2) : Math.max(v1, v2), c = conf1(j2);
         let sw = -1;
-        for (let i = c + 1; i < Math.min(N, c + 192); i++) if (dir > 0 ? bars[i].l < lvl : bars[i].h > lvl) { sw = i; break; }
+        for (let i = c + 1; i < Math.min(N, c + W_A); i++) if (dir > 0 ? bars[i].l < lvl : bars[i].h > lvl) { sw = i; break; }
         if (sw < 0) break;
         let ext = dir > 0 ? bars[sw].l : bars[sw].h;
         for (let i = sw; i < sw + 4 && i < N; i++) {
@@ -120,7 +124,7 @@ function findSignals(bars, opts = {}) {
     for (const j of dir > 0 ? S4.lo : S4.hi) {
       const lvl = dir > 0 ? H4[j].l : H4[j].h, c = conf4(j);
       let sw = -1;
-      for (let i = c + 1; i < Math.min(N, c + 480); i++) if (dir > 0 ? bars[i].l < lvl : bars[i].h > lvl) { sw = i; break; }
+      for (let i = c + 1; i < Math.min(N, c + W_B); i++) if (dir > 0 ? bars[i].l < lvl : bars[i].h > lvl) { sw = i; break; }
       if (sw < 8) continue;
       let st = dir > 0 ? -Infinity : Infinity;
       for (let k = sw - 8; k < sw; k++) st = dir > 0 ? Math.max(st, bars[k].h) : Math.min(st, bars[k].l);
@@ -135,7 +139,7 @@ function findSignals(bars, opts = {}) {
   // C. Acumulare pe H1, apoi continuarea trendului (semnalul la închiderea orei care sparge cutia)
   for (let j = o.accN + 1; j < H1.length; j++) {
     const i = H1[j].i1;
-    if ((bars[i].t + M15) % H !== 0) continue; // ora nu s-a încheiat încă (sau lipsesc date)
+    if ((bars[i].t + o.base) % o.lvl !== 0) continue; // ora nu s-a încheiat încă (sau lipsesc date)
     const j4 = h4Of[H1[j].i0] - 1, A4 = a4[j4];
     if (!A4) continue;
     let hi = -Infinity, lo = Infinity;
@@ -169,8 +173,8 @@ function settle(bars, ei, dir, stopPx, tpR, cost, maxBars = 96) {
 }
 
 /** Backtest cu aceleași reguli de risc ca live: o poziție odată, cel mult 2 pierderi pe zi. */
-function backtest(bars, { cost, maxLossesPerDay = 2 } = {}) {
-  const sig = findSignals(bars);
+function backtest(bars, { cost, maxLossesPerDay = 2, maxBars = 96, agent = {} } = {}) {
+  const sig = findSignals(bars, agent);
   const trades = [];
   let busy = -1;
   const lossesBy = {};
@@ -178,7 +182,7 @@ function backtest(bars, { cost, maxLossesPerDay = 2 } = {}) {
     if (s.i + 1 <= busy) continue;
     const day = new Date(s.t).toISOString().slice(0, 10);
     if ((lossesBy[day] || 0) >= maxLossesPerDay) continue;
-    const r = settle(bars, s.i + 1, s.dir, s.stop, s.tpR, cost);
+    const r = settle(bars, s.i + 1, s.dir, s.stop, s.tpR, cost, maxBars);
     if (!r || r.invalid) continue;
     trades.push(Object.assign({ t: s.t, dir: s.dir, setup: s.setup }, r));
     busy = r.k;
