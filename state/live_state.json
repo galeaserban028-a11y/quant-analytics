@@ -12,20 +12,7 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-11-05",
-    "outbox": [
-      {
-        "at": 1793913624662,
-        "text": "🟢 <b>BUY NAS100</b> — intră 06.11 la 16:30 (deschiderea bursei)\n<i>Pe platformă: NAS100 / US100 / USTEC</i>\nEntry: la prețul pieței (referință 26631.8)\nSL: <b>25286.4</b>\nLot: <b>0.01</b> (risc 13 $)\nTF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)\n<i>Verifică o dată în platformă: 1 lot = 1.00 $ pe punct. Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.</i>"
-      },
-      {
-        "at": 1793913624662,
-        "text": "🟢 <b>BUY SPX500</b> — intră 06.11 la 16:30 (deschiderea bursei)\n<i>Pe platformă: US500 / SPX500</i>\nEntry: la prețul pieței (referință 7354.3)\nSL: <b>7144.4</b>\nLot: <b>0.12</b> (risc 25 $)\nTF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)\nTraderi: Mihai, Florin\n<i>Verifică o dată în platformă: 1 lot = 0.100 $ pe punct. Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.</i>"
-      },
-      {
-        "at": 1793913624662,
-        "text": "🟢 <b>BUY US2000</b> — intră 06.11 la 16:30 (deschiderea bursei)\n<i>Pe platformă: US2000 / RUSS2000</i>\nEntry: la prețul pieței (referință 2730.19)\nSL: <b>2643.05</b>\nLot: <b>0.15</b> (risc 13 $)\nTF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)\n<i>Verifică o dată în platformă: 1 lot = 0.100 $ pe punct. Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.</i>"
-      }
-    ],
+    "outbox": [],
     "weeklyDate": "2026-11-01"
   },
   "prop": {
@@ -3929,5 +3916,5 @@
     "lastFetch": 1793941737894,
     "graduated": null
   },
-  "savedAt": "2026-11-06T05:57:04.890Z"
+  "savedAt": "2026-11-06T06:00:59.473Z"
 }
