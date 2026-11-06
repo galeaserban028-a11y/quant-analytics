@@ -89,7 +89,7 @@ def day_minutes(pair, y, m0, d, side):
     return parse_bi5(fetch(url), start, pair)
 
 
-def download_m15(pair, y0, y1, now=None, month=None):
+def download_m15(pair, y0, y1, now=None, month=None, bucket=900):
     """Lumânări de 15 minute (mid = media bid/ask, spread = ask − bid la închidere), din fișierele zilnice cu minute.
     Sare peste weekend și peste ziua de azi; o zi lipsă nu oprește descărcarea."""
     now = now or dt.datetime.now(dt.timezone.utc)
@@ -110,7 +110,7 @@ def download_m15(pair, y0, y1, now=None, month=None):
             ask = {r[0]: r for r in sides['ASK']}
             for t in sorted(set(bid) & set(ask)):
                 b, a = bid[t], ask[t]
-                k = t - t % 900
+                k = t - t % bucket
                 mid = ((b[1] + a[1]) / 2, (b[2] + a[2]) / 2, (b[3] + a[3]) / 2, (b[4] + a[4]) / 2)
                 sp = max(0.0, a[4] - b[4])
                 x = out.get(k)
@@ -351,7 +351,7 @@ def main(argv=None):
     ap.add_argument('--merge', action='store_true', help='lipește anii descărcați peste fișierul existent (pentru actualizarea lunară)')
     ap.add_argument('--month', type=int, default=0, help='m15: doar luna aceasta (1–12) din anul --from')
     ap.add_argument('--part', action='store_true', help='h1: scrie bucata de ani în h1/PERECHE_ANUL.csv.gz')
-    ap.add_argument('--tf', default='d1', choices=['d1', 'h1', 'm15'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
+    ap.add_argument('--tf', default='d1', choices=['d1', 'h1', 'm15', 'm1'], help='d1: un fișier pe an (rapid, recomandat); h1: un fișier pe lună (foarte lent, Dukascopy limitează)')
     a = ap.parse_args(argv)
     pairs = PAIRS if a.all else [p.strip().upper() for p in a.pairs.split(',') if p.strip()]
     ok = 0
@@ -381,14 +381,14 @@ def main(argv=None):
                 print(f'::notice::{p}: {len(d1)} zile ({first} → {last}) în {time.time() - t0:.0f}s')
                 ok += 1
                 continue
-            if a.tf == 'm15':
-                rows = download_m15(p, a.y0, a.y1, month=a.month or None)
+            if a.tf in ('m15', 'm1'):
+                rows = download_m15(p, a.y0, a.y1, month=a.month or None, bucket=900 if a.tf == 'm15' else 60)
                 if len(rows) < (100 if a.month else 1000):
-                    print(f'::error::{p}: prea puține lumânări M15 ({len(rows)})')
+                    print(f'::error::{p}: prea puține lumânări {a.tf.upper()} ({len(rows)})')
                     continue
                 dec = 3 if (p.endswith('JPY') or 'IDX' in p or p.startswith('XA')) else 5
-                write_csv_gz(os.path.join(a.out, 'm15', f'{p}_{a.y0}' + (f'_{a.month:02d}' if a.month else '') + '.csv.gz'), rows, dec + 1)
-                print(f'::notice::{p}: {len(rows)} lumânări M15 ({a.y0}–{a.y1}) în {time.time() - t0:.0f}s')
+                write_csv_gz(os.path.join(a.out, a.tf, f'{p}_{a.y0}' + (f'_{a.month:02d}' if a.month else '') + '.csv.gz'), rows, dec + 1)
+                print(f'::notice::{p}: {len(rows)} lumânări {a.tf.upper()} ({a.y0}–{a.y1}) în {time.time() - t0:.0f}s')
                 ok += 1
                 continue
             hours = download_pair(p, a.y0, a.y1)
