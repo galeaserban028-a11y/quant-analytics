@@ -13,7 +13,7 @@
     "failSince": null,
     "heartbeatDate": "2026-11-08",
     "outbox": [],
-    "weeklyDate": "2026-11-01"
+    "weeklyDate": "2026-11-08"
   },
   "prop": {
     "v": 2,
@@ -4231,5 +4231,5 @@
     "lossDay": {},
     "graduated": null
   },
-  "savedAt": "2026-11-08T07:50:38.500Z"
+  "savedAt": "2026-11-08T08:00:38.398Z"
 }
