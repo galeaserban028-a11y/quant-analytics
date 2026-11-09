@@ -17,143 +17,31 @@
   },
   "prop": {
     "v": 2,
-    "firm": "THE5ERS_HIGH_STAKES",
+    "firm": "FTM_1STEP_NITRO",
     "phase": 0,
     "initial": 5000,
-    "balance": 5386.261090955013,
+    "balance": 5000,
     "dayKey": "2026-11-09",
-    "dayStart": 5386.261090955013,
-    "highestEod": 5386.261090955013,
-    "tradingDays": [
-      "2026-10-23",
-      "2026-10-30",
-      "2026-11-05"
-    ],
-    "positions": {
-      "NAS100|bb": {
-        "symbol": "NAS100",
-        "direction": "LONG",
-        "entry": 26631.80859375,
-        "initialStop": 25286.4296875,
-        "stop": 25286.4296875,
-        "openedAt": 1793975400000,
-        "desk": "BB",
-        "strategy": "bb",
-        "agent": null,
-        "who": "Andreea (Banda Bollinger)",
-        "riskUsd": 13.4537890625,
-        "lots": 0.01
-      },
-      "SPX500|rsi2": {
-        "symbol": "SPX500",
-        "direction": "LONG",
-        "entry": 7354.32998046875,
-        "initialStop": 7144.445563616072,
-        "stop": 7144.445563616072,
-        "openedAt": 1793975400000,
-        "desk": "RSI2",
-        "strategy": "rsi2",
-        "agent": null,
-        "who": "Mihai (Pullback RSI(2))",
-        "riskUsd": 12.593065011160705,
-        "lots": 0.06
-      },
-      "SPX500|bb": {
-        "symbol": "SPX500",
-        "direction": "LONG",
-        "entry": 7354.32998046875,
-        "initialStop": 7144.445563616072,
-        "stop": 7144.445563616072,
-        "openedAt": 1793975400000,
-        "desk": "BB",
-        "strategy": "bb",
-        "agent": null,
-        "who": "Florin (Banda Bollinger)",
-        "riskUsd": 12.593065011160705,
-        "lots": 0.06
-      },
-      "US2000|bb": {
-        "symbol": "US2000",
-        "direction": "LONG",
-        "entry": 2730.18671875,
-        "initialStop": 2643.0529645647325,
-        "stop": 2643.0529645647325,
-        "openedAt": 1793975400000,
-        "desk": "BB",
-        "strategy": "bb",
-        "agent": null,
-        "who": "Alina (Banda Bollinger)",
-        "riskUsd": 13.07006312779015,
-        "lots": 0.15
-      }
-    },
+    "dayStart": 5000,
+    "highestEod": 5000,
+    "tradingDays": [],
+    "positions": {},
     "skipped": {
-      "SPX500|d7": 1793453400000,
-      "US30|d7": 1793975400000,
-      "US30|bb": 1794061800000
+      "SPX500|rsi2": 1793975400000,
+      "SPX500|bb": 1793975400000,
+      "SPX500|d7": 1793453400000
     },
     "lastBarClose": {
-      "US30": 1793998800000,
-      "NAS100": 1793998800000,
-      "SPX500": 1793998800000,
-      "GER40": 1793982600000,
-      "UK100": 1793982600000,
-      "FRA40": 1793982600000,
-      "EU50": 1793982600000,
-      "US2000": 1793998800000
+      "SPX500": 1793998800000
     },
     "lastFetch": {
-      "US30": 1794215809409,
-      "NAS100": 1794215809409,
-      "SPX500": 1794215809409,
-      "GER40": 1794216230044,
-      "UK100": 1794216230044,
-      "FRA40": 1794216230044,
-      "EU50": 1794216230044,
-      "US2000": 1794215809409
+      "SPX500": 1794217249902
     },
     "initialized": true,
-    "history": [
-      {
-        "sym": "SPX500",
-        "strategy": "rsi2",
-        "agent": null,
-        "direction": "LONG",
-        "openedAt": 1792848600000,
-        "closedAt": 1793194200000,
-        "r": 0.652,
-        "pnl": 2.8242151339285786,
-        "outcome": "TARGET"
-      },
-      {
-        "sym": "GER40",
-        "strategy": "d7",
-        "agent": null,
-        "direction": "LONG",
-        "openedAt": 1792825200000,
-        "closedAt": 1793260800000,
-        "r": 0.5136,
-        "pnl": 100.34598226193289,
-        "outcome": "TARGET"
-      },
-      {
-        "sym": "US30",
-        "strategy": "rsi2",
-        "agent": null,
-        "direction": "LONG",
-        "openedAt": 1793453400000,
-        "closedAt": 1793889000000,
-        "r": 1.4667,
-        "pnl": 283.09089355915256,
-        "outcome": "TP"
-      }
-    ],
-    "startedAt": 1792754041197,
-    "fxRates": {
-      "EURUSD": 1.1228259801864624,
-      "GBPUSD": 1.3456052541732788
-    },
-    "fxFetchedAt": 1794216469599
+    "history": [],
+    "startedAt": 1794217249902,
+    "fxRates": {},
+    "fxFetchedAt": 1794217249902
   },
   "fx": null,
   "fxVirtual": {
@@ -4231,5 +4119,5 @@
     "lossDay": {},
     "graduated": null
   },
-  "savedAt": "2026-11-09T09:31:50.136Z"
+  "savedAt": "2026-11-09T09:40:50.681Z"
 }
