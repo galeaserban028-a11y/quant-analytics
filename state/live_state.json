@@ -41,7 +41,7 @@
     "history": [],
     "startedAt": 1794217249902,
     "fxRates": {},
-    "fxFetchedAt": 1794217249902
+    "fxFetchedAt": 1794217310130
   },
   "fx": null,
   "fxVirtual": {
@@ -4119,5 +4119,5 @@
     "lossDay": {},
     "graduated": null
   },
-  "savedAt": "2026-11-09T09:40:50.681Z"
+  "savedAt": "2026-11-09T09:41:50.157Z"
 }
