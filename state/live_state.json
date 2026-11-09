@@ -4127,11 +4127,11 @@
       }
     ],
     "skips": {
-      "INTERVAL_PREA_LARG": 6
+      "INTERVAL_PREA_LARG": 8
     },
     "settled": {
-      "SPX500": "2026-11-06",
-      "NAS100": "2026-11-06"
+      "SPX500": "2026-11-09",
+      "NAS100": "2026-11-09"
     },
     "graduated": null,
     "paused": false,
@@ -4169,5 +4169,5 @@
     "lossDay": {},
     "graduated": null
   },
-  "savedAt": "2026-11-09T21:01:28.257Z"
+  "savedAt": "2026-11-09T21:15:28.001Z"
 }
