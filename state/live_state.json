@@ -4215,7 +4215,7 @@
       }
     ],
     "open": null,
-    "lastFetch": 1794190890053,
+    "lastFetch": 1794194190712,
     "graduated": null
   },
   "liq": {
@@ -4225,11 +4225,11 @@
     "open": {},
     "seen": {},
     "slot": {
-      "XAUUSD": 1993548,
-      "NAS100": 1993548
+      "XAUUSD": 1993549,
+      "NAS100": 1993549
     },
     "lossDay": {},
     "graduated": null
   },
-  "savedAt": "2026-11-09T03:02:37.660Z"
+  "savedAt": "2026-11-09T03:16:31.409Z"
 }
