@@ -96,7 +96,7 @@
     "overrides": {
       "propDesk": {
         "enabled": true,
-        "firm": "THE5ERS_HIGH_STAKES",
+        "firm": "FTM_1STEP_NITRO",
         "riskPct": 4,
         "safety": 0.8,
         "maxOpen": 5,
@@ -158,14 +158,7 @@
           }
         ],
         "symbols": [
-          "US30",
-          "NAS100",
-          "SPX500",
-          "GER40",
-          "UK100",
-          "FRA40",
-          "EU50",
-          "US2000"
+          "SPX500"
         ],
         "benched": [
           "UK100|rsi2",
@@ -175,7 +168,10 @@
           "FRA40|bb",
           "UK100|d7"
         ],
-        "expectedR": 0.067
+        "expectedR": 0.067,
+        "accountSize": 5000,
+        "contractSizes": "SPX500=50",
+        "_contulTau": "Contul REAL al utilizatorului: Funded Trader Markets 1 Step Nitro 5K (din 09.11.2026). Doar instrumentele cu mărimea contractului verificată în platforma lui (US500 = 50). Adaugă un indice în symbols doar după ce îi confirmi contract size-ul."
       }
     }
   },

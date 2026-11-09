@@ -32,6 +32,11 @@ const PROP_RULES = {
     minDays: 3, split: 0.8, fee10k: 66, resetTz: 'Europe/Moscow', weekendFunded: false,
     notes: 'Aceleași ținte și limite ca The5ers, mai ieftin (~53–66 $). DAR pe contul finanțat pozițiile se închid automat vineri (sept. 2026), iar strategiile noastre țin până la 10 zile: nu e recomandat până nu se ridică restricția.'
   },
+  FTM_1STEP_NITRO: {
+    name: 'Funded Trader Markets 1 Step Nitro', phases: [0.10], dailyLoss: 0.04, maxLoss: 0.06, maxLossType: 'trailingEod',
+    minDays: 1, split: 0.8, fee10k: 100, resetTz: 'Europe/Athens',
+    notes: 'Cont 5.000 $ ≈ 58 $ (nov. 2026). Țintă 10%, pierdere max. 4%/zi și 6% care urcă odată cu profitul („trailing lock”). Nicio zi nu poate depăși 50% din profitul total. Indicii au contracte mari (US500: 1 lot = 50 $/punct).'
+  },
   FTMO_1STEP: {
     name: 'FTMO 1-Step', phases: [0.10], dailyLoss: 0.03, maxLoss: 0.10, maxLossType: 'trailingEod',
     minDays: 4, split: 0.9, fee10k: 150, resetTz: 'Europe/Prague', notes: 'Pierdere zilnică doar 3% și drawdown care urcă odată cu profitul. Mai greu pentru strategii cu serii de pierderi.'

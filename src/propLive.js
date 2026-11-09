@@ -236,7 +236,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
   const rules = PROP_RULES[desk.firm] || PROP_RULES.THE5ERS_HIGH_STAKES;
   // Valoarea unui punct diferă de la firmă la firmă (ex. JP225: 1 sau 100 yeni pe punct la 1 lot). PROP_CONTRACT_SIZES
   // o corectează: „JP225=100,GER40=1”. Fără ea folosim valorile din config/forex_instruments.json.
-  instruments = applyContractSizes(instruments, env.PROP_CONTRACT_SIZES);
+  instruments = applyContractSizes(instruments, env.PROP_CONTRACT_SIZES || desk.contractSizes);
   const strategies = deskStrategies(desk);
   const benched = new Set(desk.benched || []);
   const fetcher = fetch || ((sym, inst) => fetchDaily(inst, { now }));
