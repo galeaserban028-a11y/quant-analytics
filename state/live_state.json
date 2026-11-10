@@ -53,7 +53,7 @@
       "EURUSD": 1.1228259801864624,
       "GBPUSD": 1.3456052541732788
     },
-    "fxFetchedAt": 1794300666065
+    "fxFetchedAt": 1794303979750
   },
   "fx": null,
   "fxVirtual": {
@@ -4394,11 +4394,11 @@
     "open": {},
     "seen": {},
     "slot": {
-      "XAUUSD": 1993670,
-      "NAS100": 1993670
+      "XAUUSD": 1993671,
+      "NAS100": 1993671
     },
     "lossDay": {},
     "graduated": null
   },
-  "savedAt": "2026-11-10T09:41:20.161Z"
+  "savedAt": "2026-11-10T09:46:20.329Z"
 }
