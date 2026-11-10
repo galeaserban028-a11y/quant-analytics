@@ -1,0 +1,71 @@
+# ORDER FLOW GRATUIT pe 1 minut: delta aproximativ din tick-urile Dukascopy (indici) + order flow REAL de la Binance (BTCUSDT).
+# O lună pe job, în paralel; fiecare lună se salvează imediat în data/orderflow.
+name: APEX date order flow (gratuit)
+
+on:
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: 'Surse (sursă:simbol)'
+        required: false
+        default: 'dk:USATECHIDXUSD,dk:USA500IDXUSD,binance:BTCUSDT'
+      from:
+        description: 'Prima lună (AAAA-LL)'
+        required: false
+        default: '2024-01'
+      to:
+        description: 'Ultima lună (AAAA-LL)'
+        required: false
+        default: '2025-12'
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.p.outputs.src }}
+      months: ${{ steps.p.outputs.months }}
+    steps:
+      - id: p
+        run: |
+          echo "src=$(echo '${{ github.event.inputs.sources }}' | python3 -c 'import sys,json; print(json.dumps([x.strip() for x in sys.stdin.read().split(",") if x.strip()]))')" >> "$GITHUB_OUTPUT"
+          echo "months=$(python3 -c "
+          import json
+          a,b='${{ github.event.inputs.from }}','${{ github.event.inputs.to }}'
+          y,m=map(int,a.split('-')); Y,Mo=map(int,b.split('-')); out=[]
+          while (y,m)<=(Y,Mo):
+              out.append(f'{y}-{m:02d}'); m+=1
+              if m==13: y,m=y+1,1
+          print(json.dumps(out))")" >> "$GITHUB_OUTPUT"
+  fetch:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        src: ${{ fromJSON(needs.plan.outputs.src) }}
+        month: ${{ fromJSON(needs.plan.outputs.months) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Descarcă ${{ matrix.src }} ${{ matrix.month }}
+        env:
+          DK_PACE: '0.4'
+        run: |
+          S='${{ matrix.src }}'
+          python3 scripts/orderflow.py --src ${S%%:*} --sym ${S#*:} --month ${{ matrix.month }}
+      - name: Salvează
+        run: |
+          git config user.name "apex-bot"
+          git config user.email "apex-bot@users.noreply.github.com"
+          git add data/orderflow
+          if git diff --cached --quiet; then echo "Nimic nou."; exit 0; fi
+          git commit -m "order flow ${{ matrix.src }} ${{ matrix.month }}"
+          for i in $(seq 1 15); do git pull --rebase && git push && exit 0; sleep $((RANDOM % 30 + 5)); done
+          exit 1
