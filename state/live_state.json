@@ -53,7 +53,7 @@
       "EURUSD": 1.1228259801864624,
       "GBPUSD": 1.3456052541732788
     },
-    "fxFetchedAt": 1794317419658
+    "fxFetchedAt": 1794320720655
   },
   "fx": null,
   "fxVirtual": {
@@ -4413,5 +4413,5 @@
     "lossDay": {},
     "graduated": null
   },
-  "savedAt": "2026-11-10T14:17:20.984Z"
+  "savedAt": "2026-11-10T14:25:20.933Z"
 }
