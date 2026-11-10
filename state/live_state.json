@@ -4390,28 +4390,41 @@
   "liq": {
     "v": 1,
     "startedAt": 1793962218827,
-    "trades": [],
+    "trades": [
+      {
+        "sym": "NAS100",
+        "setup": "acumulare, apoi continuarea trendului",
+        "dir": -1,
+        "openedAt": 1794319200000,
+        "closedAt": 1794322800000,
+        "outcome": "SL",
+        "r": -1.008,
+        "live": false
+      }
+    ],
     "open": {
       "NAS100": {
         "dir": -1,
-        "stop": 28047.14239894583,
-        "tpR": 1.5,
-        "setup": "acumulare, apoi continuarea trendului",
-        "entryT": 1794319200000,
-        "ref": 27689.25,
-        "riskUsd": 21.65354393674985,
+        "stop": 28092.60725852447,
+        "tpR": 2,
+        "setup": "lichiditate egală luată",
+        "entryT": 1794323700000,
+        "ref": 28019.25,
+        "riskUsd": 24.43432272783015,
         "live": false
       }
     },
     "seen": {
-      "NAS100": 1794318300000
+      "NAS100": 1794322800000
     },
     "slot": {
-      "XAUUSD": 1993692,
-      "NAS100": 1993692
+      "XAUUSD": 1993693,
+      "NAS100": 1993693
     },
-    "lossDay": {},
+    "lossDay": {
+      "NAS1002026-11-10": 1
+    },
     "graduated": null
   },
-  "savedAt": "2026-11-10T15:12:36.286Z"
+  "savedAt": "2026-11-10T15:16:36.024Z"
 }
