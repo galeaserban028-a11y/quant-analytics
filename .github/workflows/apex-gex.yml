@@ -1,0 +1,28 @@
+# Date din piața de opțiuni (GEX) pentru S&P 500, gratuite, de la SqueezeMetrics: istoric zilnic din 2011 + actualizare zilnică.
+# GEX > 0: dealerii sunt „long gamma” (piața tinde să revină la medie). GEX mic/negativ: „short gamma” (mișcări care fug).
+name: APEX date GEX (opțiuni)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 11 * * 1-5'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descarcă DIX/GEX
+        run: |
+          mkdir -p data/gex
+          curl -fsSL -A 'Mozilla/5.0' https://squeezemetrics.com/monitor/static/DIX.csv -o data/gex/DIX.csv
+          head -3 data/gex/DIX.csv; tail -2 data/gex/DIX.csv; wc -l data/gex/DIX.csv
+      - name: Salvează
+        run: |
+          git config user.name 'apex-bot'; git config user.email 'apex-bot@users.noreply.github.com'
+          git add data/gex/DIX.csv
+          git diff --cached --quiet || git commit -m "date GEX $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull --rebase -q && git push -q && break; sleep 5; done
