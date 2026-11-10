@@ -4400,31 +4400,30 @@
         "outcome": "SL",
         "r": -1.008,
         "live": false
-      }
-    ],
-    "open": {
-      "NAS100": {
-        "dir": -1,
-        "stop": 28092.60725852447,
-        "tpR": 2,
+      },
+      {
+        "sym": "NAS100",
         "setup": "lichiditate egală luată",
-        "entryT": 1794323700000,
-        "ref": 28019.25,
-        "riskUsd": 24.43432272783015,
+        "dir": -1,
+        "openedAt": 1794323700000,
+        "closedAt": 1794324600000,
+        "outcome": "TP",
+        "r": 1.96,
         "live": false
       }
-    },
+    ],
+    "open": {},
     "seen": {
       "NAS100": 1794322800000
     },
     "slot": {
-      "XAUUSD": 1993695,
-      "NAS100": 1993695
+      "XAUUSD": 1993696,
+      "NAS100": 1993696
     },
     "lossDay": {
       "NAS1002026-11-10": 1
     },
     "graduated": null
   },
-  "savedAt": "2026-11-10T15:49:46.750Z"
+  "savedAt": "2026-11-10T16:01:38.311Z"
 }
