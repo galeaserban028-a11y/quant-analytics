@@ -38,7 +38,8 @@ def dk_month(pair, y, m):
     for d in range(1, ndays + 1):
         if dt.date(y, m, d).weekday() >= 5:
             continue
-        for hh in range(13, 21):
+        h0_, h1_ = map(int, os.environ.get('DK_HOURS', '13-21').split('-'))
+        for hh in range(h0_, h1_):
             raw = fetch(f'{BASE}/{pair}/{y}/{m - 1:02d}/{d:02d}/{hh:02d}h_ticks.bi5')
             if not raw:
                 continue

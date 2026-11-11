@@ -17,6 +17,14 @@ on:
         description: 'Ultima lună (AAAA-LL)'
         required: false
         default: '2025-12'
+      hours:
+        description: 'Ore UTC Dukascopy (de la-până la)'
+        required: false
+        default: '13-21'
+      parallel:
+        description: 'Joburi în paralel (prea multe ⇒ Dukascopy încetinește)'
+        required: false
+        default: '8'
 
 permissions:
   contents: write
@@ -42,10 +50,10 @@ jobs:
   fetch:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 340
     strategy:
       fail-fast: false
-      max-parallel: 20
+      max-parallel: ${{ fromJSON(github.event.inputs.parallel || '8') }}
       matrix:
         src: ${{ fromJSON(needs.plan.outputs.src) }}
         month: ${{ fromJSON(needs.plan.outputs.months) }}
@@ -57,6 +65,7 @@ jobs:
       - name: Descarcă ${{ matrix.src }} ${{ matrix.month }}
         env:
           DK_PACE: '0.4'
+          DK_HOURS: ${{ github.event.inputs.hours || '13-21' }}
         run: |
           S='${{ matrix.src }}'
           python3 scripts/orderflow.py --src ${S%%:*} --sym ${S#*:} --month ${{ matrix.month }}
