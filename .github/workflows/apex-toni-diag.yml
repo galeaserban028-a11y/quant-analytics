@@ -1,0 +1,16 @@
+# Diagnostic pentru sistemul de test Toni (date Yahoo M15, semnale pe ultimele 60 de zile, salvarea stării). Nu trimite pe Telegram.
+name: APEX diagnostic Toni
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/toni-diag.js
