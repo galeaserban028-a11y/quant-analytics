@@ -11,7 +11,9 @@
  * Risk management (pentru un cont separat de 5.000 $, implicit 1% pe tranzacție):
  *  - cel mult o poziție pe piață și 3 în total; după 2 pierderi în aceeași zi pe o piață, acea piață se oprește până mâine;
  *  - fiecare tranzacție se închide cel târziu la finalul sesiunii pieței (nimic peste noapte).
- * Variabile: TONI_SIGNALS=0 oprește mesajele (scorul continuă), TONI_ACCOUNT, TONI_RISK_PCT.
+ * Implicit sistemul deschide și închide SINGUR tranzacțiile, pe hârtie, fără mesaje pe fiecare tranzacție; trimite doar
+ * un rezumat zilnic (după 23:15 ora României, în zilele cu tranzacții închise) cu media pe fiecare piață.
+ * Variabile: TONI_SIGNALS=1 trimite și fiecare intrare/ieșire (pentru demo), TONI_ACCOUNT, TONI_RISK_PCT.
  */
 const A = require('../strategies/amtAgent');
 const { lotsFor } = require('../prop/lots');
@@ -36,7 +38,7 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   if (!bus.state.toni || bus.state.toni.v !== 1) bus.state.toni = { v: 1, startedAt: now, trades: [], open: {}, seen: {}, slot: {}, lossDay: {}, passed: {} };
   const book = bus.state.toni;
   const slot = Math.floor((now - 60e3) / M15);
-  const send = notify && env.TONI_SIGNALS !== '0';
+  const send = notify && env.TONI_SIGNALS === '1';
   const account = Number(env.TONI_ACCOUNT || 5000), riskPct = Number(env.TONI_RISK_PCT || 1);
   const report = { opened: 0, closed: 0, skipped: 0, errors: {} };
   const prices = {};
@@ -121,6 +123,27 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
     if (!book.passed[sym] && sc.n >= MIN_TRADES && sc.mean >= MIN_MEAN && sc.t >= T_MIN) {
       book.passed[sym] = { at: now, stats: sc };
       if (notify) await notify(`🎓 <b>TEST TONI: ${A.MARKETS[sym].name} a trecut testul live</b>: ${sc.n} tranzacții pe prețuri reale, media +${sc.mean}R (t = ${sc.t}). Putem discuta trecerea pe un cont real separat.`);
+    }
+  }
+  // 4. Rezumatul zilei (o dată pe zi, după 23:15 ora României, doar dacă s-au închis tranzacții azi)
+  const ro = A.local(now, 'Europe/Bucharest');
+  if (notify && ro.m >= 23 * 60 + 15 && book.summaryDay !== ro.day) {
+    const isToday = (t) => A.local(t.closedAt, 'Europe/Bucharest').day === ro.day;
+    const todays = book.trades.filter(isToday);
+    if (todays.length) {
+      book.summaryDay = ro.day;
+      const sign = (x, d = 2) => `${x >= 0 ? '+' : ''}${x.toFixed(d)}`;
+      const lines = [`🧪 <b>TEST TONI · rezumatul zilei</b> (tranzacții pe hârtie, făcute automat; nu faci nimic)`];
+      lines.push(`Azi: ${todays.length} tranzacții, ${todays.filter((t) => t.r > 0).length} pe plus, total ${sign(todays.reduce((a, t) => a + t.r, 0))}R (≈ ${sign(todays.reduce((a, t) => a + t.r, 0) * account * riskPct / 100, 0)} $ la ${riskPct}% risc)`);
+      lines.push('', '<b>Media de la pornire, pe fiecare piață:</b>');
+      for (const sym of Object.keys(A.MARKETS)) {
+        const sc = report.stats[sym];
+        if (!sc.n) continue;
+        lines.push(`${A.MARKETS[sym].name}: ${sc.n} tranz., media ${sign(sc.mean)}R, total ${sign(sc.totalR)}R${book.passed[sym] ? ' 🎓' : ''}`);
+      }
+      const all = stats(book.trades);
+      lines.push('', `<b>Total:</b> ${all.n} tranzacții, media ${sign(all.mean)}R (pe 5.000 $ la ${riskPct}%: ${sign(all.totalR * account * riskPct / 100, 0)} $). Testul e trecut la ≥ ${MIN_TRADES} tranzacții pe o piață cu media ≥ +${MIN_MEAN}R.`);
+      await notify(lines.join('\n'));
     }
   }
   if (book.trades.length > 5000) book.trades.splice(0, book.trades.length - 5000);

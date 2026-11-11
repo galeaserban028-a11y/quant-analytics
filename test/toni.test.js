@@ -23,7 +23,7 @@ test('Toni nu se uită în viitor: semnalele apar la fel când datele se opresc 
   }
 });
 
-test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract size-ul brokerului; TONI_SIGNALS=0 doar ține scorul', async () => {
+test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract size-ul brokerului; implicit doar ține scorul și trimite rezumatul zilei', async () => {
   const s = A.findSignals(NQ, A.MARKETS.NAS100)[5];
   const fetchAt = (now) => async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= now) : []);
   const run = async (env) => {
@@ -35,14 +35,21 @@ test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract 
     for (let k = 1; k <= 200 && bus.state.toni.open.NAS100; k++) { now += 900e3; await runToniCycle({ bus, instruments: INSTR, fetchBars: fetchAt(now), notify, now, env }); }
     return { bus, msgs, opened };
   };
-  const live = await run({});
+  const live = await run({ TONI_SIGNALS: '1' });
   assert.ok(live.opened, 'poziție deschisă');
   assert.equal(live.bus.state.toni.trades.length, 1, 'tranzacția s-a închis și e în scor');
-  assert.equal(live.msgs.length, 2, live.msgs.join('\n---\n'));
+  assert.equal(live.msgs.filter((m) => !/rezumatul zilei/.test(m)).length, 2, live.msgs.join('\n---\n'));
   assert.match(live.msgs[0], /TEST TONI/);
   assert.match(live.msgs[0], /Lot: <b>0\.\d\d<\/b>/);
   assert.match(live.msgs[1], /Scorul pe NAS100: 1 tranzacții/);
-  const quiet = await run({ TONI_SIGNALS: '0' });
-  assert.equal(quiet.msgs.length, 0);
+  const quiet = await run({});
   assert.equal(quiet.bus.state.toni.trades.length, 1);
+  assert.ok(quiet.msgs.every((m) => /rezumatul zilei/.test(m)), 'fără mesaje pe fiecare tranzacție');
+  // rezumatul: după 23:15 ora României, în ziua închiderii
+  const closed = quiet.bus.state.toni.trades[0].closedAt;
+  const d = A.local(closed, 'Europe/Bucharest').day;
+  const at = Date.parse(d + 'T21:20:00Z'); // 23:20 ora României (iarna) / 00:20 vara
+  const bus = quiet.bus; bus.state.toni.summaryDay = null; const msgs = [];
+  await runToniCycle({ bus, instruments: INSTR, fetchBars: async () => [], notify: async (x) => { msgs.push(x); }, now: at, env: {} });
+  if (A.local(at, 'Europe/Bucharest').day === d) { assert.equal(msgs.length, 1); assert.match(msgs[0], /Media de la pornire/); assert.match(msgs[0], /NASDAQ/); }
 });
