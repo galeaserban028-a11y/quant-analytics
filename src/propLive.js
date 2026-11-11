@@ -166,7 +166,15 @@ const whenTxt = (t) => {
  * Când mai mulți traderi intră deodată pe același instrument, în aceeași direcție, primești un singur semnal cu lotul
  * TOTAL; la ieșire, mesajul spune exact ce lot închizi și ce rămâne deschis.
  */
-async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, outEntries, notify }) {
+const FULL_NAMES = { US30: 'Dow Jones', NAS100: 'Nasdaq 100', SPX500: 'S&P 500', US2000: 'Russell 2000', GER40: 'DAX', UK100: 'FTSE 100', FRA40: 'CAC 40', EU50: 'Euro Stoxx 50', JP225: 'Nikkei 225', AUS200: 'ASX 200' };
+/** Numele de pe platforma ta: „SPX500=US500,NAS100=US100” (din config, desk.platformNames). */
+function platformNames(spec) {
+  const out = {};
+  for (const part of String(spec || '').split(',')) { const [a, b] = part.split('=').map((x) => (x || '').trim()); if (a && b) out[a] = b; }
+  return out;
+}
+
+async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, outEntries, notify, names = {}, riskPctNow = null }) {
   const tag = label === 'APEX PROP' ? '' : ' (Forex)';
   const unit = inst.category === 'FX' ? 'pip' : 'punct';
   const name = (w) => escapeHtml((w || '').split(' (')[0]);
@@ -198,18 +206,23 @@ async function flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, 
     const sameStop = es.every((e) => Math.abs(e.position.stop - es[0].position.stop) < inst.pipSize / 2);
     const px = (v) => fmtPx(v, inst);
     const openAt = inst.category === 'FX' ? null : nextOpenUtc(inst, barClose);
-    const lines = [`${long ? '🟢 <b>BUY' : '🔴 <b>SELL'} ${escapeHtml(sym)}</b>${tag}${openAt ? ` — intră ${whenTxt(openAt)} (deschiderea bursei)` : ' — ACUM, la prețul pieței'}`];
-    if (ALIASES[sym]) lines.push(`<i>Pe platformă: ${ALIASES[sym]}</i>`);
-    lines.push(`Entry: la prețul pieței (referință ${px(es[0].position.entry)})`);
+    const shown = names[sym] || sym;
+    const full = FULL_NAMES[sym] ? ` (${FULL_NAMES[sym]})` : '';
+    const dist = (a, b) => { const d = Math.abs(a - b); return inst.category === 'FX' ? `${(d / inst.pipSize).toFixed(1)} pips` : `${d.toFixed(inst.decimals != null ? Math.min(inst.decimals, 1) : 1)} puncte`; };
+    const entry = es[0].position.entry;
+    const lines = [`${long ? '🟢 <b>BUY' : '🔴 <b>SELL'}</b>${tag}`];
+    lines.push(`Pe ce: <b>${escapeHtml(shown)}</b>${full}${!names[sym] && ALIASES[sym] ? ` · pe platformă: ${ALIASES[sym]}` : ''}`);
+    lines.push(`Time frame: <b>D1</b> (zilnic; ieșirea vine prin mesaj, de obicei în 1–5 zile)`);
+    lines.push(`Intrare: ${openAt ? `<b>${whenTxt(openAt)}</b> (deschiderea bursei), la prețul pieței` : '<b>ACUM</b>, la prețul pieței'} · referință ${px(entry)}`);
     if (sameStop) {
-      lines.push(`SL: <b>${px(es[0].position.stop)}</b>`);
-      if (es[0].position.tp != null) lines.push(`TP: <b>${px(es[0].position.tp)}</b>`);
-      lines.push(`Lot: <b>${totalLots.toFixed(2)}</b> (risc ${money(totalRisk)})`);
+      lines.push(`Stop loss: <b>${px(es[0].position.stop)}</b> (${dist(entry, es[0].position.stop)})`);
+      lines.push(es[0].position.tp != null ? `Take profit: <b>${px(es[0].position.tp)}</b> (${dist(entry, es[0].position.tp)})` : 'Take profit: fără, ieșirea vine prin mesaj');
+      lines.push(`Lot: <b>${totalLots.toFixed(2)}</b> (risc ${money(totalRisk)}${riskPctNow ? ` ≈ ${(totalRisk / acct.initial * 100).toFixed(1)}% din cont` : ''})`);
     } else {
-      es.forEach((e, k) => lines.push(`Poziția ${k + 1}: lot <b>${e.lot.lots.toFixed(2)}</b> · SL <b>${px(e.position.stop)}</b>${e.position.tp != null ? ` · TP <b>${px(e.position.tp)}</b>` : ''}`));
+      es.forEach((e, k) => lines.push(`Poziția ${k + 1}: lot <b>${e.lot.lots.toFixed(2)}</b> · stop loss <b>${px(e.position.stop)}</b>${e.position.tp != null ? ` · take profit <b>${px(e.position.tp)}</b>` : ''}`));
       lines.push(`Risc total: ${money(totalRisk)}`);
     }
-    lines.push(`TF: D1 · ieșirea vine prin mesaj (de obicei 1–5 zile)`);
+    lines.push('<i>Dacă prețul tău de intrare e altul decât referința, păstrează aceleași distanțe pentru stop loss și take profit.</i>');
     if (es.length > 1) lines.push(`Traderi: ${es.map((e) => name(e.who)).join(', ')}`);
     const pu = es[0].pointUsd;
     lines.push(`<i>Verifică o dată în platformă: 1 lot = ${pu < 1 ? pu.toFixed(3) : pu.toFixed(2)} $ pe ${unit}. ${openAt ? 'Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.' : 'Dacă au trecut peste 12 ore, sari peste.'}</i>${totalLots > 20 ? ' ⚠️ Lot neobișnuit de mare!' : ''}`);
@@ -365,7 +378,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
       const d = decide(
         { initial: acct.initial, balance: acct.balance, dayStartBalance: acct.dayStart, openRisk, highestEod: acct.highestEod, phaseTarget: phaseTarget(acct, rules), tradingDays: acct.tradingDays.length },
         rules,
-        { riskPct: desk.riskPct, safety: desk.safety, maxOpen: desk.maxOpen, openCount: Object.keys(acct.positions).length, minRiskFrac: 0.25 }
+        { riskPct: desk.riskPct, fundedRiskPct: desk.fundedRiskPct, safety: desk.safety, maxOpen: desk.maxOpen, openCount: Object.keys(acct.positions).length, minRiskFrac: 0.25 }
       );
       if (!d.allow) {
         acct.skipped[key] = position.openedAt;
@@ -388,7 +401,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
       outEntries.push({ key, who, position, lot, stopDist, pointUsd, maxDays: params.maxDays });
       report.events.push({ sym, strategy: st.kind, event: 'ENTRY', lots: lot.lots, riskUsd: lot.actualRiskUsd });
     }
-    await flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, outEntries, notify });
+    await flushSymbol({ sym, inst, acct, rules, label, barClose, outExits, outEntries, notify, names: platformNames(desk.platformNames), riskPctNow: phaseTarget(acct, rules) == null ? desk.fundedRiskPct || desk.riskPct : desk.riskPct });
   }
 
   // Reluare după pauză: PROP_RESUME cu o valoare nouă (ex. data de azi)
@@ -439,7 +452,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
   if (firstRun && Object.keys(series).length > 0 && Object.keys(report.errors).length * 2 < nSyms) {
     acct.initialized = true;
     await notify(`🚀 <b>${label} a pornit</b>: ${rules.name}, cont ${money(acct.initial)}, ${nSyms} instrumente, ${strategies.length} ${label === 'APEX PROP' ? 'strategii' : 'agenți ELITĂ'} (${strategies.slice(0, 8).map((s) => escapeHtml(s.who || s.name || s.kind)).join(', ')}${strategies.length > 8 ? '…' : ''}).\n` +
-      `Semnalele vin după închiderea zilei, cu lot exact și stop. Riscul de bază e de ${desk.riskPct}% pe tranzacție; Gardianul îl reduce automat ca să nu atingi niciodată limitele (${(rules.dailyLoss * 100).toFixed(0)}% pe zi, ${(rules.maxLoss * 100).toFixed(0)}% total).\n` +
+      `Semnalele vin după închiderea zilei, cu lot exact și stop. Riscul de bază e de ${desk.riskPct}% pe tranzacție${desk.fundedRiskPct ? ` (${desk.fundedRiskPct}% în contul finanțat)` : ''}; Gardianul îl reduce automat ca să nu atingi niciodată limitele (${(rules.dailyLoss * 100).toFixed(0)}% pe zi, ${(rules.maxLoss * 100).toFixed(0)}% total).\n` +
       `Pozițiile deja începute în piață NU îți sunt trimise. Așteptăm semnale noi.` +
       (label === 'APEX PROP' ? '' : `\n⚠️ Semnalele FOREX sunt pentru un cont SEPARAT de cel cu indici (alt examen). Pe același cont riscurile s-ar aduna și ai putea depăși limita zilnică.`));
   }
@@ -512,4 +525,4 @@ function propSummary(acct, config) {
   return `💼 <b>Contul de prop</b> (${rules.name})\n${progressLine(acct, rules)}\n${roomLine(acct, rules)}\n` + (pos.length ? `Poziții deschise:\n${lines.join('\n')}` : 'Nicio poziție deschisă.');
 }
 
-module.exports = { expectedLastClose, nextOpenUtc, flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes };
+module.exports = { expectedLastClose, nextOpenUtc, flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes, platformNames };

@@ -351,10 +351,10 @@ test('live: pornire tăcută → semnal nou cu lot și stop → mesaj de ieșire
   assert.equal(r.events[0].event, 'ENTRY');
   assert.ok(r.events[0].lots >= 0.01);
   assert.ok(r.events[0].riskUsd <= 300 + 1e-6, 'riscul nu depășește 3% din cont');
-  assert.match(msgs[1], /BUY EURUSD<\/b>/);
-  assert.match(msgs[1], /Entry: la prețul pieței \(referință [\d.]+\)\nSL: <b>[\d.]+<\/b>/);
+  assert.match(msgs[1], /BUY<\/b>\nPe ce: <b>EURUSD<\/b>/);
+  assert.match(msgs[1], /Intrare: <b>ACUM<\/b>, la prețul pieței · referință [\d.]+\nStop loss: <b>[\d.]+<\/b> \([\d.]+ pips\)/);
   assert.match(msgs[1], /Lot: <b>\d+\.\d\d<\/b>/);
-  assert.match(msgs[1], /TF: D1/);
+  assert.match(msgs[1], /Time frame: <b>D1<\/b>/);
   assert.match(msgs[1], /risc [\d.]+ \$/);
   assert.match(msgs[1], /1 lot = 10\.00 \$ pe pip/, 'mesajul arată valoarea pip-ului, de verificat în platformă');
 
@@ -588,12 +588,12 @@ test('live: două strategii pe același indice → două poziții separate, lot 
   const entries = r.events.filter((e) => e.event === 'ENTRY');
   assert.equal(entries.length, 2, JSON.stringify(r.events));
   assert.deepEqual(Object.keys(bus.state.prop.positions).sort(), ['GER40|down', 'GER40|rsi2']);
-  const sig = msgs.filter((m) => /BUY GER40<\/b>/.test(m));
+  const sig = msgs.filter((m) => /BUY<\/b>\nPe ce: <b>GER40<\/b>/.test(m));
   assert.equal(sig.length, 1, 'doi traderi pe același indice deodată ⇒ UN singur semnal');
   assert.ok(/Traderi: .*Tudor/.test(sig[0]), sig[0]);
   const lots = Object.values(bus.state.prop.positions).reduce((t, p) => t + p.lots, 0);
   assert.ok(sig[0].includes(`Lot: <b>${lots.toFixed(2)}</b>`) || /Poziția 2/.test(sig[0]), sig[0]);
-  assert.ok(/SL: <b>|SL <b>/.test(sig[0]));
+  assert.ok(/Stop loss: <b>|stop loss <b>/.test(sig[0]));
   const totalRisk = Object.values(bus.state.prop.positions).reduce((s, p) => s + p.riskUsd, 0);
   assert.ok(totalRisk <= 10000 * 0.05 * 0.8 + 1e-6, 'Gardianul împarte bugetul zilnic între poziții');
   assert.equal(bus.state.prop.fxRates.EURUSD, 1.1);
