@@ -18,7 +18,7 @@
  */
 const { fetchDaily, sessionCloseUtc, todayCloseUtc, CLOSE_BUFFER_MS } = require('./data/dailySources');
 const lab = require('./strategies/dailyLab');
-const { decide } = require('./prop/guardian');
+const { decide, maxLossFloor } = require('./prop/guardian');
 const { lotsFor } = require('./prop/lots');
 const { PROP_RULES } = require('./prop/rules');
 const { escapeHtml, roTime } = require('./notify/telegram');
@@ -112,7 +112,7 @@ function roomLine(acct, rules) {
   const lostToday = Math.max(0, acct.dayStart - acct.balance);
   const openRisk = Object.values(acct.positions).reduce((s, p) => s + p.riskUsd, 0);
   const dailyLeft = acct.initial * rules.dailyLoss - lostToday - openRisk;
-  const floor = acct.initial * (1 - rules.maxLoss);
+  const floor = maxLossFloor(acct.initial, acct.highestEod, rules);
   return `Gardian: risc deschis ${money(openRisk)} · mai poți pierde azi ${money(Math.max(0, dailyLeft))} până la limita zilnică · distanță până la limita totală ${money(acct.balance - floor)}.`;
 }
 
@@ -420,11 +420,11 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
 
   // 3. Fazele examenului
   const target = phaseTarget(acct, rules);
-  const floor = acct.initial * (1 - rules.maxLoss);
+  const floor = maxLossFloor(acct.initial, acct.highestEod, rules);
   if (acct.balance <= floor || acct.dayStart - acct.balance > acct.initial * rules.dailyLoss) {
     if (!acct.breachNotified) {
       acct.breachNotified = true;
-      await notify(`🚨 <b>PROP: limită atinsă (după calculul estimat)</b>. Verifică imediat contul în platformă. Dacă soldul real e altul, setează variabila PROP_BALANCE.`);
+      await notify(`🚨 <b>PROP: limită atinsă (după calculul estimat)</b>. Verifică imediat contul în platformă. Dacă soldul real e altul, scrie-i lui Claude soldul real ca să-l corecteze.`);
     }
   } else if (target != null && acct.balance >= acct.initial * (1 + target)) {
     if (acct.tradingDays.length >= (rules.minDays || 0)) {
@@ -439,7 +439,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
       acct.minDaysNotified = false;
       await notify(`🎉 <b>${passed} TRECUTĂ</b> (după calculul estimat)! Verifică în platformă.\n` +
         (openSyms.length ? `Închide pozițiile rămase: ${openSyms.join(', ')}.\n` : '') +
-        (acct.phase < rules.phases.length ? `Când primești contul pentru ${phaseLabel(acct, rules)}, sistemul continuă automat (țintă ${(rules.phases[acct.phase] * 100).toFixed(0)}%).` : 'Urmează contul FINANȚAT: aceleași reguli, iar profitul îl retragi lunar.'));
+        (acct.phase < rules.phases.length ? `Când primești contul pentru ${phaseLabel(acct, rules)}, sistemul continuă automat (țintă ${(rules.phases[acct.phase] * 100).toFixed(0)}%).` : `Urmează contul FINANȚAT: riscul scade automat la ${desk.fundedRiskPct || desk.riskPct}% pe tranzacție. Cere payout de cum ai ~150 $ profit și 5 zile de tranzacționare (cea mai bună zi ≤ 45% din profit). Scrie-i lui Claude când primești contul finanțat.`));
       report.events.push({ event: 'PHASE_PASSED', phase: acct.phase });
     } else if (!acct.minDaysNotified) {
       acct.minDaysNotified = true;

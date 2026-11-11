@@ -15,6 +15,18 @@
  * @param {object} cfg { riskPct, safety, maxOpen, openCount }
  * @returns {{ allow: boolean, riskAmount: number, reason: string }}
  */
+/**
+ * Limita totală (soldul sub care contul e pierdut): fixă, sau „trailing” după cel mai mare sold de la final de zi.
+ * Cu `rules.trailLock` (FTM) limita trailing se blochează la soldul inițial.
+ */
+function maxLossFloor(initial, highestEod, rules) {
+  let floor = rules.maxLossType === 'trailingEod'
+    ? Math.max(initial, highestEod || initial) - initial * rules.maxLoss
+    : initial * (1 - rules.maxLoss);
+  if (rules.trailLock) floor = Math.min(floor, initial);
+  return floor;
+}
+
 function decide(acct, rules, cfg) {
   const safety = cfg.safety != null ? cfg.safety : 0.7;
   const initial = acct.initial;
@@ -49,9 +61,7 @@ function decide(acct, rules, cfg) {
   if (onlyDays) risk = initial * 0.0025;
 
   // Limita totală (static sau trailing la final de zi)
-  const floor = rules.maxLossType === 'trailingEod'
-    ? Math.max(initial, acct.highestEod || initial) - initial * rules.maxLoss
-    : initial * (1 - rules.maxLoss);
+  const floor = maxLossFloor(initial, acct.highestEod, rules);
   const roomTotal = (balance - floor) * safety - acct.openRisk;
   // Limita zilnică: pierderea de azi + tot riscul deschis + riscul nou ≤ safety × limită
   const lostToday = Math.max(0, acct.dayStartBalance - balance);
@@ -67,4 +77,4 @@ function decide(acct, rules, cfg) {
   return { allow: true, riskAmount: risk, reason: onlyDays ? 'ZILE_MINIME' : 'OK' };
 }
 
-module.exports = { decide };
+module.exports = { decide, maxLossFloor };

@@ -176,7 +176,8 @@ test('gardian: pe 20.000 de conturi aleatoare NU permite niciodată un risc care
       const d = decide(acct, rules, { riskPct: 1 + r() * 4, safety, maxOpen: 5, openCount: i % 6 });
       if (!d.allow) continue;
       assert.ok(d.riskAmount > 0);
-      const floor = rules.maxLossType === 'trailingEod' ? Math.max(initial, highestEod) - initial * rules.maxLoss : initial * (1 - rules.maxLoss);
+      const trail = Math.max(initial, highestEod) - initial * rules.maxLoss;
+      const floor = rules.maxLossType === 'trailingEod' ? (rules.trailLock ? Math.min(trail, initial) : trail) : initial * (1 - rules.maxLoss);
       const worstBalance = balance - openRisk - d.riskAmount;
       assert.ok(worstBalance > floor, `${key}: ar sparge limita totală`);
       const lostToday = Math.max(0, dayStart - balance);
