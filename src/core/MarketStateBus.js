@@ -236,6 +236,7 @@ class MarketStateBus {
         orb: this.state.orb || null,
         gold: this.state.gold || null,
         liq: this.state.liq || null,
+        toni: this.state.toni || null,
         savedAt: new Date(this.now()).toISOString()
       };
       // Rulăm des (din 5 în 5 minute): dacă nimic nu s-a schimbat în afară de oră, nu rescriem fișierul (evită commit-uri inutile)
@@ -279,6 +280,7 @@ class MarketStateBus {
       if (parsed.orb) this.state.orb = parsed.orb;
       if (parsed.gold) this.state.gold = parsed.gold;
       if (parsed.liq) this.state.liq = parsed.liq;
+      if (parsed.toni) this.state.toni = parsed.toni;
       if (parsed.trend && parsed.trend.positions) this.state.trend = Object.assign({ positions: {}, skipped: {}, lastAsOf: {} }, parsed.trend);
       this._checkDailyReset();
     } catch (err) {

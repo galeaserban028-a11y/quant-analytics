@@ -57,3 +57,15 @@ test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract 
   await runToniCycle({ bus, instruments: INSTR, fetchBars: async () => [], notify: async (x) => { msgs.push(x); }, now: at, env: {} });
   if (A.local(at, 'Europe/Bucharest').day === d) { assert.equal(msgs.length, 1); assert.match(msgs[0], /Media de la pornire/); assert.match(msgs[0], /NASDAQ/); }
 });
+
+test('starea Toni se salvează și se reîncarcă între cicluri (altfel pozițiile s-ar pierde la fiecare 5 minute)', () => {
+  const os = require('os');
+  const MarketStateBus = require('../src/core/MarketStateBus');
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'toni-')), 'state.json');
+  const a = new MarketStateBus({}, { snapshotPath: file });
+  a.state.toni = { v: 2, trades: [{ sym: 'NAS100', r: 0.5 }], open: { SPX500: { dir: 1 } } };
+  a.saveSnapshot();
+  const b = new MarketStateBus({}, { snapshotPath: file });
+  assert.deepEqual(b.state.toni.open, { SPX500: { dir: 1 } });
+  assert.equal(b.state.toni.trades.length, 1);
+});
