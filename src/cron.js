@@ -27,11 +27,7 @@ const { runOrbCycle } = require('./academy/orbLive');
 const { runGoldCycle } = require('./academy/goldLive');
 const { runLiquidityCycle } = require('./academy/liquidityLive');
 const { runToniCycle } = require('./academy/toniLive');
-/** Lumânări Yahoo de 15 minute pentru sistemul de test „Toni” (simbolul Yahoo vine din definiția pieței). */
-async function fetchM15Toni(sym, mk) {
-  const d = await getJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(mk.yahoo)}?interval=15m&range=60d`, { retries: 1 });
-  return validOhlc(parseYahooChart(d)).map((b) => ({ t: b.timestamp, o: b.open, h: b.high, l: b.low, c: b.close }));
-}
+const { fetchM15Toni } = require('./data/toniFeed');
 /** Lumânări de 15 minute de pe futures (23 h/zi), pentru agentul „Lichiditate”: aur GC=F, Nasdaq NQ=F. */
 const FUT = { XAUUSD: 'GC=F', NAS100: 'NQ=F' };
 async function fetchM15Futures(sym) {

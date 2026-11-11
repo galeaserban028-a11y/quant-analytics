@@ -2,17 +2,12 @@
 // Diagnostic pentru sistemul de test Toni: datele Yahoo M15 pe fiecare piață + semnalele și rezultatele din ultimele ~60 de zile
 // (aceleași reguli ca live) + un ciclu complet cu salvare/reîncărcare a stării. Nu trimite nimic pe Telegram.
 const os = require('os'), fs = require('fs'), path = require('path');
-const { getJson } = require('../src/data/http');
-const { parseYahooChart, validOhlc } = require('../src/data/dailySources');
 const A = require('../src/strategies/amtAgent');
 const { runToniCycle, stats } = require('../src/academy/toniLive');
 const { applyContractSizes } = require('../src/propLive');
 const MarketStateBus = require('../src/core/MarketStateBus');
 
-async function fetchBars(sym, mk) {
-  const d = await getJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(mk.yahoo)}?interval=15m&range=60d`, { retries: 1 });
-  return validOhlc(parseYahooChart(d)).map((b) => ({ t: b.timestamp, o: b.open, h: b.high, l: b.low, c: b.close }));
-}
+const { fetchM15Toni: fetchBars } = require('../src/data/toniFeed');
 (async () => {
   const cache = {};
   for (const [sym, mk] of Object.entries(A.MARKETS)) {
@@ -22,7 +17,7 @@ async function fetchBars(sym, mk) {
       const sig = A.findSignals(bars, mk); const T = [];
       for (const s of sig) { if (s.i + 1 >= bars.length) continue; const r = A.settle(bars, s.i + 1, s, mk); if (r && !r.invalid) T.push({ r: r.r }); }
       const st = stats(T);
-      console.log(`::notice::${sym} (${mk.yahoo}${mk.v2 ? ', varianta 2' : ''}): ${bars.length} lumânări, ultima ${new Date(bars[bars.length - 1].t).toISOString()}, sesiuni ${S.length} (complete ${full}), semnale 60 zile ${sig.length}, închise ${st.n}, media ${st.mean}R, total ${st.totalR}R`);
+      console.log(`::notice::${sym} (${mk.hl || mk.yahoo}${mk.v2 ? ', varianta 2' : ''}): ${bars.length} lumânări, ultima deschisă acum ${((Date.now() - bars[bars.length - 1].t) / 60000).toFixed(1)} min, sesiuni ${S.length} (complete ${full}), semnale 60 zile ${sig.length}, închise ${st.n}, media ${st.mean}R, total ${st.totalR}R`);
     } catch (err) { console.log(`::error::${sym}: ${err.message}`); }
   }
   // ciclu complet, de două ori, cu stare salvată pe disc între ele (ca în bucla live)

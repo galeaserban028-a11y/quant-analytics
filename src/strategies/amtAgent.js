@@ -17,10 +17,10 @@
  *  Rezultat (costuri incluse): antrenament +0,15R/tranz. (n=294), test 2023–2025 +0,13R (n=318, t=2,6); pe plus în fiecare an.
  */
 const MARKETS = {
-  NAS100: { name: 'NASDAQ (NAS100)', yahoo: 'NQ=F', tz: 'America/New_York', s0: 570, s1: 960, cost: 2, unit: 'puncte', dp: 0 , v2: true },
-  SPX500: { name: 'S&P 500 (US500)', yahoo: 'ES=F', tz: 'America/New_York', s0: 570, s1: 960, cost: 0.6, unit: 'puncte', dp: 1 , v2: true },
+  NAS100: { name: 'NASDAQ (NAS100)', yahoo: 'NQ=F', hl: 'xyz:XYZ100', tz: 'America/New_York', s0: 570, s1: 960, cost: 2, unit: 'puncte', dp: 0 , v2: true },
+  SPX500: { name: 'S&P 500 (US500)', yahoo: 'ES=F', hl: 'xyz:SP500', tz: 'America/New_York', s0: 570, s1: 960, cost: 0.6, unit: 'puncte', dp: 1 , v2: true },
   GER40: { name: 'DAX (GER40)', yahoo: '^GDAXI', tz: 'Europe/Berlin', s0: 540, s1: 1050, cost: 2, unit: 'puncte', dp: 0 , v2: true },
-  XAUUSD: { name: 'AUR (XAUUSD)', yahoo: 'GC=F', tz: 'America/New_York', s0: 480, s1: 1020, cost: 0.4, unit: '$', dp: 1 },
+  XAUUSD: { name: 'AUR (XAUUSD)', yahoo: 'GC=F', hl: 'xyz:GOLD', tz: 'America/New_York', s0: 480, s1: 1020, cost: 0.4, unit: '$', dp: 1 },
   EURUSD: { name: 'EUR/USD', yahoo: 'EURUSD=X', tz: 'Europe/London', s0: 420, s1: 1020, cost: 0.00012, unit: 'pips', dp: 5, pip: 0.0001 },
   GBPUSD: { name: 'GBP/USD', yahoo: 'GBPUSD=X', tz: 'Europe/London', s0: 420, s1: 1020, cost: 0.00016, unit: 'pips', dp: 5, pip: 0.0001 }
 };
@@ -32,12 +32,14 @@ function local(t, tz) {
   return { day: `${p.year}-${p.month}-${p.day}`, m: (Number(p.hour) % 24) * 60 + Number(p.minute) };
 }
 
-/** Sesiunile (zile cu cel puțin 80% din lumânări), fiecare cu indicii lumânărilor din sesiune. */
+/** Sesiunile (zile lucrătoare cu cel puțin 80% din lumânări), fiecare cu indicii lumânărilor din sesiune. */
 function sessions(bars, mk) {
   const days = [];
   for (let i = 0; i < bars.length; i++) {
     const L = local(bars[i].t, mk.tz);
     if (L.m < mk.s0 || L.m >= mk.s1) continue;
+    const wd = new Date(L.day + 'T12:00:00Z').getUTCDay();
+    if (wd === 0 || wd === 6) continue; // sursele 24/7 (Hyperliquid) au lumânări și în weekend: nu sunt sesiuni
     const c = days[days.length - 1];
     if (c && c.day === L.day) c.idx.push(i); else days.push({ day: L.day, idx: [i] });
   }
