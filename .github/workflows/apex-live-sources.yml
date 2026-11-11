@@ -1,0 +1,16 @@
+# Testează sursele gratuite de prețuri live (fără cont) de pe serverele GitHub și măsoară întârzierea.
+name: APEX surse live
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/live-sources-diag.js
