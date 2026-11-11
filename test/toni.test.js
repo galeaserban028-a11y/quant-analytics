@@ -11,20 +11,24 @@ const INSTR = applyContractSizes(require('../config/forex_instruments.json'), 'S
 const DIR = path.join(__dirname, '..', 'data', 'fx', 'dk', 'm15');
 const load = (sym, months) => months.flatMap((m) => zlib.gunzipSync(fs.readFileSync(path.join(DIR, `${sym}_${m}.csv.gz`))).toString().split('\n').slice(1))
   .filter(Boolean).map((l) => { const [t, o, h, lo, c] = l.split(',').map(Number); return { t, o, h, l: lo, c }; }).filter((b) => !(b.h === b.l && b.o === b.c));
-const NQ = load('USATECHIDXUSD', ['2025_08', '2025_09', '2025_10']);
+const NQ = load('USATECHIDXUSD', ['2025_01', '2025_02', '2025_03', '2025_04', '2025_05', '2025_06', '2025_07', '2025_08', '2025_09', '2025_10']);
 
 test('Toni nu se uită în viitor: semnalele apar la fel când datele se opresc la lumânarea lor', () => {
   const all = A.findSignals(NQ, A.MARKETS.NAS100);
   assert.ok(all.length > 10, `semnale: ${all.length}`);
+  // varianta 2: doar zile care s-au deschis în afara zonei de valoare de ieri
+  const S = A.sessions(NQ, A.MARKETS.NAS100);
+  for (const s of all) { const o = NQ[S.find((x) => x.day === s.day).idx[0]].o; assert.ok(o >= s.VAH || o <= s.VAL, 'deschidere în afara VA'); }
   for (const s of all.filter((_, k) => k % 5 === 0)) {
     const again = A.findSignals(NQ.slice(0, s.i + 1), A.MARKETS.NAS100).filter((x) => x.i === s.i && x.dir === s.dir);
     assert.equal(again.length, 1, `semnalul de la ${new Date(s.t).toISOString()} nu apare cu datele tăiate`);
     assert.ok(s.dir < 0 ? s.stop > NQ[s.i].c && s.tp < NQ[s.i].c : s.stop < NQ[s.i].c && s.tp > NQ[s.i].c, 'SL și TP de partea corectă');
+    assert.ok(s.dir < 0 ? s.tp === s.VAL : s.tp === s.VAH, 'varianta 2: TP la marginea opusă a zonei de valoare');
   }
 });
 
 test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract size-ul brokerului; implicit doar ține scorul și trimite rezumatul zilei', async () => {
-  const s = A.findSignals(NQ, A.MARKETS.NAS100)[5];
+  const s = A.findSignals(NQ, A.MARKETS.NAS100)[3];
   const fetchAt = (now) => async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= now) : []);
   const run = async (env) => {
     const bus = { state: {} }, msgs = [];

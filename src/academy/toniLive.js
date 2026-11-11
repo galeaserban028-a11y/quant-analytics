@@ -4,8 +4,9 @@
  * SISTEMUL DE TEST „TONI” (failed auction, profil TPO, M15), SEPARAT de sistemul zilnic (APEX PROP).
  * Piețe: Nasdaq, S&P 500, DAX, aur, EUR/USD, GBP/USD, fiecare în sesiunea ei.
  *
- * Backtest (Dukascopy M15, costuri incluse, reguli fixate dinainte): indici ≈ 0 (−0,01…−0,05R), aur −0,13R, EUR/USD −0,19R,
- * GBP/USD −0,10R pe tranzacție. De aceea e doar TEST: mesajele sunt marcate 🧪 TEST, iar sistemul își ține singur scorul
+ * Indicii rulează VARIANTA 2 (doar deschideri în afara zonei de valoare, TP la marginea opusă; vezi strategies/amtAgent.js):
+ * backtest Nasdaq +0,16R, S&P +0,21R, DAX +0,05R pe tranzacție. Aur (−0,13R), EUR/USD (−0,19R) și GBP/USD (−0,10R) rămân pe
+ * varianta 1, doar pentru scor: acolo nicio variantă testată nu a ieșit pe plus. De aceea e doar TEST: mesajele sunt marcate 🧪 TEST, iar sistemul își ține singur scorul
  * pe fiecare piață, cu prețuri reale. O piață „trece testul” doar după ≥ 50 de tranzacții live cu media ≥ +0,05R și t ≥ 1,5.
  *
  * Risk management (pentru un cont separat de 5.000 $, implicit 1% pe tranzacție):
@@ -35,7 +36,7 @@ const fmtDist = (mk, d) => (mk.pip ? `${(d / mk.pip).toFixed(1)} pips` : `${d.to
  * @param {object} p.instruments instrumentele cu contract size-ul brokerului tău (pentru lot)
  */
 async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = Date.now(), env = {} }) {
-  if (!bus.state.toni || bus.state.toni.v !== 1) bus.state.toni = { v: 1, startedAt: now, trades: [], open: {}, seen: {}, slot: {}, lossDay: {}, passed: {} };
+  if (!bus.state.toni || bus.state.toni.v !== 2) bus.state.toni = { v: 2, startedAt: now, trades: [], open: {}, seen: {}, slot: {}, lossDay: {}, passed: {} };
   const book = bus.state.toni;
   const slot = Math.floor((now - 60e3) / M15);
   const send = notify && env.TONI_SIGNALS === '1';
