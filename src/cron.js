@@ -26,6 +26,12 @@ const { runLondonCycle } = require('./academy/londonLive');
 const { runOrbCycle } = require('./academy/orbLive');
 const { runGoldCycle } = require('./academy/goldLive');
 const { runLiquidityCycle } = require('./academy/liquidityLive');
+const { runToniCycle } = require('./academy/toniLive');
+/** Lumânări Yahoo de 15 minute pentru sistemul de test „Toni” (simbolul Yahoo vine din definiția pieței). */
+async function fetchM15Toni(sym, mk) {
+  const d = await getJson(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(mk.yahoo)}?interval=15m&range=60d`, { retries: 1 });
+  return validOhlc(parseYahooChart(d)).map((b) => ({ t: b.timestamp, o: b.open, h: b.high, l: b.low, c: b.close }));
+}
 /** Lumânări de 15 minute de pe futures (23 h/zi), pentru agentul „Lichiditate”: aur GC=F, Nasdaq NQ=F. */
 const FUT = { XAUUSD: 'GC=F', NAS100: 'NQ=F' };
 async function fetchM15Futures(sym) {
@@ -131,6 +137,15 @@ async function main() {
     const lq = await runLiquidityCycle({ bus, instruments: FX_INSTRUMENTS, fetchBars: fetchM15Futures, notify: LIVE && process.env.TELEGRAM_TOKEN ? notify : null, now, env: process.env });
     if (lq.opened || lq.closed || Object.keys(lq.errors).length) console.log(`${new Date(now).toISOString()} | LICHIDITATE (antrenament) | ${JSON.stringify(lq)}`);
   } catch (err) { console.log('Lichiditate: eroare', err.message); }
+
+  // SISTEMUL DE TEST „TONI” (failed auction TPO, M15; indici, aur, DAX, forex): separat de sistemul zilnic, mesaje marcate TEST
+  try {
+    const promo = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config', 'promotions.json'), 'utf8'));
+    const sizes = (((promo.prop || {}).overrides || {}).propDesk || {}).contractSizes;
+    const { applyContractSizes } = require('./propLive');
+    const tr = await runToniCycle({ bus, instruments: applyContractSizes(FX_INSTRUMENTS, process.env.PROP_CONTRACT_SIZES || sizes), fetchBars: fetchM15Toni, notify: LIVE && process.env.TELEGRAM_TOKEN ? notify : null, now, env: process.env });
+    if (tr.opened || tr.closed || Object.keys(tr.errors).length) console.log(`${new Date(now).toISOString()} | TONI (test) | ${JSON.stringify(tr)}`);
+  } catch (err) { console.log('Toni: eroare', err.message); }
 
   // Dacă trebuie să trimită pe Telegram dar lipsesc datele, NU avansăm starea (altfel s-ar pierde mesaje)
   if (LIVE && (!process.env.TELEGRAM_TOKEN || !(process.env.TELEGRAM_CHAT_ID || process.env.CHAT_ID))) {
