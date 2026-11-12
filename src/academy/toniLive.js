@@ -54,6 +54,37 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
     if (last) prices[sym] = last.c;
   }
 
+  // 0. Nivelurile zilei (VAH, POC, VAL de ieri) pe Telegram, înainte de deschidere: indicii americani la 16:00–16:29, DAX la 09:45–09:59
+  //    (ora României), în zilele lucrătoare. Ca să poți trage liniile pe grafic fără să calculezi nimic. TONI_LEVELS=0 le oprește.
+  if (notify && env.TONI_LEVELS !== '0') {
+    const ro = A.local(now, 'Europe/Bucharest');
+    const wd = new Date(ro.day + 'T12:00:00Z').getUTCDay();
+    const groups = [{ key: 'us', from: 16 * 60, to: 16 * 60 + 30, syms: ['SPX500', 'NAS100'], open: '16:30', end: '23:00', late: '17:45' },
+      { key: 'dax', from: 9 * 60 + 45, to: 10 * 60, syms: ['GER40'], open: '10:00', end: '18:30', late: '11:15' }];
+    book.levelsDay = book.levelsDay || {};
+    for (const g of groups) {
+      if (wd === 0 || wd === 6 || ro.m < g.from || ro.m >= g.to || book.levelsDay[g.key] === ro.day) continue;
+      const lines = [];
+      for (const sym of g.syms) {
+        const bars = series[sym], mk = A.MARKETS[sym];
+        if (!bars || bars.length < 100) continue;
+        const today = A.local(now, mk.tz).day;
+        const prev = A.sessions(bars, mk).filter((x) => x.full && x.day < today).pop();
+        if (!prev) continue;
+        const bin = bars[prev.idx[0]].c * 0.0005, va = A.valueArea(bars, prev.idx, bin), last = bars[bars.length - 1].c;
+        const f = (v) => v.toFixed(mk.dp === 0 ? 0 : 1);
+        const shown = { SPX500: 'US500', NAS100: 'US100', GER40: 'GER40' }[sym];
+        lines.push(`<b>${shown}</b>: VAH <b>${f(va.VAH)}</b> · POC <b>${f(va.POC)}</b> · VAL <b>${f(va.VAL)}</b>  (preț de referință acum: ${f(last)})`);
+      }
+      if (!lines.length) continue;
+      book.levelsDay[g.key] = ro.day;
+      await notify([`📏 <b>Nivelurile de azi</b> (strategia M15, din sesiunea de ieri)`, ...lines, '',
+        `Dacă în platforma ta prețul diferă de referință, adaugă aceeași diferență la toate nivelurile.`,
+        `La ${g.open} te uiți unde se deschide: <b>în bandă</b> ⇒ azi nimic. <b>Sub VAL</b> ⇒ aștepți o lumânare M15 închisă peste VAL (până pe la ${g.late}) ⇒ BUY, stop loss ~2 puncte sub minimul zilei, take profit la VAH. <b>Peste VAH</b> ⇒ invers: SELL, take profit la VAL. Închizi la ${g.end}.`,
+        `Doar pe DEMO deocamdată.`].join('\n'));
+    }
+  }
+
   for (const [sym, bars] of Object.entries(series)) {
     const mk = A.MARKETS[sym];
     if (bars.length < 300) { report.errors[sym] = `DATE_INSUFICIENTE(${bars.length})`; continue; }

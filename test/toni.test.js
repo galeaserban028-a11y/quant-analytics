@@ -69,3 +69,17 @@ test('starea Toni se salvează și se reîncarcă între cicluri (altfel poziți
   assert.deepEqual(b.state.toni.open, { SPX500: { dir: 1 } });
   assert.equal(b.state.toni.trades.length, 1);
 });
+
+test('nivelurile zilei: un singur mesaj înainte de deschiderea americană, cu VAH/POC/VAL', async () => {
+  const day = A.sessions(NQ, A.MARKETS.NAS100).filter((x) => x.full).slice(-1)[0].day; // o zi lucrătoare din date
+  const now = Date.parse(day + 'T14:05:00Z'); // 16:05 ora României (iarna) / 17:05 (vara)
+  const ro = A.local(now, 'Europe/Bucharest');
+  const at = ro.m >= 16 * 60 && ro.m < 16 * 60 + 30 ? now : now - 3600e3;
+  const bus = { state: {} }, msgs = [];
+  const fetchBars = async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= at) : []);
+  await runToniCycle({ bus, instruments: INSTR, fetchBars, notify: async (m) => msgs.push(m), now: at, env: {} });
+  await runToniCycle({ bus, instruments: INSTR, fetchBars, notify: async (m) => msgs.push(m), now: at + 600e3, env: {} });
+  const lv = msgs.filter((m) => /Nivelurile de azi/.test(m));
+  assert.equal(lv.length, 1, msgs.join('\n---\n'));
+  assert.match(lv[0], /US100<\/b>: VAH <b>\d+<\/b> · POC <b>\d+<\/b> · VAL <b>\d+<\/b>/);
+});
