@@ -15,7 +15,9 @@ const { fetchM15Toni: fetchBars } = require('../src/data/toniFeed');
       const bars = (cache[sym] = await fetchBars(sym, mk));
       const S = A.sessions(bars, mk), full = S.filter((s) => s.full).length;
       const sig = A.findSignals(bars, mk); const T = [];
-      for (const s of sig) { if (s.i + 1 >= bars.length) continue; const r = A.settle(bars, s.i + 1, s, mk); if (r && !r.invalid) T.push({ r: r.r }); }
+      for (const s of sig) { if (s.i + 1 >= bars.length) continue; const r = A.settle(bars, s.i + 1, s, mk); if (r && !r.invalid) T.push({ r: r.r, day: s.day, t: bars[s.i + 1].t, dir: s.dir, out: r.outcome }); }
+      const ro = (t) => new Date(t).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      for (const x of T) console.log(`::notice::TRADE ${sym} ${ro(x.t)} ${x.dir > 0 ? 'BUY' : 'SELL'} ${x.out} ${x.r >= 0 ? '+' : ''}${x.r.toFixed(2)}R`);
       const st = stats(T);
       console.log(`::notice::${sym} (${mk.hl || mk.yahoo}${mk.v2 ? ', varianta 2' : ''}): ${bars.length} lumânări, ultima deschisă acum ${((Date.now() - bars[bars.length - 1].t) / 60000).toFixed(1)} min, sesiuni ${S.length} (complete ${full}), semnale 60 zile ${sig.length}, închise ${st.n}, media ${st.mean}R, total ${st.totalR}R`);
     } catch (err) { console.log(`::error::${sym}: ${err.message}`); }
