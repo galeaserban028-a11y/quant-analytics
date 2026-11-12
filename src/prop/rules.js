@@ -9,6 +9,8 @@
  *  dailyLoss        pierderea maximă pe zi (fracție din soldul inițial), măsurată față de soldul de la miezul nopții
  *  maxLoss          pierderea maximă totală (fracție din soldul inițial)
  *  maxLossType      'static' (față de soldul inițial) sau 'trailingEod' (față de cel mai mare sold de la final de zi)
+ *  consistency      (opțional) cea mai bună zi poate fi cel mult această fracție din profitul total al fazei (FTM: 0,5);
+ *                   ținta efectivă urcă la cea mai bună zi / consistency dacă e nevoie
  *  minDays          zile minime de tranzacționare pe fază
  *  split            procentul tău din profit pe contul finanțat
  *  fee10k           taxa aproximativă pentru un cont ~10.000 $ (USD)
@@ -33,7 +35,7 @@ const PROP_RULES = {
     notes: 'Aceleași ținte și limite ca The5ers, mai ieftin (~53–66 $). DAR pe contul finanțat pozițiile se închid automat vineri (sept. 2026), iar strategiile noastre țin până la 10 zile: nu e recomandat până nu se ridică restricția.'
   },
   FTM_1STEP_NITRO: {
-    name: 'Funded Trader Markets 1 Step Nitro', phases: [0.10], dailyLoss: 0.04, maxLoss: 0.06, maxLossType: 'trailingEod', trailLock: true,
+    name: 'Funded Trader Markets 1 Step Nitro', phases: [0.10], dailyLoss: 0.04, maxLoss: 0.06, maxLossType: 'trailingEod', trailLock: true, consistency: 0.5,
     minDays: 1, split: 0.8, fee10k: 100, resetTz: 'Europe/Athens',
     notes: 'Cont 5.000 $ ≈ 58 $ (nov. 2026). Țintă 10%, pierdere max. 4%/zi și 6% care urcă odată cu profitul („trailing lock”). Nicio zi nu poate depăși 50% din profitul total. Indicii au contracte mari (US500: 1 lot = 50 $/punct).'
   },

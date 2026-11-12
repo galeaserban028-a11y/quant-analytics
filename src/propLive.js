@@ -91,8 +91,26 @@ function initAccount(desk, rules, now) {
   };
 }
 
+/** Profitul celei mai bune zile din faza curentă (ziua firmei, după resetTz), din tranzacțiile închise. */
+function bestDayProfit(acct, rules) {
+  const byDay = {};
+  for (const h of acct.history || []) {
+    if (!(h.closedAt >= (acct.phaseStart || 0)) || !Number.isFinite(h.pnl)) continue;
+    const d = dayKeyIn(h.closedAt, rules.resetTz);
+    byDay[d] = (byDay[d] || 0) + h.pnl;
+  }
+  return Math.max(0, ...Object.values(byDay));
+}
+
+/**
+ * Ținta fazei ca fracție din cont. Cu regula de consistență (FTM: cea mai bună zi ≤ 50% din profit), ținta efectivă
+ * urcă la cea mai bună zi / 0,5 când o zi a adus prea mult (ex. +300 $ într-o zi ⇒ trebuie 600 $ total, nu 500 $).
+ */
 function phaseTarget(acct, rules) {
-  return acct.phase < rules.phases.length ? rules.phases[acct.phase] : null;
+  if (acct.phase >= rules.phases.length) return null;
+  const base = rules.phases[acct.phase];
+  if (!rules.consistency) return base;
+  return Math.max(base, bestDayProfit(acct, rules) / rules.consistency / acct.initial);
 }
 
 function phaseLabel(acct, rules) {
@@ -420,6 +438,11 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
 
   // 3. Fazele examenului
   const target = phaseTarget(acct, rules);
+  if (target != null && rules.consistency && target > rules.phases[acct.phase] + 1e-9 && acct.consistencyTarget !== Math.round(target * acct.initial)) {
+    acct.consistencyTarget = Math.round(target * acct.initial);
+    const best = bestDayProfit(acct, rules);
+    await notify(`⚖️ <b>Regula de consistență</b>: cea mai bună zi a adus ${money(best)}, iar o zi poate fi cel mult ${(rules.consistency * 100).toFixed(0)}% din profitul total. Ținta urcă de la ${money(rules.phases[acct.phase] * acct.initial)} la <b>${money(acct.consistencyTarget)}</b> profit. Nu e o problemă: continui normal, sistemul ține cont singur.`);
+  }
   const floor = maxLossFloor(acct.initial, acct.highestEod, rules);
   if (acct.balance <= floor || acct.dayStart - acct.balance > acct.initial * rules.dailyLoss) {
     if (!acct.breachNotified) {
@@ -430,6 +453,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
     if (acct.tradingDays.length >= (rules.minDays || 0)) {
       const passed = phaseLabel(acct, rules);
       acct.phase += 1;
+      acct.phaseStart = now;
       const openSyms = Array.from(new Set(Object.values(acct.positions).map((p) => p.symbol)));
       acct.positions = {};
       acct.balance = acct.initial;
@@ -525,4 +549,4 @@ function propSummary(acct, config) {
   return `💼 <b>Contul de prop</b> (${rules.name})\n${progressLine(acct, rules)}\n${roomLine(acct, rules)}\n` + (pos.length ? `Poziții deschise:\n${lines.join('\n')}` : 'Nicio poziție deschisă.');
 }
 
-module.exports = { expectedLastClose, nextOpenUtc, flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes, platformNames };
+module.exports = { expectedLastClose, nextOpenUtc, flushSymbol, runPropCycle, propSummary, initAccount, dayKeyIn, samePos, shouldFetch, deskStrategies, barCloseOf, breakerCheck, applyContractSizes, platformNames, phaseTarget, bestDayProfit };

@@ -938,3 +938,18 @@ test('live: o intrare pleacă doar din ultima zi de bursă încheiată; date cu 
   const r = await runPropCycle({ config, instruments: INSTR, bus, notify, fetch, now: closeLast + DAY + 30 * 60e3, env: {} });
   assert.equal(r.events.filter((e) => e.event === 'ENTRY').length, 0, 'semnal de ieri, văzut azi după închidere ⇒ nu se trimite');
 });
+
+test('FTM: regula de consistență de 50% ridică ținta când o zi aduce prea mult', () => {
+  const { phaseTarget } = require('../src/propLive');
+  const rules = PROP_RULES.FTM_1STEP_NITRO;
+  const day = (d, h) => Date.UTC(2026, 10, d, h);
+  const acct = { phase: 0, initial: 5000, phaseStart: 0, history: [] };
+  assert.equal(phaseTarget(acct, rules), 0.10); // fără tranzacții: 500 $
+  acct.history.push({ closedAt: day(12, 15), pnl: 150 }, { closedAt: day(12, 18), pnl: 50 }); // aceeași zi: 200 $ ≤ 250 $
+  assert.equal(phaseTarget(acct, rules), 0.10);
+  acct.history.push({ closedAt: day(13, 15), pnl: 300 }); // o zi de 300 $ ⇒ trebuie 600 $ total
+  assert.ok(Math.abs(phaseTarget(acct, rules) * 5000 - 600) < 1e-6);
+  acct.phaseStart = day(14, 0); // după trecerea fazei, zilele vechi nu mai contează
+  assert.equal(phaseTarget(acct, rules), 0.10);
+  assert.equal(phaseTarget({ phase: 1, initial: 5000, history: [] }, rules), null); // finanțat
+});
