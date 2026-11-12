@@ -1,0 +1,16 @@
+# Nivelurile zilei (VAH/VAL/POC de ieri) pentru strategia M15 pe indici.
+name: APEX niveluri
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  levels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/levels.js
