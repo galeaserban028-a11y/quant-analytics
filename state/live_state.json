@@ -50,7 +50,7 @@
       "EURUSD": 1.1095207929611206,
       "GBPUSD": 1.3276686668395996
     },
-    "fxFetchedAt": 1794553665067
+    "fxFetchedAt": 1794556965476
   },
   "fx": null,
   "fxVirtual": {
@@ -4758,7 +4758,7 @@
       }
     ],
     "open": null,
-    "lastFetch": 1794553665067,
+    "lastFetch": 1794556965476,
     "graduated": null
   },
   "liq": {
@@ -4860,5 +4860,5 @@
     },
     "summaryDay": "2026-11-12"
   },
-  "savedAt": "2026-11-13T08:01:48.535Z"
+  "savedAt": "2026-11-13T08:02:46.019Z"
 }
