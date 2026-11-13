@@ -18,6 +18,8 @@
  */
 const { fetchDaily, sessionCloseUtc, todayCloseUtc, CLOSE_BUFFER_MS } = require('./data/dailySources');
 const lab = require('./strategies/dailyLab');
+const fs = require('fs');
+const path = require('path');
 const { decide, maxLossFloor } = require('./prop/guardian');
 const { lotsFor } = require('./prop/lots');
 const { PROP_RULES } = require('./prop/rules');
@@ -277,6 +279,26 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
     bus.state[stateKey] = initAccount(desk, rules, now);
   }
   const acct = bus.state[stateKey];
+  // Sincronizare cu contul real din config/prop_sync.json (scris de Claude după ce utilizatorul trimite istoricul din MT5):
+  // { id, balance, highestEod, manualTrades: [{ closedAt, pnl, sym }] }. Se aplică o singură dată pentru fiecare id nou.
+  // Tranzacțiile manuale intră în istoric doar pentru regula de consistență (fără R, deci nu afectează frâna de urgență).
+  if (stateKey === 'prop' && (env.PROP_SYNC_FILE || env.LIVE_TELEGRAM === '1')) {
+    try {
+      const sync = JSON.parse(fs.readFileSync(env.PROP_SYNC_FILE || path.join(__dirname, '..', 'config', 'prop_sync.json'), 'utf8'));
+      if (sync && sync.id && sync.id !== acct.syncId && Number(sync.balance) > 0) {
+        acct.syncId = sync.id;
+        acct.balance = Number(sync.balance);
+        acct.dayStart = acct.balance;
+        if (Number(sync.highestEod) > 0) acct.highestEod = Math.max(acct.highestEod || 0, Number(sync.highestEod));
+        for (const t of sync.manualTrades || []) {
+          acct.history.push({ sym: t.sym, strategy: 'manual', direction: t.direction || null, closedAt: Date.parse(t.closedAt), pnl: Number(t.pnl), outcome: 'MANUAL' });
+          const d = dayKeyIn(Date.parse(t.closedAt), rules.resetTz);
+          if (!acct.tradingDays.includes(d)) acct.tradingDays.push(d);
+        }
+        console.log(`PROP: sincronizat cu contul real (${sync.id}), sold ${acct.balance}`);
+      }
+    } catch (e) { /* fără fișier de sincronizare */ }
+  }
   // Sincronizare manuală cu soldul real (opțional)
   if (env.PROP_BALANCE && Number(env.PROP_BALANCE) > 0 && Number(env.PROP_BALANCE) !== acct.syncedBalance) {
     acct.balance = Number(env.PROP_BALANCE);

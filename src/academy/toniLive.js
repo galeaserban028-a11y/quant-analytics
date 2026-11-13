@@ -39,7 +39,11 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   if (!bus.state.toni || bus.state.toni.v !== 2) bus.state.toni = { v: 2, startedAt: now, trades: [], open: {}, seen: {}, slot: {}, lossDay: {}, passed: {} };
   const book = bus.state.toni;
   const slot = Math.floor((now - 60e3) / M15);
-  const send = notify && env.TONI_SIGNALS === '1';
+  // Semnale reale pe Telegram doar pentru piețele din TONI_SIGNAL_SYMS (implicit doar US500, la cererea utilizatorului, 13.11.2026);
+  // restul piețelor rulează doar pe hârtie, pentru scor. TONI_SIGNALS=1 trimite pentru toate.
+  const signalSyms = String(env.TONI_SIGNAL_SYMS != null ? env.TONI_SIGNAL_SYMS : 'SPX500').split(',').map((x) => x.trim()).filter(Boolean);
+  const sendFor = (sym) => Boolean(notify) && (env.TONI_SIGNALS === '1' || signalSyms.includes(sym));
+  const SHOWN = { SPX500: 'US500', NAS100: 'US100', GER40: 'GER40', XAUUSD: 'XAUUSD', EURUSD: 'EURUSD', GBPUSD: 'GBPUSD' };
   const account = Number(env.TONI_ACCOUNT || 5000), riskPct = Number(env.TONI_RISK_PCT || 1);
   const report = { opened: 0, closed: 0, skipped: 0, errors: {} };
   const prices = {};
@@ -59,8 +63,8 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   if (notify && env.TONI_LEVELS !== '0') {
     const ro = A.local(now, 'Europe/Bucharest');
     const wd = new Date(ro.day + 'T12:00:00Z').getUTCDay();
-    const groups = [{ key: 'us', from: 16 * 60, to: 16 * 60 + 30, syms: ['SPX500', 'NAS100'], open: '16:30', end: '23:00', late: '17:45' },
-      { key: 'dax', from: 9 * 60 + 45, to: 10 * 60, syms: ['GER40'], open: '10:00', end: '18:30', late: '11:15' }];
+    const groups = [{ key: 'us', from: 16 * 60, to: 16 * 60 + 30, syms: ['SPX500', 'NAS100'].filter((x) => signalSyms.includes(x) || env.TONI_SIGNALS === '1'), open: '16:30', end: '23:00', late: '17:45' },
+      { key: 'dax', from: 9 * 60 + 45, to: 10 * 60, syms: ['GER40'].filter((x) => signalSyms.includes(x) || env.TONI_SIGNALS === '1'), open: '10:00', end: '18:30', late: '11:15' }];
     book.levelsDay = book.levelsDay || {};
     for (const g of groups) {
       if (wd === 0 || wd === 6 || ro.m < g.from || ro.m >= g.to || book.levelsDay[g.key] === ro.day) continue;
@@ -102,12 +106,12 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
           book.trades.push(tr);
           report.closed++;
           if (res.r < 0) book.lossDay[sym + op.day] = (book.lossDay[sym + op.day] || 0) + 1;
-          if (op.sent && send) {
+          if (op.sent && sendFor(sym)) {
             const sc = stats(book.trades.filter((t) => t.sym === sym));
             const usd = res.r * op.riskUsd;
             const head = res.outcome === 'TP' ? '✅' : (res.outcome === 'SL' ? '⛔' : '⏰');
             const what = res.outcome === 'TP' ? 'a atins TP-ul (s-a închis singur)' : (res.outcome === 'SL' ? 'a atins SL-ul (s-a închis singur)' : 's-a terminat sesiunea — ÎNCHIDE ACUM dacă e încă deschisă');
-            await notify(`${head} <b>🧪 TEST TONI · ${mk.name}</b> ${what}\n` +
+            await notify(`${head} <b>M15 · ${SHOWN[sym] || sym}</b> ${what}\n` +
               `Rezultat: ${res.r >= 0 ? '+' : ''}${res.r.toFixed(2)}R (≈ ${usd >= 0 ? '+' : '−'}${Math.abs(usd).toFixed(0)} $ la ${riskPct}% risc)\n` +
               `Scorul pe ${sym}: ${sc.n} tranzacții, media ${sc.mean >= 0 ? '+' : ''}${sc.mean.toFixed(2)}R, total ${sc.totalR >= 0 ? '+' : ''}${sc.totalR}R`);
           }
@@ -131,18 +135,20 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
     if (!(tpDist > mk.cost) || s.dir * (s.tp - last.c) <= 0) { report.skipped++; continue; }
     const inst = instruments[sym];
     const lot = inst ? lotsFor(inst, riskUsd, dist, prices) : { ok: false, reason: 'INSTRUMENT_LIPSĂ' };
-    book.open[sym] = { dir: s.dir, stop: s.stop, tp: s.tp, setup: s.setup, day: s.day, entryT: last.t + M15, ref: last.c, riskUsd: lot.ok ? lot.actualRiskUsd : riskUsd, sent: Boolean(send) };
+    book.open[sym] = { dir: s.dir, stop: s.stop, tp: s.tp, setup: s.setup, day: s.day, entryT: last.t + M15, ref: last.c, riskUsd: lot.ok ? lot.actualRiskUsd : riskUsd, sent: sendFor(sym) };
     report.opened++;
-    if (send) {
+    if (sendFor(sym)) {
+      const px = (v) => v.toFixed(mk.dp === 0 ? 0 : 1);
+      const slPx = s.dir > 0 ? last.c - dist : last.c + dist, tpPx = s.tp;
       await notify([
-        `🧪 <b>TEST TONI · ${mk.name} — ${s.dir > 0 ? '🟢 BUY' : '🔴 SELL'} ACUM</b> (la prețul pieței)`,
-        `Referință: ~${last.c.toFixed(mk.dp)}`,
-        `SL: <b>${fmtDist(mk, dist)}</b> ${s.dir > 0 ? 'sub' : 'peste'} intrare`,
-        `TP: <b>${fmtDist(mk, tpDist)}</b> ${s.dir > 0 ? 'peste' : 'sub'} intrare (POC-ul de ieri, ~${(tpDist / dist).toFixed(1)}R)`,
-        `Lot: <b>${lot.ok ? lot.lots.toFixed(2) : '— (' + lot.reason.replace(/_/g, ' ').toLowerCase() + ')'}</b> (cont de ${account} $, risc ${riskPct}% = ${riskUsd.toFixed(0)} $)`,
-        `M15 · ${s.setup} · se închide cel târziu la finalul sesiunii`,
-        'Pune SL și TP ca distanță de la prețul tău de intrare (prețurile diferă puțin între platforme).',
-        'Doar TEST (demo sau notat pe hârtie): strategia nu e dovedită. NU pe contul cu sistemul zilnic.'
+        `${s.dir > 0 ? '🟢 <b>BUY' : '🔴 <b>SELL'}</b> · strategia M15`,
+        `Pe ce: <b>${SHOWN[sym] || sym}</b> (${mk.name.split(' (')[0]})`,
+        `Time frame: <b>M15</b> (se închide cel târziu la finalul sesiunii, 23:00)`,
+        `Intrare: <b>ACUM</b>, la prețul pieței · referință ~${px(last.c)}`,
+        `Stop loss: <b>~${px(slPx)}</b> (${fmtDist(mk, dist)} ${s.dir > 0 ? 'sub' : 'peste'} intrare)`,
+        `Take profit: <b>~${px(tpPx)}</b> (${fmtDist(mk, tpDist)}, marginea ${s.dir > 0 ? 'de sus (VAH)' : 'de jos (VAL)'} a zonei de valoare, ~${(tpDist / dist).toFixed(1)}R)`,
+        `Lot: <b>${lot.ok ? lot.lots.toFixed(2) : '— (' + lot.reason.replace(/_/g, ' ').toLowerCase() + ')'}</b> (risc ${riskPct}% = ${riskUsd.toFixed(0)} $)`,
+        `<i>Dacă prețul tău de intrare e altul decât referința, păstrează aceleași distanțe pentru stop loss și take profit. Strategie nouă: încă se dovedește live.</i>`
       ].join('\n'));
     }
   }
