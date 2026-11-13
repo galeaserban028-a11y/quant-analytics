@@ -20,11 +20,14 @@
     "firm": "FTM_1STEP_NITRO",
     "phase": 0,
     "initial": 5000,
-    "balance": 5000,
+    "balance": 5210.95,
     "dayKey": "2026-11-13",
-    "dayStart": 5000,
-    "highestEod": 5000,
-    "tradingDays": [],
+    "dayStart": 5210.95,
+    "highestEod": 5210.95,
+    "tradingDays": [
+      "2026-11-09",
+      "2026-11-12"
+    ],
     "positions": {},
     "skipped": {
       "US30|d7": 1793975400000
@@ -44,13 +47,47 @@
       "UK100": 1794561946090
     },
     "initialized": true,
-    "history": [],
+    "history": [
+      {
+        "sym": "SPX500",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1794215665000,
+        "pnl": 1.25,
+        "outcome": "MANUAL"
+      },
+      {
+        "sym": "SPX500",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1794217313000,
+        "pnl": -5.05,
+        "outcome": "MANUAL"
+      },
+      {
+        "sym": "SPX500",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1794495772000,
+        "pnl": -17,
+        "outcome": "MANUAL"
+      },
+      {
+        "sym": "SPX500",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1794499854000,
+        "pnl": 231.75,
+        "outcome": "MANUAL"
+      }
+    ],
     "startedAt": 1794217249902,
     "fxRates": {
       "EURUSD": 1.1095207929611206,
       "GBPUSD": 1.3276686668395996
     },
-    "fxFetchedAt": 1794563568185
+    "fxFetchedAt": 1794563568185,
+    "syncId": "mt5-2026-11-13"
   },
   "fx": null,
   "fxVirtual": {
@@ -4860,5 +4897,5 @@
     },
     "summaryDay": "2026-11-12"
   },
-  "savedAt": "2026-11-13T09:52:48.706Z"
+  "savedAt": "2026-11-13T09:53:47.809Z"
 }
