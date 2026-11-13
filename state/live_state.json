@@ -12,7 +12,12 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-11-13",
-    "outbox": [],
+    "outbox": [
+      {
+        "at": 1794604523835,
+        "text": "🧪 <b>TEST TONI · rezumatul zilei</b> (tranzacții pe hârtie, făcute automat; nu faci nimic)\nAzi: 1 tranzacții, 1 pe plus, total +0.08R (≈ +4 $ la 1% risc)\n\n<b>Media de la pornire, pe fiecare piață:</b>\nS&P 500 (US500): 1 tranz., media +0.78R, total +0.78R\nAUR (XAUUSD): 1 tranz., media +0.08R, total +0.08R\n\n<b>Total:</b> 2 tranzacții, media +0.43R (pe 5.000 $ la 1%: +43 $). Testul e trecut la ≥ 50 tranzacții pe o piață cu media ≥ +0.05R."
+      }
+    ],
     "weeklyDate": "2026-11-08"
   },
   "prop": {
@@ -4790,14 +4795,26 @@
         "outcome": "TIME",
         "resultR": 1.072,
         "enteredAt": 1794411000000
+      },
+      {
+        "sym": "NAS100",
+        "day": "2026-11-13",
+        "live": false,
+        "direction": "SHORT",
+        "entry": 27983.63671875,
+        "stop": 28295.798828125,
+        "exit": 27913.849609375,
+        "outcome": "TIME",
+        "resultR": 0.2156,
+        "enteredAt": 1794582000000
       }
     ],
     "skips": {
-      "INTERVAL_PREA_LARG": 11
+      "INTERVAL_PREA_LARG": 12
     },
     "settled": {
-      "SPX500": "2026-11-12",
-      "NAS100": "2026-11-12"
+      "SPX500": "2026-11-13",
+      "NAS100": "2026-11-13"
     },
     "graduated": null,
     "paused": false,
@@ -4941,7 +4958,7 @@
       "us": "2026-11-13",
       "dax": "2026-11-13"
     },
-    "summaryDay": "2026-11-12"
+    "summaryDay": "2026-11-13"
   },
-  "savedAt": "2026-11-13T21:11:29.996Z"
+  "savedAt": "2026-11-13T21:15:24.453Z"
 }
