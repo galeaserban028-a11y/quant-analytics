@@ -52,10 +52,10 @@
     "history": [],
     "startedAt": 1794217249902,
     "fxRates": {
-      "EURUSD": 1.1168941259384155,
-      "GBPUSD": 1.3348639011383057
+      "EURUSD": 1.1095207929611206,
+      "GBPUSD": 1.3276686668395996
     },
-    "fxFetchedAt": 1794527107739
+    "fxFetchedAt": 1794530423503
   },
   "fx": null,
   "fxVirtual": {
@@ -4763,7 +4763,7 @@
       }
     ],
     "open": null,
-    "lastFetch": 1794527107739,
+    "lastFetch": 1794530423503,
     "graduated": null
   },
   "liq": {
@@ -4864,5 +4864,5 @@
     },
     "summaryDay": "2026-11-12"
   },
-  "savedAt": "2026-11-13T00:31:26.975Z"
+  "savedAt": "2026-11-13T00:40:24.397Z"
 }
