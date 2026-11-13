@@ -86,7 +86,7 @@
       "EURUSD": 1.1095207929611206,
       "GBPUSD": 1.3276686668395996
     },
-    "fxFetchedAt": 1794596722991,
+    "fxFetchedAt": 1794600023091,
     "syncId": "mt5-2026-11-13"
   },
   "fx": null,
@@ -4544,15 +4544,39 @@
         "outcome": "STOP",
         "resultR": -1.0298,
         "enteredAt": 1794466800000
+      },
+      {
+        "pair": "EURUSD",
+        "day": 1794528000000,
+        "live": false,
+        "direction": "LONG",
+        "entry": 1.1072970628738403,
+        "stop": 1.1050944328308105,
+        "exit": 1.1050944328308105,
+        "outcome": "STOP",
+        "resultR": -1.0545,
+        "enteredAt": 1794553200000
+      },
+      {
+        "pair": "GBPUSD",
+        "day": 1794528000000,
+        "live": false,
+        "direction": "LONG",
+        "entry": 1.3242226839065552,
+        "stop": 1.322226643562317,
+        "exit": 1.322226643562317,
+        "outcome": "STOP",
+        "resultR": -1.0601,
+        "enteredAt": 1794556800000
       }
     ],
     "skips": {
       "INTERVAL_PREA_LARG": 11
     },
     "settled": {
-      "EURUSD": 1794441600000,
-      "GBPUSD": 1794441600000,
-      "USDJPY": 1794441600000
+      "EURUSD": 1794528000000,
+      "GBPUSD": 1794528000000,
+      "USDJPY": 1794528000000
     },
     "graduated": null,
     "paused": false,
@@ -4795,7 +4819,7 @@
       }
     ],
     "open": null,
-    "lastFetch": 1794596722991,
+    "lastFetch": 1794600023091,
     "graduated": null
   },
   "liq": {
@@ -4919,5 +4943,5 @@
     },
     "summaryDay": "2026-11-12"
   },
-  "savedAt": "2026-11-13T19:46:25.705Z"
+  "savedAt": "2026-11-13T20:00:24.502Z"
 }
