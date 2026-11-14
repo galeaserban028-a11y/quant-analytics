@@ -14,3 +14,4 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/toni-diag.js
+      - run: node scripts/daily-diag.js
