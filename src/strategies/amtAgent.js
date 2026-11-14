@@ -17,9 +17,9 @@
  *  Rezultat (costuri incluse): antrenament +0,15R/tranz. (n=294), test 2023–2025 +0,13R (n=318, t=2,6); pe plus în fiecare an.
  */
 const MARKETS = {
-  NAS100: { name: 'NASDAQ (NAS100)', yahoo: 'NQ=F', hl: 'xyz:XYZ100', tz: 'America/New_York', s0: 570, s1: 960, cost: 2, unit: 'puncte', dp: 0 , v2: true },
-  SPX500: { name: 'S&P 500 (US500)', yahoo: 'ES=F', hl: 'xyz:SP500', tz: 'America/New_York', s0: 570, s1: 960, cost: 0.6, unit: 'puncte', dp: 1 , v2: true },
-  GER40: { name: 'DAX (GER40)', yahoo: '^GDAXI', tz: 'Europe/Berlin', s0: 540, s1: 1050, cost: 2, unit: 'puncte', dp: 0 , v2: true },
+  NAS100: { name: 'NASDAQ (NAS100)', yahoo: 'NQ=F', hl: 'xyz:XYZ100', tz: 'America/New_York', s0: 570, s1: 960, cost: 2, unit: 'puncte', dp: 0 , v2: true, inside: true },
+  SPX500: { name: 'S&P 500 (US500)', yahoo: 'ES=F', hl: 'xyz:SP500', tz: 'America/New_York', s0: 570, s1: 960, cost: 0.6, unit: 'puncte', dp: 1 , v2: true, inside: true },
+  GER40: { name: 'DAX (GER40)', yahoo: '^GDAXI', tz: 'Europe/Berlin', s0: 540, s1: 1050, cost: 2, unit: 'puncte', dp: 0 , v2: true, inside: true },
   XAUUSD: { name: 'AUR (XAUUSD)', yahoo: 'GC=F', hl: 'xyz:GOLD', tz: 'America/New_York', s0: 480, s1: 1020, cost: 0.4, unit: '$', dp: 1 },
   EURUSD: { name: 'EUR/USD', yahoo: 'EURUSD=X', tz: 'Europe/London', s0: 420, s1: 1020, cost: 0.00012, unit: 'pips', dp: 5, pip: 0.0001 },
   GBPUSD: { name: 'GBP/USD', yahoo: 'GBPUSD=X', tz: 'Europe/London', s0: 420, s1: 1020, cost: 0.00016, unit: 'pips', dp: 5, pip: 0.0001 }
@@ -79,7 +79,10 @@ function findSignals(bars, mk) {
       if (fullPrev.length < 20) continue;
       avgRange = fullPrev.reduce((a, x) => { let h = -Infinity, l = Infinity; for (const i of x.idx) { h = Math.max(h, bars[i].h); l = Math.min(l, bars[i].l); } return a + h - l; }, 0) / 20;
       const o = bars[cur.idx[0]].o;
-      if (o < VAH && o > VAL) continue; // s-a deschis în zona de valoare ⇒ fără semnal
+      if (o < VAH && o > VAL) { // s-a deschis în zona de valoare
+        if (mk.inside) insideDay(bars, S, d, { VAH, VAL, POC, o }, mk, out);
+        continue;
+      }
     }
     const okRisk = (stop, px) => !mk.v2 || Math.abs(px - stop) >= 0.25 * avgRange;
     let brkUp = -1, brkDn = -1, extUp = -Infinity, extDn = Infinity, doneUp = false, doneDn = false;
@@ -99,6 +102,36 @@ function findSignals(bars, mk) {
     }
   }
   return out;
+}
+
+/**
+ * VARIANTA „ÎNĂUNTRU” (indici, `inside: true`): zilele care se DESCHID în zona de valoare de ieri, pe la mijlocul ei (25–75%).
+ *  - trendul = închiderea sesiunii de ieri față de media închiderilor din ultimele 20 de sesiuni;
+ *  - semnal: prima dată când 2 lumânări M15 la rând se închid în afara benzii; doar dacă ieșirea e în direcția trendului;
+ *  - intrare la lumânarea următoare; SL la mijlocul benzii; TP 1,5R; ieșire forțată la finalul sesiunii.
+ * Găsită pe 2019–2022, verificată pe 2023–2025 (+0,22R / +0,18R pe tranzacție, costuri incluse), pe plus în fiecare an
+ * și pe fiecare indice; contra trendului dă zero. Setările vecine (1 sau 3 lumânări, TP 2R/3R) sunt toate pe plus.
+ */
+function insideDay(bars, S, d, lv, mk, out) {
+  const { VAH, VAL, POC, o } = lv, cur = S[d];
+  const pos = (o - VAL) / (VAH - VAL);
+  if (pos < 0.25 || pos > 0.75) return;
+  const last20 = S.slice(Math.max(0, d - 20), d);
+  if (last20.length < 20) return;
+  const closeOf = (x) => bars[x.idx[x.idx.length - 1]].c;
+  const ma = last20.reduce((a, x) => a + closeOf(x), 0) / 20, trend = Math.sign(closeOf(S[d - 1]) - ma);
+  let up = 0, dn = 0;
+  for (let q = 0; q < cur.idx.length; q++) {
+    const b = bars[cur.idx[q]];
+    up = b.c > VAH ? up + 1 : 0; dn = b.c < VAL ? dn + 1 : 0;
+    if (up >= 2 || dn >= 2) {
+      const dir = up >= 2 ? 1 : -1;
+      if (dir !== trend) return; // prima ieșire acceptată e contra trendului ⇒ azi nimic
+      const stop = (VAH + VAL) / 2, tp = b.c + dir * 1.5 * Math.abs(b.c - stop);
+      out.push({ t: b.t, i: cur.idx[q], dir, stop, tp, setup: dir > 0 ? 'ieșire acceptată peste VAH, în direcția trendului' : 'ieșire acceptată sub VAL, în direcția trendului', day: cur.day, VAH, VAL, POC, sessionEndLocal: mk.s1, inside: true });
+      return;
+    }
+  }
 }
 
 /**

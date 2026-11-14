@@ -135,7 +135,7 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
     if (!(tpDist > mk.cost) || s.dir * (s.tp - last.c) <= 0) { report.skipped++; continue; }
     const inst = instruments[sym];
     const lot = inst ? lotsFor(inst, riskUsd, dist, prices) : { ok: false, reason: 'INSTRUMENT_LIPSĂ' };
-    book.open[sym] = { dir: s.dir, stop: s.stop, tp: s.tp, setup: s.setup, day: s.day, entryT: last.t + M15, ref: last.c, riskUsd: lot.ok ? lot.actualRiskUsd : riskUsd, sent: sendFor(sym) };
+    book.open[sym] = { dir: s.dir, stop: s.stop, tp: s.tp, setup: s.setup, inside: Boolean(s.inside), day: s.day, entryT: last.t + M15, ref: last.c, riskUsd: lot.ok ? lot.actualRiskUsd : riskUsd, sent: sendFor(sym) };
     report.opened++;
     if (sendFor(sym)) {
       const px = (v) => v.toFixed(mk.dp === 0 ? 0 : 1);
@@ -146,7 +146,10 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
         `Time frame: <b>M15</b> (se închide cel târziu la finalul sesiunii, 23:00)`,
         `Intrare: <b>ACUM</b>, la prețul pieței · referință ~${px(last.c)}`,
         `Stop loss: <b>~${px(slPx)}</b> (${fmtDist(mk, dist)} ${s.dir > 0 ? 'sub' : 'peste'} intrare)`,
-        `Take profit: <b>~${px(tpPx)}</b> (${fmtDist(mk, tpDist)}, marginea ${s.dir > 0 ? 'de sus (VAH)' : 'de jos (VAL)'} a zonei de valoare, ~${(tpDist / dist).toFixed(1)}R)`,
+        s.inside
+          ? `Take profit: <b>~${px(tpPx)}</b> (${fmtDist(mk, tpDist)}, 1,5R)`
+          : `Take profit: <b>~${px(tpPx)}</b> (${fmtDist(mk, tpDist)}, marginea ${s.dir > 0 ? 'de sus (VAH)' : 'de jos (VAL)'} a zonei de valoare, ~${(tpDist / dist).toFixed(1)}R)`,
+        `Tipul zilei: ${s.inside ? 'deschidere ÎN bandă ⇒ ieșire acceptată în direcția trendului' : 'deschidere ÎN AFARA benzii ⇒ revenire în bandă'}`,
         `Lot: <b>${lot.ok ? lot.lots.toFixed(2) : '— (' + lot.reason.replace(/_/g, ' ').toLowerCase() + ')'}</b> (risc ${riskPct}% = ${riskUsd.toFixed(0)} $)`,
         `<i>Dacă prețul tău de intrare e altul decât referința, păstrează aceleași distanțe pentru stop loss și take profit. Strategie nouă: încă se dovedește live.</i>`
       ].join('\n'));

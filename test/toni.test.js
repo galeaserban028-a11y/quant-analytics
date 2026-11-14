@@ -18,12 +18,13 @@ test('Toni nu se uită în viitor: semnalele apar la fel când datele se opresc 
   assert.ok(all.length > 10, `semnale: ${all.length}`);
   // varianta 2: doar zile care s-au deschis în afara zonei de valoare de ieri
   const S = A.sessions(NQ, A.MARKETS.NAS100);
-  for (const s of all) { const o = NQ[S.find((x) => x.day === s.day).idx[0]].o; assert.ok(o >= s.VAH || o <= s.VAL, 'deschidere în afara VA'); }
+  for (const s of all) { const o = NQ[S.find((x) => x.day === s.day).idx[0]].o; assert.ok(s.inside ? o < s.VAH && o > s.VAL : o >= s.VAH || o <= s.VAL, 'deschidere în afara VA (sau înăuntru pentru varianta „înăuntru”)'); }
   for (const s of all.filter((_, k) => k % 5 === 0)) {
     const again = A.findSignals(NQ.slice(0, s.i + 1), A.MARKETS.NAS100).filter((x) => x.i === s.i && x.dir === s.dir);
     assert.equal(again.length, 1, `semnalul de la ${new Date(s.t).toISOString()} nu apare cu datele tăiate`);
     assert.ok(s.dir < 0 ? s.stop > NQ[s.i].c && s.tp < NQ[s.i].c : s.stop < NQ[s.i].c && s.tp > NQ[s.i].c, 'SL și TP de partea corectă');
-    assert.ok(s.dir < 0 ? s.tp === s.VAL : s.tp === s.VAH, 'varianta 2: TP la marginea opusă a zonei de valoare');
+    if (!s.inside) assert.ok(s.dir < 0 ? s.tp === s.VAL : s.tp === s.VAH, 'varianta 2: TP la marginea opusă a zonei de valoare');
+    else assert.ok(Math.abs(Math.abs(s.tp - NQ[s.i].c) - 1.5 * Math.abs(NQ[s.i].c - s.stop)) < 1e-6 && s.stop === (s.VAH + s.VAL) / 2, 'înăuntru: SL la mijlocul benzii, TP 1,5R');
   }
 });
 
