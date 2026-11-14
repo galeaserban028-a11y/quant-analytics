@@ -25,6 +25,14 @@ const MARKETS = {
   GBPUSD: { name: 'GBP/USD', yahoo: 'GBPUSD=X', tz: 'Europe/London', s0: 420, s1: 1020, cost: 0.00016, unit: 'pips', dp: 5, pip: 0.0001 }
 };
 const M15 = 900e3;
+/**
+ * Zilele în care bursa americană e închisă sau închide devreme (NYSE, 2026–2027). Sursele 24/7 (Hyperliquid) au lumânări și
+ * atunci, dar CFD-ul brokerului stă pe loc: nu le tratăm ca sesiuni (nici pentru zona de valoare, nici pentru semnale).
+ */
+const NY_CLOSED = new Set(['2026-01-01', '2026-01-19', '2026-02-16', '2026-04-03', '2026-05-25', '2026-06-19', '2026-07-03', '2026-09-07',
+  '2026-11-26', '2026-11-27', '2026-12-24', '2026-12-25', '2027-01-01', '2027-01-18', '2027-02-15', '2027-03-26', '2027-05-31', '2027-06-18',
+  '2027-07-05', '2027-09-06', '2027-11-25', '2027-11-26', '2027-12-24']);
+const isClosedDay = (day, tz) => tz === 'America/New_York' && NY_CLOSED.has(day);
 const fmtCache = {};
 function local(t, tz) {
   const f = fmtCache[tz] || (fmtCache[tz] = new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }));
@@ -40,6 +48,7 @@ function sessions(bars, mk) {
     if (L.m < mk.s0 || L.m >= mk.s1) continue;
     const wd = new Date(L.day + 'T12:00:00Z').getUTCDay();
     if (wd === 0 || wd === 6) continue; // sursele 24/7 (Hyperliquid) au lumânări și în weekend: nu sunt sesiuni
+    if (isClosedDay(L.day, mk.tz)) continue; // sărbătoare / închidere devreme la bursa americană
     const c = days[days.length - 1];
     if (c && c.day === L.day) c.idx.push(i); else days.push({ day: L.day, idx: [i] });
   }
@@ -157,4 +166,4 @@ function settle(bars, ei, sig, mk, nowT = null) {
   function fin(px, outcome, closedAt) { return { outcome, closedAt, entry: e, exit: px, risk, r: (sig.dir * (px - e) - mk.cost) / risk }; }
 }
 
-module.exports = { MARKETS, findSignals, settle, valueArea, sessions, local, M15 };
+module.exports = { isClosedDay, MARKETS, findSignals, settle, valueArea, sessions, local, M15 };

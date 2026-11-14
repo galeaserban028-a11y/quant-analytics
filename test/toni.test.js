@@ -74,9 +74,9 @@ test('starea Toni se salvează și se reîncarcă între cicluri (altfel poziți
 
 test('nivelurile zilei: un singur mesaj înainte de deschiderea americană, cu VAH/POC/VAL', async () => {
   const day = A.sessions(NQ, A.MARKETS.NAS100).filter((x) => x.full).slice(-1)[0].day; // o zi lucrătoare din date
-  const now = Date.parse(day + 'T14:05:00Z'); // 16:05 ora României (iarna) / 17:05 (vara)
-  const ro = A.local(now, 'Europe/Bucharest');
-  const at = ro.m >= 16 * 60 && ro.m < 16 * 60 + 30 ? now : now - 3600e3;
+  const { zonedToUtc } = require('../src/data/dailySources');
+  const [yy, mm, dd] = day.split('-').map(Number);
+  const at = zonedToUtc(yy, mm, dd, 9, 30, 'America/New_York') - 25 * 60e3; // cu 25 de minute înainte de deschiderea reală
   const bus = { state: {} }, msgs = [];
   const fetchBars = async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= at) : []);
   const env = { TONI_SIGNAL_SYMS: 'SPX500,NAS100' };
@@ -95,4 +95,13 @@ test('implicit, semnalele reale merg doar pentru US500 (restul piețelor doar pe
   assert.ok(bus.state.toni.open.NAS100, 'poziția pe hârtie există');
   assert.equal(bus.state.toni.open.NAS100.sent, false);
   assert.equal(msgs.filter((m) => /strategia M15\nPe ce/.test(m)).length, 0);
+});
+
+test('sărbătorile americane nu sunt sesiuni (Hyperliquid tranzacționează și atunci)', () => {
+  assert.equal(A.isClosedDay('2026-11-26', 'America/New_York'), true);
+  assert.equal(A.isClosedDay('2026-11-25', 'America/New_York'), false);
+  assert.equal(A.isClosedDay('2026-11-26', 'Europe/Berlin'), false);
+  const day = Date.parse('2026-11-26T14:30:00Z'); // Thanksgiving, 9:30 la New York
+  const bars = []; for (let k = 0; k < 30; k++) bars.push({ t: day + k * 900e3, o: 1, h: 2, l: 0.5, c: 1.5 });
+  assert.equal(A.sessions(bars, A.MARKETS.SPX500).length, 0);
 });

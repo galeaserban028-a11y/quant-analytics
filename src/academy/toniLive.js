@@ -18,6 +18,10 @@
  */
 const A = require('../strategies/amtAgent');
 const { lotsFor } = require('../prop/lots');
+const { zonedToUtc } = require('../data/dailySources');
+/** Ora (UTC) la care începe/se termină sesiunea pieței în ziua locală `day` a pieței. */
+function sessionUtc(day, mk, minutes) { const [y, m, d] = day.split('-').map(Number); return zonedToUtc(y, m, d, Math.floor(minutes / 60), minutes % 60, mk.tz); }
+const roHM = (t) => new Intl.DateTimeFormat('ro-RO', { timeZone: 'Europe/Bucharest', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(t));
 
 const MIN_TRADES = 50, MIN_MEAN = 0.05, T_MIN = 1.5, MAX_OPEN = 3;
 const M15 = A.M15;
@@ -63,11 +67,18 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   if (notify && env.TONI_LEVELS !== '0') {
     const ro = A.local(now, 'Europe/Bucharest');
     const wd = new Date(ro.day + 'T12:00:00Z').getUTCDay();
-    const groups = [{ key: 'us', from: 16 * 60, to: 16 * 60 + 30, syms: ['SPX500', 'NAS100'].filter((x) => signalSyms.includes(x) || env.TONI_SIGNALS === '1'), open: '16:30', end: '23:00', late: '17:45' },
-      { key: 'dax', from: 9 * 60 + 45, to: 10 * 60, syms: ['GER40'].filter((x) => signalSyms.includes(x) || env.TONI_SIGNALS === '1'), open: '10:00', end: '18:30', late: '11:15' }];
+    // fereastra mesajului: cu 30 de minute înainte de deschiderea reală (ora României se schimbă când SUA/Europa trec la altă oră)
+    const mkGroup = (key, syms, ref) => {
+      const mk = A.MARKETS[ref], day = A.local(now, mk.tz).day;
+      const open = sessionUtc(day, mk, mk.s0), close = sessionUtc(day, mk, mk.s1);
+      const f = A.local(open - 30 * 60e3, 'Europe/Bucharest').m, t = A.local(open, 'Europe/Bucharest').m;
+      return { key, from: f, to: t, syms, open: roHM(open), end: roHM(close), late: roHM(open + 75 * 60e3), closed: A.isClosedDay(day, mk.tz) };
+    };
+    const groups = [mkGroup('us', ['SPX500', 'NAS100'].filter((x) => signalSyms.includes(x) || env.TONI_SIGNALS === '1'), 'SPX500'),
+      mkGroup('dax', ['GER40'].filter((x) => signalSyms.includes(x) || env.TONI_SIGNALS === '1'), 'GER40')];
     book.levelsDay = book.levelsDay || {};
     for (const g of groups) {
-      if (wd === 0 || wd === 6 || ro.m < g.from || ro.m >= g.to || book.levelsDay[g.key] === ro.day) continue;
+      if (wd === 0 || wd === 6 || g.closed || !g.syms.length || ro.m < g.from || ro.m >= g.to || book.levelsDay[g.key] === ro.day) continue;
       const lines = [];
       for (const sym of g.syms) {
         const bars = series[sym], mk = A.MARKETS[sym];
@@ -84,8 +95,10 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
       book.levelsDay[g.key] = ro.day;
       await notify([`📏 <b>Nivelurile de azi</b> (strategia M15, din sesiunea de ieri)`, ...lines, '',
         `Dacă în platforma ta prețul diferă de referință, adaugă aceeași diferență la toate nivelurile.`,
-        `La ${g.open} te uiți unde se deschide: <b>în bandă</b> ⇒ azi nimic. <b>Sub VAL</b> ⇒ aștepți o lumânare M15 închisă peste VAL (până pe la ${g.late}) ⇒ BUY, stop loss ~2 puncte sub minimul zilei, take profit la VAH. <b>Peste VAH</b> ⇒ invers: SELL, take profit la VAL. Închizi la ${g.end}.`,
-        `Doar pe DEMO deocamdată.`].join('\n'));
+        `La <b>${g.open}</b> te uiți unde se deschide:`,
+        `• <b>în afara benzii</b> (sub VAL / peste VAH) ⇒ aștepți revenirea în bandă (până pe la ${g.late}) ⇒ intri spre bandă, TP la marginea opusă;`,
+        `• <b>în bandă, pe la mijloc</b> ⇒ aștepți 2 lumânări M15 la rând închise afară, doar în direcția trendului ⇒ intri cu ieșirea, SL la mijlocul benzii, TP 1,5R.`,
+        `Semnalul îți vine pe Telegram când e cazul. Închizi tot la ${g.end}.`].join('\n'));
     }
   }
 
@@ -143,7 +156,7 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
       await notify([
         `${s.dir > 0 ? '🟢 <b>BUY' : '🔴 <b>SELL'}</b> · strategia M15`,
         `Pe ce: <b>${SHOWN[sym] || sym}</b> (${mk.name.split(' (')[0]})`,
-        `Time frame: <b>M15</b> (se închide cel târziu la finalul sesiunii, 23:00)`,
+        `Time frame: <b>M15</b> (se închide cel târziu la finalul sesiunii, ${roHM(sessionUtc(s.day, mk, mk.s1))})`,
         `Intrare: <b>ACUM</b>, la prețul pieței · referință ~${px(last.c)}`,
         `Stop loss: <b>~${px(slPx)}</b> (${fmtDist(mk, dist)} ${s.dir > 0 ? 'sub' : 'peste'} intrare)`,
         s.inside
