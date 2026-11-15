@@ -19,7 +19,7 @@ const { fetchM15Toni: fetchBars } = require('../src/data/toniFeed');
       const ro = (t) => new Date(t).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
       for (const x of T) console.log(`::notice::TRADE ${sym} ${ro(x.t)} ${x.dir > 0 ? 'BUY' : 'SELL'} ${x.out} ${x.r >= 0 ? '+' : ''}${x.r.toFixed(2)}R`);
       const st = stats(T);
-      console.log(`::notice::${sym} (${mk.hl || mk.yahoo}${mk.v2 ? ', varianta 2' : ''}): ${bars.length} lumânări, ultima deschisă acum ${((Date.now() - bars[bars.length - 1].t) / 60000).toFixed(1)} min, sesiuni ${S.length} (complete ${full}), semnale 60 zile ${sig.length}, închise ${st.n}, media ${st.mean}R, total ${st.totalR}R`);
+      console.log(`::notice::${sym} (${mk.hl || mk.bf || mk.yahoo}${mk.v2 ? ', varianta 2' : ''}): ${bars.length} lumânări, ultima deschisă acum ${((Date.now() - bars[bars.length - 1].t) / 60000).toFixed(1)} min, sesiuni ${S.length} (complete ${full}), semnale 60 zile ${sig.length}, închise ${st.n}, media ${st.mean}R, total ${st.totalR}R`);
     } catch (err) { console.log(`::error::${sym}: ${err.message}`); }
   }
   // ciclu complet, de două ori, cu stare salvată pe disc între ele (ca în bucla live)

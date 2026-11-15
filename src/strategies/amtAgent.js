@@ -19,7 +19,7 @@
 const MARKETS = {
   NAS100: { name: 'NASDAQ (NAS100)', yahoo: 'NQ=F', hl: 'xyz:XYZ100', tz: 'America/New_York', s0: 570, s1: 960, cost: 2, unit: 'puncte', dp: 0 , v2: true, inside: true },
   SPX500: { name: 'S&P 500 (US500)', yahoo: 'ES=F', hl: 'xyz:SP500', tz: 'America/New_York', s0: 570, s1: 960, cost: 0.6, unit: 'puncte', dp: 1 , v2: true, inside: true },
-  GER40: { name: 'DAX (GER40)', yahoo: '^GDAXI', tz: 'Europe/Berlin', s0: 540, s1: 1050, cost: 2, unit: 'puncte', dp: 0 , v2: true, inside: true },
+  GER40: { name: 'DAX (GER40)', yahoo: '^GDAXI', bf: 'XETR:DE0008469008', tz: 'Europe/Berlin', s0: 540, s1: 1050, cost: 2, unit: 'puncte', dp: 0 , v2: true, inside: true },
   XAUUSD: { name: 'AUR (XAUUSD)', yahoo: 'GC=F', hl: 'xyz:GOLD', tz: 'America/New_York', s0: 480, s1: 1020, cost: 0.4, unit: '$', dp: 1 },
   EURUSD: { name: 'EUR/USD', yahoo: 'EURUSD=X', tz: 'Europe/London', s0: 420, s1: 1020, cost: 0.00012, unit: 'pips', dp: 5, pip: 0.0001 },
   GBPUSD: { name: 'GBP/USD', yahoo: 'GBPUSD=X', tz: 'Europe/London', s0: 420, s1: 1020, cost: 0.00016, unit: 'pips', dp: 5, pip: 0.0001 }
