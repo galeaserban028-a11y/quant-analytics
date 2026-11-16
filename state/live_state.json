@@ -5066,26 +5066,23 @@
         "outcome": "TP",
         "r": 0.081,
         "sent": false
-      }
-    ],
-    "open": {
-      "XAUUSD": {
-        "dir": 1,
-        "stop": 3864.3278750000004,
-        "tp": 3879.750875,
+      },
+      {
+        "sym": "XAUUSD",
         "setup": "failed auction la VAL",
-        "inside": false,
-        "day": "2026-11-16",
-        "entryT": 1794836700000,
-        "ref": 3875.3,
-        "riskUsd": 45.488499999999114,
+        "dir": 1,
+        "openedAt": 1794836700000,
+        "closedAt": 1794839400000,
+        "outcome": "SL",
+        "r": -1.037,
         "sent": false
       }
-    },
+    ],
+    "open": {},
     "seen": {
       "NAS100": 1794837600000,
       "SPX500": 1794837600000,
-      "XAUUSD": 1794835800000,
+      "XAUUSD": 1794838500000,
       "EURUSD": 1794837600000,
       "GBPUSD": 1794837600000,
       "GER40": 1794837600000
@@ -5098,7 +5095,9 @@
       "EURUSD": 1994265,
       "GBPUSD": 1994265
     },
-    "lossDay": {},
+    "lossDay": {
+      "XAUUSD2026-11-16": 1
+    },
     "passed": {},
     "levelsDay": {
       "us": "2026-11-16",
@@ -5106,5 +5105,5 @@
     },
     "summaryDay": "2026-11-13"
   },
-  "savedAt": "2026-11-16T14:19:57.282Z"
+  "savedAt": "2026-11-16T14:30:57.190Z"
 }
