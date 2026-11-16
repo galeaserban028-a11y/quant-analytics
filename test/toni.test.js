@@ -24,7 +24,7 @@ test('Toni nu se uită în viitor: semnalele apar la fel când datele se opresc 
     assert.equal(again.length, 1, `semnalul de la ${new Date(s.t).toISOString()} nu apare cu datele tăiate`);
     assert.ok(s.dir < 0 ? s.stop > NQ[s.i].c && s.tp < NQ[s.i].c : s.stop < NQ[s.i].c && s.tp > NQ[s.i].c, 'SL și TP de partea corectă');
     if (!s.inside) assert.ok(s.dir < 0 ? s.tp === s.VAL : s.tp === s.VAH, 'varianta 2: TP la marginea opusă a zonei de valoare');
-    else assert.ok(Math.abs(Math.abs(s.tp - NQ[s.i].c) - 1.5 * Math.abs(NQ[s.i].c - s.stop)) < 1e-6 && s.stop === (s.VAH + s.VAL) / 2, 'înăuntru: SL la mijlocul benzii, TP 1,5R');
+    else assert.ok(Math.abs(Math.abs(s.tp - NQ[s.i].c) - (s.R || 1.5) * Math.abs(NQ[s.i].c - s.stop)) < 1e-6 && s.stop === (s.VAH + s.VAL) / 2, 'înăuntru: SL la mijlocul benzii, TP 1,5R');
   }
 });
 

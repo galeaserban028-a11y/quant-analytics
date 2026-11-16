@@ -118,13 +118,17 @@ function findSignals(bars, mk) {
  *  - trendul = închiderea sesiunii de ieri față de media închiderilor din ultimele 20 de sesiuni;
  *  - semnal: prima dată când 2 lumânări M15 la rând se închid în afara benzii; doar dacă ieșirea e în direcția trendului;
  *  - intrare la lumânarea următoare; SL la mijlocul benzii; TP 1,5R; ieșire forțată la finalul sesiunii.
+ *  - deschidere LIPITĂ de o margine (primele/ultimele 25%): doar dacă prețul traversează banda și iese pe partea opusă
+ *    (tot 2 închideri, tot cu trendul), TP 2R. Găsită pe 2019–2022, verificată pe 2023–2025, pe plus în fiecare an.
  * Găsită pe 2019–2022, verificată pe 2023–2025 (+0,22R / +0,18R pe tranzacție, costuri incluse), pe plus în fiecare an
  * și pe fiecare indice; contra trendului dă zero. Setările vecine (1 sau 3 lumânări, TP 2R/3R) sunt toate pe plus.
  */
 function insideDay(bars, S, d, lv, mk, out) {
   const { VAH, VAL, POC, o } = lv, cur = S[d];
   const pos = (o - VAL) / (VAH - VAL);
-  if (pos < 0.25 || pos > 0.75) return;
+  // deschidere lipită de o margine: se tranzacționează doar traversarea întregii benzi și ieșirea pe partea OPUSĂ
+  // (+0,49R / +0,43R pe 2019–2022 / 2023–2025, TP 2R); ieșirea prin marginea apropiată dă zero, deci se ignoră
+  const edge = pos < 0.25 ? -1 : pos > 0.75 ? 1 : 0;
   const last20 = S.slice(Math.max(0, d - 20), d);
   if (last20.length < 20) return;
   const closeOf = (x) => bars[x.idx[x.idx.length - 1]].c;
@@ -136,8 +140,10 @@ function insideDay(bars, S, d, lv, mk, out) {
     if (up >= 2 || dn >= 2) {
       const dir = up >= 2 ? 1 : -1;
       if (dir !== trend) return; // prima ieșire acceptată e contra trendului ⇒ azi nimic
-      const stop = (VAH + VAL) / 2, tp = b.c + dir * 1.5 * Math.abs(b.c - stop);
-      out.push({ t: b.t, i: cur.idx[q], dir, stop, tp, setup: dir > 0 ? 'ieșire acceptată peste VAH, în direcția trendului' : 'ieșire acceptată sub VAL, în direcția trendului', day: cur.day, VAH, VAL, POC, sessionEndLocal: mk.s1, inside: true });
+      if (edge && dir === edge) return; // deschidere lângă margine și ieșire tot pe acolo ⇒ fără avantaj
+      const R = edge ? 2 : 1.5;
+      const stop = (VAH + VAL) / 2, tp = b.c + dir * R * Math.abs(b.c - stop);
+      out.push({ t: b.t, i: cur.idx[q], dir, stop, tp, R, edge: Boolean(edge), setup: (edge ? 'traversare a benzii și ' : '') + (dir > 0 ? 'ieșire acceptată peste VAH, în direcția trendului' : 'ieșire acceptată sub VAL, în direcția trendului'), day: cur.day, VAH, VAL, POC, sessionEndLocal: mk.s1, inside: true });
       return;
     }
   }
