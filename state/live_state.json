@@ -16,6 +16,10 @@
       {
         "at": 1794863710836,
         "text": "🧪 <b>TEST TONI · rezumatul zilei</b> (tranzacții pe hârtie, făcute automat; nu faci nimic)\nAzi: 1 tranzacții, 0 pe plus, total -1.04R (≈ -52 $ la 1% risc)\n\n<b>Media de la pornire, pe fiecare piață:</b>\nS&P 500 (US500): 1 tranz., media +0.78R, total +0.78R\nAUR (XAUUSD): 2 tranz., media -0.48R, total -0.96R\n\n<b>Total:</b> 3 tranzacții, media -0.06R (pe 5.000 $ la 1%: -9 $). Testul e trecut la ≥ 50 tranzacții pe o piață cu media ≥ +0.05R."
+      },
+      {
+        "at": 1794864011057,
+        "text": "🟢 <b>BUY</b>\nPe ce: <b>US30</b> (Dow Jones)\nTime frame: <b>D1</b> (zilnic; ieșirea vine prin mesaj, de obicei în 1–5 zile)\nIntrare: <b>17.11 la 16:30</b> (deschiderea bursei), la prețul pieței · referință 51611.2\nStop loss: <b>50816.1</b> (795.1 puncte)\nTake profit: fără, ieșirea vine prin mesaj\nLot: <b>0.02</b> (risc 80 $ ≈ 1.6% din cont)\n<i>Dacă prețul tău de intrare e altul decât referința, păstrează aceleași distanțe pentru stop loss și take profit.</i>\n<i>Verifică o dată în platformă: 1 lot = 5.00 $ pe punct. Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.</i>"
       }
     ],
     "weeklyDate": "2026-11-15"
@@ -31,23 +35,41 @@
     "highestEod": 5210.95,
     "tradingDays": [
       "2026-11-09",
-      "2026-11-12"
+      "2026-11-12",
+      "2026-11-16"
     ],
-    "positions": {},
+    "positions": {
+      "US30|rsi2": {
+        "symbol": "US30",
+        "direction": "LONG",
+        "entry": 51611.171875,
+        "initialStop": 50816.09514508928,
+        "stop": 50816.09514508928,
+        "openedAt": 1794925800000,
+        "desk": "RSI2",
+        "strategy": "rsi2",
+        "agent": null,
+        "who": "Andrei (Pullback RSI(2))",
+        "riskUsd": 79.50767299107174,
+        "lots": 0.02
+      }
+    },
     "skipped": {
-      "US30|d7": 1793975400000
+      "US30|d7": 1793975400000,
+      "SPX500|rsi2": 1794925800000,
+      "SPX500|down": 1794925800000
     },
     "lastBarClose": {
-      "SPX500": 1794603600000,
-      "US30": 1794603600000,
-      "NAS100": 1794603600000,
+      "SPX500": 1794862800000,
+      "US30": 1794862800000,
+      "NAS100": 1794862800000,
       "GER40": 1794846600000,
       "UK100": 1794846600000
     },
     "lastFetch": {
-      "SPX500": 1794863950927,
-      "US30": 1794863950927,
-      "NAS100": 1794863950927,
+      "SPX500": 1794864011057,
+      "US30": 1794864011057,
+      "NAS100": 1794864011057,
       "GER40": 1794862631078,
       "UK100": 1794861070845
     },
@@ -5158,5 +5180,5 @@
     },
     "summaryDay": "2026-11-16"
   },
-  "savedAt": "2026-11-16T21:19:11.673Z"
+  "savedAt": "2026-11-16T21:20:11.816Z"
 }
