@@ -17,6 +17,10 @@ const SHOWN = { SPX500: 'US500', NAS100: 'US100', GER40: 'GER40' };
       const last = bars[bars.length - 1].c, f = (v) => v.toFixed(mk.dp === 0 ? 0 : 1);
       const all = A.sessions(bars, mk).filter((s) => s.day < today), last20 = all.slice(-20), closeOf = (x) => bars[x.idx[x.idx.length - 1]].c;
       const ma = last20.reduce((a, x) => a + closeOf(x), 0) / last20.length, pc = closeOf(all[all.length - 1]);
+      const todayS = A.sessions(bars, mk).find((x) => x.day === today);
+      if (todayS) { const tb = todayS.idx.map((i) => bars[i]); const o = tb[0].o, pos = (o - VAL) / (VAH - VAL);
+        const tip = o >= VAH ? 'PESTE VAH (afară)' : o <= VAL ? 'SUB VAL (afară)' : pos < 0.25 ? 'în bandă, LIPIT de VAL' : pos > 0.75 ? 'în bandă, LIPIT de VAH' : 'în bandă, la MIJLOC';
+        console.log(`::notice::${sym} deschiderea de azi: ${f(o)} ⇒ ${tip} | lumânări azi: ${tb.map((b) => `${new Date(b.t).toISOString().slice(11, 16)}Z o${f(b.o)} h${f(b.h)} l${f(b.l)} c${f(b.c)}`).join(' ; ')}`); }
       console.log(`::notice::${sym} trend: închiderea de ieri ${f(pc)} vs media 20 de sesiuni ${f(ma)} ⇒ ${pc > ma ? 'CREȘTERE (doar BUY peste VAH)' : 'SCĂDERE (doar SELL sub VAL)'}`);
       console.log(`::notice::${sym} ${prev.day}: VAH ${f(VAH)} POC ${f(POC)} VAL ${f(VAL)} | ultimul preț ${f(last)} | ${mk.hl || mk.yahoo}`);
       lines.push(`<b>${SHOWN[sym]}</b>: VAH <b>${f(VAH)}</b> · POC <b>${f(POC)}</b> · VAL <b>${f(VAL)}</b>  (preț de referință acum: ${f(last)})`);
