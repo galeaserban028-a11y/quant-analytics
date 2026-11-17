@@ -4839,15 +4839,27 @@
         "outcome": "TIME",
         "resultR": -0.2397,
         "enteredAt": 1794812400000
+      },
+      {
+        "pair": "GBPUSD",
+        "day": 1794873600000,
+        "live": false,
+        "direction": "LONG",
+        "entry": 1.3203237056732178,
+        "stop": 1.3169331550598145,
+        "exit": 1.3215277194976807,
+        "outcome": "TIME",
+        "resultR": 0.3197,
+        "enteredAt": 1794906000000
       }
     ],
     "skips": {
-      "INTERVAL_PREA_LARG": 11
+      "INTERVAL_PREA_LARG": 12
     },
     "settled": {
-      "EURUSD": 1794787200000,
-      "GBPUSD": 1794787200000,
-      "USDJPY": 1794787200000
+      "EURUSD": 1794873600000,
+      "GBPUSD": 1794873600000,
+      "USDJPY": 1794873600000
     },
     "graduated": null,
     "paused": false,
@@ -5302,5 +5314,5 @@
     },
     "summaryDay": "2026-11-16"
   },
-  "savedAt": "2026-11-17T19:50:33.348Z"
+  "savedAt": "2026-11-17T20:00:32.613Z"
 }
