@@ -16,6 +16,10 @@
       {
         "at": 1794950131536,
         "text": "🧪 <b>TEST TONI · rezumatul zilei</b> (tranzacții pe hârtie, făcute automat; nu faci nimic)\nAzi: 4 tranzacții, 3 pe plus, total -0.13R (≈ -7 $ la 1% risc)\n\n<b>Media de la pornire, pe fiecare piață:</b>\nS&P 500 (US500): 1 tranz., media +0.78R, total +0.78R\nAUR (XAUUSD): 4 tranz., media -0.09R, total -0.36R\nEUR/USD: 1 tranz., media -1.10R, total -1.10R\nGBP/USD: 1 tranz., media +0.37R, total +0.37R\n\n<b>Total:</b> 7 tranzacții, media -0.04R (pe 5.000 $ la 1%: -16 $). Testul e trecut la ≥ 50 tranzacții pe o piață cu media ≥ +0.05R."
+      },
+      {
+        "at": 1794950431706,
+        "text": "🟢 <b>BUY</b>\nPe ce: <b>US30</b> (Dow Jones)\nTime frame: <b>D1</b> (zilnic; ieșirea vine prin mesaj, de obicei în 1–5 zile)\nIntrare: <b>18.11 la 16:30</b> (deschiderea bursei), la prețul pieței · referință 50762.4\nStop loss: <b>49914.3</b> (848.1 puncte)\nTake profit: fără, ieșirea vine prin mesaj\nLot: <b>0.01</b> (risc 42 $ ≈ 0.8% din cont)\n<i>Dacă prețul tău de intrare e altul decât referința, păstrează aceleași distanțe pentru stop loss și take profit.</i>\n<i>Verifică o dată în platformă: 1 lot = 5.00 $ pe punct. Dacă ai ratat deschiderea, poți intra în primele ore după; dacă prețul a fugit mult de referință, sari peste.</i>"
       }
     ],
     "weeklyDate": "2026-11-15"
@@ -25,29 +29,30 @@
     "firm": "FTM_1STEP_NITRO",
     "phase": 0,
     "initial": 5000,
-    "balance": 5210.95,
+    "balance": 5130.7347087193075,
     "dayKey": "2026-11-17",
     "dayStart": 5210.95,
     "highestEod": 5210.95,
     "tradingDays": [
       "2026-11-09",
       "2026-11-12",
-      "2026-11-16"
+      "2026-11-16",
+      "2026-11-17"
     ],
     "positions": {
-      "US30|rsi2": {
+      "US30|bb": {
         "symbol": "US30",
         "direction": "LONG",
-        "entry": 51611.171875,
-        "initialStop": 50816.09514508928,
-        "stop": 50816.09514508928,
-        "openedAt": 1794925800000,
-        "desk": "RSI2",
-        "strategy": "rsi2",
+        "entry": 50762.421875,
+        "initialStop": 49914.32366071428,
+        "stop": 49914.32366071428,
+        "openedAt": 1795012200000,
+        "desk": "BB",
+        "strategy": "bb",
         "agent": null,
-        "who": "Andrei (Pullback RSI(2))",
-        "riskUsd": 79.50767299107174,
-        "lots": 0.02
+        "who": "George (Banda Bollinger)",
+        "riskUsd": 42.40491071428587,
+        "lots": 0.01
       }
     },
     "skipped": {
@@ -61,16 +66,16 @@
       "UK100|d7": 1794988800000
     },
     "lastBarClose": {
-      "SPX500": 1794862800000,
-      "US30": 1794862800000,
-      "NAS100": 1794862800000,
+      "SPX500": 1794949200000,
+      "US30": 1794949200000,
+      "NAS100": 1794949200000,
       "GER40": 1794933000000,
       "UK100": 1794933000000
     },
     "lastFetch": {
-      "SPX500": 1794950311822,
-      "US30": 1794950311822,
-      "NAS100": 1794950311822,
+      "SPX500": 1794950431706,
+      "US30": 1794950431706,
+      "NAS100": 1794950431706,
       "GER40": 1794947491856,
       "UK100": 1794947491856
     },
@@ -107,6 +112,17 @@
         "closedAt": 1794499854000,
         "pnl": 231.75,
         "outcome": "MANUAL"
+      },
+      {
+        "sym": "US30",
+        "strategy": "rsi2",
+        "agent": null,
+        "direction": "LONG",
+        "openedAt": 1794925800000,
+        "closedAt": 1795012200000,
+        "r": -1.0089,
+        "pnl": -80.21529128069227,
+        "outcome": "STOP"
       }
     ],
     "startedAt": 1794217249902,
@@ -5343,5 +5359,5 @@
     },
     "summaryDay": "2026-11-17"
   },
-  "savedAt": "2026-11-17T21:18:32.814Z"
+  "savedAt": "2026-11-17T21:20:33.258Z"
 }
