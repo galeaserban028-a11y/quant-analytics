@@ -12,7 +12,12 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-11-18",
-    "outbox": [],
+    "outbox": [
+      {
+        "at": 1795039007297,
+        "text": "🧪 <b>TEST TONI · rezumatul zilei</b> (tranzacții pe hârtie, făcute automat; nu faci nimic)\nAzi: 1 tranzacții, 0 pe plus, total -0.47R (≈ -24 $ la 1% risc)\n\n<b>Media de la pornire, pe fiecare piață:</b>\nNASDAQ (NAS100): 1 tranz., media -0.47R, total -0.47R\nS&P 500 (US500): 1 tranz., media +0.78R, total +0.78R\nAUR (XAUUSD): 4 tranz., media -0.09R, total -0.36R\nEUR/USD: 1 tranz., media -1.10R, total -1.10R\nGBP/USD: 1 tranz., media +0.37R, total +0.37R\n\n<b>Total:</b> 8 tranzacții, media -0.10R (pe 5.000 $ la 1%: -39 $). Testul e trecut la ≥ 50 tranzacții pe o piață cu media ≥ +0.05R."
+      }
+    ],
     "weeklyDate": "2026-11-15"
   },
   "prop": {
@@ -48,28 +53,26 @@
       }
     },
     "skipped": {
-      "US30|d7": 1793975400000,
-      "SPX500|rsi2": 1794925800000,
-      "SPX500|down": 1794925800000,
       "GER40|rsi2": 1794988800000,
       "GER40|down": 1794988800000,
       "GER40|d7": 1794988800000,
       "UK100|d7": 1794988800000,
-      "GER40|bb": 1795075200000
+      "GER40|bb": 1795075200000,
+      "US30|bb": 1795012200000
     },
     "lastBarClose": {
-      "SPX500": 1794949200000,
-      "US30": 1794949200000,
-      "NAS100": 1794949200000,
+      "SPX500": 1795035600000,
+      "US30": 1795035600000,
+      "NAS100": 1795035600000,
       "GER40": 1795019400000,
       "UK100": 1795019400000
     },
     "lastFetch": {
-      "SPX500": 1795030011697,
-      "US30": 1795030011697,
-      "NAS100": 1795030011697,
-      "GER40": 1795030551654,
-      "UK100": 1795030551654
+      "SPX500": 1795039007297,
+      "US30": 1795039007297,
+      "NAS100": 1795039007297,
+      "GER40": 1795039007297,
+      "UK100": 1795039007297
     },
     "initialized": true,
     "history": [
@@ -138,7 +141,7 @@
       "EURUSD": 1.0998196601867676,
       "GBPUSD": 1.3184610605239868
     },
-    "fxFetchedAt": 1795031513603,
+    "fxFetchedAt": 1795039007297,
     "syncId": "mt5-2026-11-18"
   },
   "fx": null,
@@ -3223,31 +3226,31 @@
       "NZDCAD": 1794960000000
     },
     "lastFetch": {
-      "GBPJPY": 1795029052276,
-      "EURCAD": 1795029052276,
-      "AUDCAD": 1795029052276,
-      "AUDJPY": 1795029052276,
-      "EURJPY": 1795029052276,
-      "EURGBP": 1795029052276,
-      "CHFJPY": 1795029052276,
-      "GBPUSD": 1795029052276,
-      "GBPCAD": 1795029052276,
-      "USDCAD": 1795029052276,
-      "NZDUSD": 1795029052276,
-      "AUDUSD": 1795029052276,
-      "CADJPY": 1795029052276,
-      "USDJPY": 1795029052276,
-      "AUDCHF": 1795029052276,
-      "GBPNZD": 1795029052276,
-      "USDCHF": 1795029052276,
-      "EURUSD": 1795029052276,
-      "EURNZD": 1795029052276,
-      "GBPAUD": 1795029052276,
-      "NZDJPY": 1795029052276,
-      "GBPCHF": 1795029052276,
-      "EURCHF": 1795029052276,
-      "EURAUD": 1795029052276,
-      "NZDCAD": 1795029052276
+      "GBPJPY": 1795039007297,
+      "EURCAD": 1795039007297,
+      "AUDCAD": 1795039007297,
+      "AUDJPY": 1795039007297,
+      "EURJPY": 1795039007297,
+      "EURGBP": 1795039007297,
+      "CHFJPY": 1795039007297,
+      "GBPUSD": 1795039007297,
+      "GBPCAD": 1795039007297,
+      "USDCAD": 1795039007297,
+      "NZDUSD": 1795039007297,
+      "AUDUSD": 1795039007297,
+      "CADJPY": 1795039007297,
+      "USDJPY": 1795039007297,
+      "AUDCHF": 1795039007297,
+      "GBPNZD": 1795039007297,
+      "USDCHF": 1795039007297,
+      "EURUSD": 1795039007297,
+      "EURNZD": 1795039007297,
+      "GBPAUD": 1795039007297,
+      "NZDJPY": 1795039007297,
+      "GBPCHF": 1795039007297,
+      "EURCHF": 1795039007297,
+      "EURAUD": 1795039007297,
+      "NZDCAD": 1795039007297
     },
     "sentHome": {},
     "recent": {
@@ -4845,15 +4848,51 @@
         "outcome": "TIME",
         "resultR": 0.3197,
         "enteredAt": 1794906000000
+      },
+      {
+        "pair": "EURUSD",
+        "day": 1794960000000,
+        "live": false,
+        "direction": "SHORT",
+        "entry": 1.0981770753860474,
+        "stop": 1.0998680591583252,
+        "exit": 1.0967316627502441,
+        "outcome": "TIME",
+        "resultR": 0.7838,
+        "enteredAt": 1794985200000
+      },
+      {
+        "pair": "GBPUSD",
+        "day": 1794960000000,
+        "live": false,
+        "direction": "SHORT",
+        "entry": 1.3188611268997192,
+        "stop": 1.3207945823669434,
+        "exit": 1.3140085935592651,
+        "outcome": "TIME",
+        "resultR": 2.4477,
+        "enteredAt": 1794985200000
+      },
+      {
+        "pair": "USDJPY",
+        "day": 1794960000000,
+        "live": false,
+        "direction": "SHORT",
+        "entry": 159.13400268554688,
+        "stop": 159.65199279785156,
+        "exit": 159.3489990234375,
+        "outcome": "TIME",
+        "resultR": -0.4382,
+        "enteredAt": 1794985200000
       }
     ],
     "skips": {
       "INTERVAL_PREA_LARG": 12
     },
     "settled": {
-      "EURUSD": 1794873600000,
-      "GBPUSD": 1794873600000,
-      "USDJPY": 1794873600000
+      "EURUSD": 1794960000000,
+      "GBPUSD": 1794960000000,
+      "USDJPY": 1794960000000
     },
     "graduated": null,
     "paused": false,
@@ -5130,11 +5169,11 @@
       }
     ],
     "skips": {
-      "INTERVAL_PREA_LARG": 12
+      "INTERVAL_PREA_LARG": 14
     },
     "settled": {
-      "SPX500": "2026-11-17",
-      "NAS100": "2026-11-17"
+      "SPX500": "2026-11-18",
+      "NAS100": "2026-11-18"
     },
     "graduated": null,
     "paused": false,
@@ -5156,7 +5195,7 @@
       }
     ],
     "open": null,
-    "lastFetch": 1795031513603,
+    "lastFetch": 1795039007297,
     "graduated": null
   },
   "liq": {
@@ -5230,8 +5269,8 @@
       "XAUUSD": 1794577500000
     },
     "slot": {
-      "XAUUSD": 1994479,
-      "NAS100": 1994479
+      "XAUUSD": 1994487,
+      "NAS100": 1994487
     },
     "lossDay": {
       "NAS1002026-11-10": 1,
@@ -5312,48 +5351,46 @@
         "outcome": "TP",
         "r": 0.407,
         "sent": false
-      }
-    ],
-    "open": {
-      "NAS100": {
-        "dir": -1,
-        "stop": 27251.786,
-        "tp": 26750.412,
+      },
+      {
+        "sym": "NAS100",
         "setup": "deschidere peste valoare, revenire în VA ⇒ spre VAL",
-        "inside": false,
-        "day": "2026-11-18",
-        "entryT": 1795016700000,
-        "ref": 26982,
-        "riskUsd": 50,
+        "dir": -1,
+        "openedAt": 1795016700000,
+        "closedAt": 1795035600000,
+        "outcome": "SESIUNE",
+        "r": -0.472,
         "sent": false
       }
-    },
+    ],
+    "open": {},
     "seen": {
-      "NAS100": 1795015800000,
-      "SPX500": 1795030200000,
-      "XAUUSD": 1795030200000,
-      "EURUSD": 1795030200000,
-      "GBPUSD": 1795030200000,
+      "NAS100": 1795037400000,
+      "SPX500": 1795037400000,
+      "XAUUSD": 1795037400000,
+      "EURUSD": 1795037400000,
+      "GBPUSD": 1795037400000,
       "GER40": 1795020300000
     },
     "slot": {
-      "NAS100": 1994479,
-      "SPX500": 1994479,
-      "GER40": 1994479,
-      "XAUUSD": 1994479,
-      "EURUSD": 1994479,
-      "GBPUSD": 1994479
+      "NAS100": 1994487,
+      "SPX500": 1994487,
+      "GER40": 1994487,
+      "XAUUSD": 1994487,
+      "EURUSD": 1994487,
+      "GBPUSD": 1994487
     },
     "lossDay": {
       "XAUUSD2026-11-16": 1,
-      "EURUSD2026-11-17": 1
+      "EURUSD2026-11-17": 1,
+      "NAS1002026-11-18": 1
     },
     "passed": {},
     "levelsDay": {
       "us": "2026-11-18",
       "dax": "2026-11-13"
     },
-    "summaryDay": "2026-11-17"
+    "summaryDay": "2026-11-18"
   },
-  "savedAt": "2026-11-18T19:51:55.329Z"
+  "savedAt": "2026-11-18T21:57:00.227Z"
 }
