@@ -1,12 +1,11 @@
 {
-  "id": "mt5-2026-11-13",
-  "_sursa": "Istoricul din MT5 trimis de utilizator pe 13.11.2026 (ora din MT5 = ora României; aici în UTC).",
-  "balance": 5210.95,
-  "highestEod": 5210.95,
+  "id": "mt5-2026-11-18",
+  "_sursa": "Istoricul din MT5 trimis de utilizator pe 18.11.2026 (ora din MT5 = ora României; aici în UTC). Utilizatorul a luat semnalele US30 cu 0,1 loturi și le-a închis singur.",
+  "balance": 5230.14,
+  "highestEod": 5310.69,
+  "closePositions": ["US30|bb"],
   "manualTrades": [
-    { "sym": "SPX500", "direction": "LONG", "closedAt": "2026-11-09T09:14:25Z", "pnl": 1.25 },
-    { "sym": "SPX500", "direction": "LONG", "closedAt": "2026-11-09T09:41:53Z", "pnl": -5.05 },
-    { "sym": "SPX500", "direction": "LONG", "closedAt": "2026-11-12T15:02:52Z", "pnl": -17.00 },
-    { "sym": "SPX500", "direction": "LONG", "closedAt": "2026-11-12T16:10:54Z", "pnl": 231.75 }
+    { "sym": "US30", "direction": "LONG", "closedAt": "2026-11-17T14:54:41Z", "pnl": 99.74 },
+    { "sym": "US30", "direction": "LONG", "closedAt": "2026-11-18T14:40:45Z", "pnl": -80.55 }
   ]
 }

@@ -280,7 +280,7 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
   }
   const acct = bus.state[stateKey];
   // Sincronizare cu contul real din config/prop_sync.json (scris de Claude după ce utilizatorul trimite istoricul din MT5):
-  // { id, balance, highestEod, manualTrades: [{ closedAt, pnl, sym }] }. Se aplică o singură dată pentru fiecare id nou.
+  // { id, balance, highestEod, closePositions: ['SYM|strategie'], manualTrades: [{ closedAt, pnl, sym }] }. Se aplică o singură dată pentru fiecare id nou.
   // Tranzacțiile manuale intră în istoric doar pentru regula de consistență (fără R, deci nu afectează frâna de urgență).
   if (stateKey === 'prop' && (env.PROP_SYNC_FILE || env.LIVE_TELEGRAM === '1')) {
     try {
@@ -290,6 +290,8 @@ async function runPropCycle({ config, instruments: instrumentsIn, bus, notify, f
         acct.balance = Number(sync.balance);
         acct.dayStart = acct.balance;
         if (Number(sync.highestEod) > 0) acct.highestEod = Math.max(acct.highestEod || 0, Number(sync.highestEod));
+        // pozițiile pe care utilizatorul le-a închis singur (sau nu le-a luat): sistemul nu le mai urmărește
+        for (const k of sync.closePositions || []) delete acct.positions[k];
         for (const t of sync.manualTrades || []) {
           acct.history.push({ sym: t.sym, strategy: 'manual', direction: t.direction || null, closedAt: Date.parse(t.closedAt), pnl: Number(t.pnl), outcome: 'MANUAL' });
           const d = dayKeyIn(Date.parse(t.closedAt), rules.resetTz);
