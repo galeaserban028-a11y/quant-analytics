@@ -20,32 +20,18 @@
     "firm": "FTM_1STEP_NITRO",
     "phase": 0,
     "initial": 5000,
-    "balance": 5130.7347087193075,
+    "balance": 5230.14,
     "dayKey": "2026-11-18",
-    "dayStart": 5130.7347087193075,
-    "highestEod": 5210.95,
+    "dayStart": 5230.14,
+    "highestEod": 5310.69,
     "tradingDays": [
       "2026-11-09",
       "2026-11-12",
       "2026-11-16",
-      "2026-11-17"
+      "2026-11-17",
+      "2026-11-18"
     ],
-    "positions": {
-      "US30|bb": {
-        "symbol": "US30",
-        "direction": "LONG",
-        "entry": 50762.421875,
-        "initialStop": 49914.32366071428,
-        "stop": 49914.32366071428,
-        "openedAt": 1795012200000,
-        "desk": "BB",
-        "strategy": "bb",
-        "agent": null,
-        "who": "George (Banda Bollinger)",
-        "riskUsd": 42.40491071428587,
-        "lots": 0.01
-      }
-    },
+    "positions": {},
     "skipped": {
       "US30|d7": 1793975400000,
       "SPX500|rsi2": 1794925800000,
@@ -114,6 +100,22 @@
         "r": -1.0089,
         "pnl": -80.21529128069227,
         "outcome": "STOP"
+      },
+      {
+        "sym": "US30",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1794927281000,
+        "pnl": 99.74,
+        "outcome": "MANUAL"
+      },
+      {
+        "sym": "US30",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1795012845000,
+        "pnl": -80.55,
+        "outcome": "MANUAL"
       }
     ],
     "startedAt": 1794217249902,
@@ -122,7 +124,7 @@
       "GBPUSD": 1.3184610605239868
     },
     "fxFetchedAt": 1795011573329,
-    "syncId": "mt5-2026-11-13"
+    "syncId": "mt5-2026-11-18"
   },
   "fx": null,
   "fxVirtual": {
@@ -5315,5 +5317,5 @@
     },
     "summaryDay": "2026-11-17"
   },
-  "savedAt": "2026-11-18T14:34:43.075Z"
+  "savedAt": "2026-11-18T14:44:32.781Z"
 }
