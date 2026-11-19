@@ -48,7 +48,7 @@ test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract 
   assert.match(live.msgs[0], /Stop loss: <b>~\d+<\/b>/);
   assert.match(live.msgs[0], /Lot: <b>0\.\d\d<\/b>/);
   assert.match(live.msgs[1], /Scorul pe NAS100: 1 tranzacții/);
-  const quiet = await run({});
+  const quiet = await run({ TONI_SIGNAL_SYMS: 'SPX500' });
   assert.equal(quiet.bus.state.toni.trades.length, 1);
   assert.ok(quiet.msgs.every((m) => /rezumatul zilei/.test(m)), 'fără mesaje pe fiecare tranzacție');
   // rezumatul: după 23:15 ora României, în ziua închiderii
@@ -87,14 +87,29 @@ test('nivelurile zilei: un singur mesaj înainte de deschiderea americană, cu V
   assert.match(lv[0], /US100<\/b>: VAH <b>\d+<\/b> · POC <b>\d+<\/b> · VAL <b>\d+<\/b>/);
 });
 
-test('implicit, semnalele reale merg doar pentru US500 (restul piețelor doar pe hârtie)', async () => {
+test('implicit, semnalele reale merg pentru US500, US100 și GER40; o piață scoasă din listă rămâne doar pe hârtie', async () => {
   const s = A.findSignals(NQ, A.MARKETS.NAS100)[3];
-  const bus = { state: {} }, msgs = [];
   const now = s.t + 900e3 + 90e3;
+  const go = async (env) => {
+    const bus = { state: {} }, msgs = [];
+    await runToniCycle({ bus, instruments: INSTR, fetchBars: async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= now) : []), notify: async (m) => msgs.push(m), now, env });
+    return { bus, msgs };
+  };
+  const def = await go({});
+  assert.equal(def.bus.state.toni.open.NAS100.sent, true);
+  assert.equal(def.msgs.filter((m) => /strategia M15\nPe ce: <b>US100/.test(m)).length, 1);
+  const only = await go({ TONI_SIGNAL_SYMS: 'SPX500' });
+  assert.ok(only.bus.state.toni.open.NAS100, 'poziția pe hârtie există');
+  assert.equal(only.bus.state.toni.open.NAS100.sent, false);
+  assert.equal(only.msgs.filter((m) => /strategia M15\nPe ce/.test(m)).length, 0);
+});
+
+test('pozițiile doar pe hârtie nu blochează un semnal real (limita se numără separat)', async () => {
+  const s = A.findSignals(NQ, A.MARKETS.NAS100)[3];
+  const now = s.t + 900e3 + 90e3, msgs = [];
+  const bus = { state: { toni: { v: 2, startedAt: 0, trades: [], open: { XAUUSD: { sent: false, entryT: now }, EURUSD: { sent: false, entryT: now }, GBPUSD: { sent: false, entryT: now } }, seen: {}, slot: {}, lossDay: {}, passed: {} } } };
   await runToniCycle({ bus, instruments: INSTR, fetchBars: async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= now) : []), notify: async (m) => msgs.push(m), now, env: {} });
-  assert.ok(bus.state.toni.open.NAS100, 'poziția pe hârtie există');
-  assert.equal(bus.state.toni.open.NAS100.sent, false);
-  assert.equal(msgs.filter((m) => /strategia M15\nPe ce/.test(m)).length, 0);
+  assert.equal(bus.state.toni.open.NAS100 && bus.state.toni.open.NAS100.sent, true);
 });
 
 test('sărbătorile americane nu sunt sesiuni (Hyperliquid tranzacționează și atunci)', () => {
