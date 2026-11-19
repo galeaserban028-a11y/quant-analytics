@@ -13,4 +13,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: node scripts/dax-sources-diag.js
+      - run: node scripts/dax-sources-diag.js; node scripts/dax-sources-diag2.js
