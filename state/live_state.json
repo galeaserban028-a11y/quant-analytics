@@ -65,7 +65,7 @@
       "SPX500": 1795105543793,
       "US30": 1795105543793,
       "NAS100": 1795105543793,
-      "GER40": 1795107584294,
+      "GER40": 1795107643694,
       "UK100": 1795107043994
     },
     "initialized": true,
@@ -5438,39 +5438,32 @@
         "outcome": "TP",
         "r": 0.164,
         "sent": false
+      },
+      {
+        "sym": "NAS100",
+        "setup": "deschidere peste valoare, revenire în VA ⇒ spre VAL",
+        "dir": -1,
+        "openedAt": 1795103100000,
+        "closedAt": 1795107600000,
+        "outcome": "TP",
+        "r": 0.194,
+        "sent": false
+      },
+      {
+        "sym": "SPX500",
+        "setup": "deschidere sub valoare, revenire în VA ⇒ spre VAH",
+        "dir": 1,
+        "openedAt": 1795105800000,
+        "closedAt": 1795107600000,
+        "outcome": "SL",
+        "r": -1.015,
+        "sent": false
       }
     ],
-    "open": {
-      "NAS100": {
-        "dir": -1,
-        "stop": 27770.7375,
-        "tp": 27003.899999999998,
-        "setup": "deschidere peste valoare, revenire în VA ⇒ spre VAL",
-        "inside": false,
-        "day": "2026-11-19",
-        "entryT": 1795103100000,
-        "ref": 27126,
-        "riskUsd": 50,
-        "sent": false,
-        "kind": "out"
-      },
-      "SPX500": {
-        "dir": 1,
-        "stop": 7276.467825000001,
-        "tp": 7354.35045,
-        "setup": "deschidere sub valoare, revenire în VA ⇒ spre VAH",
-        "inside": false,
-        "day": "2026-11-19",
-        "entryT": 1795105800000,
-        "ref": 7316.2,
-        "riskUsd": 40.33217499999919,
-        "sent": false,
-        "kind": "out"
-      }
-    },
+    "open": {},
     "seen": {
-      "NAS100": 1795102200000,
-      "SPX500": 1795104900000,
+      "NAS100": 1795106700000,
+      "SPX500": 1795106700000,
       "XAUUSD": 1795105800000,
       "EURUSD": 1795105800000,
       "GBPUSD": 1795105800000,
@@ -5487,7 +5480,8 @@
     "lossDay": {
       "XAUUSD2026-11-16": 1,
       "EURUSD2026-11-17": 1,
-      "NAS1002026-11-18": 1
+      "NAS1002026-11-18": 1,
+      "SPX5002026-11-19": 1
     },
     "passed": {},
     "levelsDay": {
@@ -5496,8 +5490,8 @@
     },
     "summaryDay": "2026-11-18",
     "px": {
-      "NAS100": 27253,
-      "SPX500": 7319.9,
+      "NAS100": 26921,
+      "SPX500": 7256.7,
       "GER40": 25488.688,
       "XAUUSD": 3690,
       "EURUSD": 1.0982975959777832,
@@ -5507,5 +5501,5 @@
       "us": "2026-11-19"
     }
   },
-  "savedAt": "2026-11-19T16:59:45.635Z"
+  "savedAt": "2026-11-19T17:00:45.147Z"
 }
