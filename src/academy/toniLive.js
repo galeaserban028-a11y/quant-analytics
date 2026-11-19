@@ -49,6 +49,11 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   // TONI_SIGNALS=1 trimite pentru toate.
   const signalSyms = String(env.TONI_SIGNAL_SYMS != null ? env.TONI_SIGNAL_SYMS : 'SPX500,NAS100,GER40').split(',').map((x) => x.trim()).filter(Boolean);
   const sendFor = (sym) => Boolean(notify) && (env.TONI_SIGNALS === '1' || signalSyms.includes(sym));
+  // Ce tipuri de zi trimit semnale REALE (TONI_REAL_KINDS: out = deschidere în afara benzii, mid = în bandă pe la mijloc,
+  // edge = lângă margine). Implicit doar „mid” (19.11.2026): pe 2026, date nevăzute, „mid” a rămas pe plus pe toți trei indicii
+  // (+0,26R, n=50), iar „out” (−0,08R, n=98) și „edge” (−0,25R, n=16) au ieșit pe minus. Ele continuă pe hârtie, pentru scor.
+  const realKinds = String(env.TONI_REAL_KINDS != null ? env.TONI_REAL_KINDS : 'mid').split(',').map((x) => x.trim());
+  const kindOf = (sg) => (sg.inside ? (sg.edge ? 'edge' : 'mid') : 'out');
   const SHOWN = { SPX500: 'US500', NAS100: 'US100', GER40: 'GER40', XAUUSD: 'XAUUSD', EURUSD: 'EURUSD', GBPUSD: 'GBPUSD' };
   const account = Number(env.TONI_ACCOUNT || 5000), riskPct = Number(env.TONI_RISK_PCT || 1);
   const report = { opened: 0, closed: 0, skipped: 0, errors: {} };
@@ -116,8 +121,9 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
       await notify([`📏 <b>Nivelurile de azi</b> (strategia M15, din sesiunea de ieri)`, ...lines, '',
         `Dacă în platforma ta prețul diferă de referință, adaugă aceeași diferență la toate nivelurile.`,
         `La <b>${g.open}</b> te uiți unde se deschide:`,
-        `• <b>în afara benzii</b> (sub VAL / peste VAH) ⇒ aștepți revenirea în bandă (până pe la ${g.late}) ⇒ intri spre bandă, TP la marginea opusă;`,
         `• <b>în bandă, pe la mijloc</b> ⇒ aștepți 2 lumânări M15 la rând închise afară, doar în direcția trendului ⇒ intri cu ieșirea, SL la mijlocul benzii, TP 1,5R.`,
+        ...(realKinds.includes('out') ? [`• <b>în afara benzii</b> (sub VAL / peste VAH) ⇒ aștepți revenirea în bandă (până pe la ${g.late}) ⇒ intri spre bandă, TP la marginea opusă;`]
+          : [`• <b>în afara benzii</b> sau <b>lipit de o margine</b> ⇒ azi NU tranzacționezi (în 2026 a ieșit pe minus; îl urmăresc doar pe hârtie).`]),
         `Semnalul îți vine pe Telegram când e cazul. Închizi tot la ${g.end}.`].join('\n'));
     }
   }
@@ -170,9 +176,9 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
     if (!(tpDist > mk.cost) || s.dir * (s.tp - last.c) <= 0) { report.skipped++; continue; }
     const inst = instruments[sym];
     const lot = inst ? lotsFor(inst, riskUsd, dist, prices) : { ok: false, reason: 'INSTRUMENT_LIPSĂ' };
-    book.open[sym] = { dir: s.dir, stop: s.stop, tp: s.tp, setup: s.setup, inside: Boolean(s.inside), day: s.day, entryT: last.t + M15, ref: last.c, riskUsd: lot.ok ? lot.actualRiskUsd : riskUsd, sent: sendFor(sym) };
+    book.open[sym] = { dir: s.dir, stop: s.stop, tp: s.tp, setup: s.setup, inside: Boolean(s.inside), day: s.day, entryT: last.t + M15, ref: last.c, riskUsd: lot.ok ? lot.actualRiskUsd : riskUsd, sent: sendFor(sym) && realKinds.includes(kindOf(s)), kind: kindOf(s) };
     report.opened++;
-    if (sendFor(sym)) {
+    if (book.open[sym].sent) {
       const px = (v) => v.toFixed(mk.dp === 0 ? 0 : 1);
       const slPx = s.dir > 0 ? last.c - dist : last.c + dist, tpPx = s.tp;
       await notify([

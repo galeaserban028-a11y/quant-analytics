@@ -29,7 +29,7 @@ test('Toni nu se uită în viitor: semnalele apar la fel când datele se opresc 
 });
 
 test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract size-ul brokerului; implicit doar ține scorul și trimite rezumatul zilei', async () => {
-  const s = A.findSignals(NQ, A.MARKETS.NAS100)[3];
+  const s = A.findSignals(NQ, A.MARKETS.NAS100).filter((x) => x.inside && !x.edge)[0]; // o zi „mid” (singurul tip trimis real implicit)
   const fetchAt = (now) => async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= now) : []);
   const run = async (env) => {
     const bus = { state: {} }, msgs = [];
@@ -88,7 +88,7 @@ test('nivelurile zilei: un singur mesaj înainte de deschiderea americană, cu V
 });
 
 test('implicit, semnalele reale merg pentru US500, US100 și GER40; o piață scoasă din listă rămâne doar pe hârtie', async () => {
-  const s = A.findSignals(NQ, A.MARKETS.NAS100)[3];
+  const s = A.findSignals(NQ, A.MARKETS.NAS100).filter((x) => x.inside && !x.edge)[0]; // o zi „mid” (singurul tip trimis real implicit)
   const now = s.t + 900e3 + 90e3;
   const go = async (env) => {
     const bus = { state: {} }, msgs = [];
@@ -105,7 +105,7 @@ test('implicit, semnalele reale merg pentru US500, US100 și GER40; o piață sc
 });
 
 test('pozițiile doar pe hârtie nu blochează un semnal real (limita se numără separat)', async () => {
-  const s = A.findSignals(NQ, A.MARKETS.NAS100)[3];
+  const s = A.findSignals(NQ, A.MARKETS.NAS100).filter((x) => x.inside && !x.edge)[0]; // o zi „mid” (singurul tip trimis real implicit)
   const now = s.t + 900e3 + 90e3, msgs = [];
   const bus = { state: { toni: { v: 2, startedAt: 0, trades: [], open: { XAUUSD: { sent: false, entryT: now }, EURUSD: { sent: false, entryT: now }, GBPUSD: { sent: false, entryT: now } }, seen: {}, slot: {}, lossDay: {}, passed: {} } } };
   await runToniCycle({ bus, instruments: INSTR, fetchBars: async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= now) : []), notify: async (m) => msgs.push(m), now, env: {} });
@@ -130,4 +130,16 @@ test('paza: dacă bucla n-a rulat ≥ 30 de minute în timpul sesiunii, vine un 
   assert.equal((await run(15, at)).length, 0, 'un ciclu normal (15 min) nu e pană');
   const sun = zonedToUtc(2026, 11, 22, 14, 0, 'America/New_York'); // duminică
   assert.equal((await run(120, sun)).length, 0);
+});
+
+test('implicit, zilele „în afara benzii” și „lângă margine” rămân doar pe hârtie; TONI_REAL_KINDS le poate porni', async () => {
+  const s = A.findSignals(NQ, A.MARKETS.NAS100).filter((x) => !x.inside)[0];
+  const now = s.t + 900e3 + 90e3;
+  const go = async (env) => { const bus = { state: {} }, msgs = []; await runToniCycle({ bus, instruments: INSTR, fetchBars: async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t + 900e3 <= now) : []), notify: async (m) => msgs.push(m), now, env }); return { bus, msgs }; };
+  const def = await go({});
+  assert.equal(def.bus.state.toni.open.NAS100.sent, false);
+  assert.equal(def.bus.state.toni.open.NAS100.kind, 'out');
+  assert.equal(def.msgs.filter((m) => /strategia M15\nPe ce/.test(m)).length, 0);
+  const on = await go({ TONI_REAL_KINDS: 'mid,out' });
+  assert.equal(on.bus.state.toni.open.NAS100.sent, true);
 });
