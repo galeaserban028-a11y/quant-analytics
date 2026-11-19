@@ -143,3 +143,18 @@ test('implicit, zilele „în afara benzii” și „lângă margine” rămân 
   const on = await go({ TONI_REAL_KINDS: 'mid,out' });
   assert.equal(on.bus.state.toni.open.NAS100.sent, true);
 });
+
+test('mesajul de la deschidere: o dată pe zi, cu tipul zilei și direcția (BUY / SELL / nimic)', async () => {
+  const S = A.sessions(NQ, A.MARKETS.NAS100).filter((x) => x.full);
+  const day = S[S.length - 1].day;
+  const { zonedToUtc } = require('../src/data/dailySources');
+  const [yy, mm, dd] = day.split('-').map(Number);
+  const openT = zonedToUtc(yy, mm, dd, 9, 30, 'America/New_York');
+  const bus = { state: {} }, msgs = [];
+  const fetchBars = async (sym) => (sym === 'NAS100' ? NQ.filter((b) => b.t <= openT) : []); // cu lumânarea de deschidere în lucru
+  for (const at of [openT + 90e3, openT + 150e3, openT + 600e3]) await runToniCycle({ bus, instruments: INSTR, fetchBars, notify: async (m) => msgs.push(m), now: at, env: { TONI_SIGNAL_SYMS: 'NAS100' } });
+  const op = msgs.filter((m) => /Deschiderea M15/.test(m));
+  assert.equal(op.length, 1, msgs.join('\n---\n'));
+  assert.match(op[0], /US100<\/b> s-a deschis la \d+ ⇒ /);
+  assert.match(op[0], /(Azi NU tranzacționezi|azi doar BUY|azi doar SELL|Aștepți să revină)/);
+});

@@ -69,13 +69,14 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
       `mesajele de închidere vin acum, dacă e cazul.`);
   }
   const prices = {};
-  const series = {}, delayed = {};
+  const series = {}, delayed = {}, rawAll = {};
 
   for (const [sym, mk] of Object.entries(A.MARKETS)) {
     if (book.slot[sym] === slot && !book.open[sym]) continue;
     let raw;
     try { raw = await fetchBars(sym, mk); } catch (err) { report.errors[sym] = err.message; continue; }
     series[sym] = (raw || []).filter((b) => b.t + M15 <= now - 30e3).sort((a, b) => a.t - b.t);
+    rawAll[sym] = raw || []; // cu tot cu lumânarea în lucru (pentru prețul de deschidere)
     if (raw && raw.delayed) delayed[sym] = true; // sursa de rezervă e întârziată ⇒ mesajul o spune
     const last = series[sym][series[sym].length - 1];
     if (last) prices[sym] = last.c;
@@ -126,6 +127,51 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
           : [`• <b>în afara benzii</b> sau <b>lipit de o margine</b> ⇒ azi NU tranzacționezi (în 2026 a ieșit pe minus; îl urmăresc doar pe hârtie).`]),
         `Semnalul îți vine pe Telegram când e cazul. Închizi tot la ${g.end}.`].join('\n'));
     }
+  }
+
+  // 0b. La DESCHIDERE: unde s-a deschis fiecare piață față de banda de ieri și ce aștepți azi (doar BUY / doar SELL / nimic).
+  //     Un mesaj pe grup (americanii împreună, DAX separat), în primele 40 de minute ale sesiunii. TONI_OPEN_MSG=0 îl oprește.
+  if (notify && env.TONI_OPEN_MSG !== '0') {
+    book.openDay = book.openDay || {};
+    for (const [key, syms] of [['us', ['SPX500', 'NAS100']], ['dax', ['GER40']]]) {
+      const list = syms.filter((x) => sendFor(x));
+      if (!list.length) continue;
+      const mk0 = A.MARKETS[list[0]], day = A.local(now, mk0.tz).day, wd = new Date(day + 'T12:00:00Z').getUTCDay();
+      const openT = sessionUtc(day, mk0, mk0.s0);
+      if (wd === 0 || wd === 6 || A.isClosedDay(day, mk0.tz) || book.openDay[key] === day || now < openT + 30e3 || now > openT + 40 * 60e3) continue;
+      const info = list.map((sym) => openInfo(sym, A.MARKETS[sym], day, openT));
+      if (info.some((x) => x === null) && now < openT + 12 * 60e3) continue; // mai așteptăm prețul de deschidere
+      const lines = info.filter(Boolean);
+      if (!lines.length) continue;
+      book.openDay[key] = day;
+      await notify([`🔔 <b>Deschiderea M15</b> (${roHM(openT)}): ce faci azi`, ...lines, '',
+        `<i>Semnalul vine oricum pe Telegram când se îndeplinește condiția. Prețurile sunt de la sursa mea; dacă platforma ta diferă puțin, adaugă diferența.</i>`].join('\n\n'));
+    }
+  }
+  function openInfo(sym, mk, day, openT) {
+    const done = series[sym] || [], raw = rawAll[sym] || [];
+    const ob = raw.find((b) => b.t === openT) || done.find((b) => b.t === openT);
+    if (!ob || done.length < 300) return null;
+    const S = A.sessions(done, mk).filter((x) => x.day < day);
+    const prev = S[S.length - 1];
+    if (!prev || !prev.full || S.length < 20) return null;
+    const va = A.valueArea(done, prev.idx, done[prev.idx[0]].c * 0.0005);
+    const closeOf = (x) => done[x.idx[x.idx.length - 1]].c;
+    const ma = S.slice(-20).reduce((a, x) => a + closeOf(x), 0) / 20, trend = Math.sign(closeOf(prev) - ma);
+    const o = ob.o, pos = (o - va.VAL) / (va.VAH - va.VAL), f = (v) => v.toFixed(mk.dp === 0 ? 0 : 1), name = `<b>${SHOWN[sym] || sym}</b>`;
+    const kind = o >= va.VAH || o <= va.VAL ? 'out' : (pos < 0.25 || pos > 0.75 ? 'edge' : 'mid');
+    const where = o >= va.VAH ? 'PESTE banda de ieri (peste VAH)' : o <= va.VAL ? 'SUB banda de ieri (sub VAL)' : kind === 'edge' ? `în bandă, dar LIPIT de ${pos > 0.75 ? 'VAH' : 'VAL'}` : 'ÎN BANDĂ, pe la mijloc';
+    const head = `${name} s-a deschis la ${f(o)} ⇒ ${where}.\nVAH ${f(va.VAH)} · POC ${f(va.POC)} · VAL ${f(va.VAL)}`;
+    if (!realKinds.includes(kind)) return `⛔ ${head}\n⇒ <b>Azi NU tranzacționezi ${SHOWN[sym] || sym}</b> (tipul ăsta de zi a ieșit pe minus în 2026; îl urmăresc doar pe hârtie).`;
+    if (kind === 'mid' || kind === 'edge') {
+      const up = trend > 0;
+      const go = kind === 'mid'
+        ? `aștepți 2 lumânări M15 la rând închise ${up ? `PESTE VAH (${f(va.VAH)}) ⇒ <b>BUY</b>` : `SUB VAL (${f(va.VAL)}) ⇒ <b>SELL</b>`}`
+        : `doar dacă traversează banda și închide de 2 ori ${pos > 0.75 ? `SUB VAL (${f(va.VAL)}) ⇒ <b>SELL</b>` : `PESTE VAH (${f(va.VAH)}) ⇒ <b>BUY</b>`}, și numai dacă e în direcția trendului`;
+      return `✅ ${head}\nTrend: ${up ? 'în SUS ⇒ azi doar BUY' : 'în JOS ⇒ azi doar SELL'}. ${go[0].toUpperCase() + go.slice(1)}. SL la mijlocul benzii (${f((va.VAH + va.VAL) / 2)}).\n` +
+        `Dacă prețul iese întâi pe partea cealaltă (2 lumânări ${up ? 'sub VAL' : 'peste VAH'}), azi nu mai faci nimic.`;
+    }
+    return `✅ ${head}\nAștepți să revină în bandă (o lumânare M15 închisă înapoi înăuntru, în prima oră) ⇒ <b>${o >= va.VAH ? 'SELL' : 'BUY'}</b>, TP la ${o >= va.VAH ? `VAL (${f(va.VAL)})` : `VAH (${f(va.VAH)})`}.`;
   }
 
   for (const [sym, bars] of Object.entries(series)) {
