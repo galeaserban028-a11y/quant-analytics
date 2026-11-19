@@ -70,12 +70,17 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
     if (book.slot[sym] === slot && !book.open[sym]) continue;
     let raw;
     try { raw = await fetchBars(sym, mk); } catch (err) { report.errors[sym] = err.message; continue; }
-    book.slot[sym] = slot;
     series[sym] = (raw || []).filter((b) => b.t + M15 <= now - 30e3).sort((a, b) => a.t - b.t);
     if (raw && raw.delayed) delayed[sym] = true; // sursa de rezervă e întârziată ⇒ mesajul o spune
     const last = series[sym][series[sym].length - 1];
     if (last) prices[sym] = last.c;
+    // Sfertul e „bifat” doar când a sosit lumânarea abia închisă. Dukascopy publică lumânarea cu ~1 minut întârziere: dacă am
+    // bifa sfertul la prima încercare, semnalul de pe lumânarea aceea s-ar pierde. Reîncercăm în fiecare minut, cel mult 6 minute.
+    if ((last && last.t >= slot * M15 - M15) || now - slot * M15 > 6 * 60e3) book.slot[sym] = slot;
   }
+  // ultimul preț cunoscut al fiecărei piețe (pentru conversia lotului, ex. EUR→USD la DAX, chiar dacă EUR/USD nu s-a descărcat acum)
+  book.px = Object.assign(book.px || {}, prices);
+  Object.assign(prices, Object.assign({}, book.px, prices));
 
   // 0. Nivelurile zilei (VAH, POC, VAL de ieri) pe Telegram, înainte de deschidere: indicii americani la 16:00–16:29, DAX la 09:45–09:59
   //    (ora României), în zilele lucrătoare. Ca să poți trage liniile pe grafic fără să calculezi nimic. TONI_LEVELS=0 le oprește.
@@ -180,7 +185,11 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
           ? `Take profit: <b>~${px(tpPx)}</b> (${fmtDist(mk, tpDist)}, ${s.R === 2 ? '2R' : '1,5R'})`
           : `Take profit: <b>~${px(tpPx)}</b> (${fmtDist(mk, tpDist)}, marginea ${s.dir > 0 ? 'de sus (VAH)' : 'de jos (VAL)'} a zonei de valoare, ~${(tpDist / dist).toFixed(1)}R)`,
         `Tipul zilei: ${s.inside ? (s.edge ? 'deschidere lângă o margine ⇒ a traversat banda și a ieșit pe partea opusă, cu trendul' : 'deschidere ÎN bandă ⇒ ieșire acceptată în direcția trendului') : 'deschidere ÎN AFARA benzii ⇒ revenire în bandă'}`,
-        `Lot: <b>${lot.ok ? lot.lots.toFixed(2) : '— (' + lot.reason.replace(/_/g, ' ').toLowerCase() + ')'}</b> (risc ${riskPct}% = ${riskUsd.toFixed(0)} $)`,
+        lot.ok
+          ? `Lot: <b>${lot.lots.toFixed(2)}</b> (risc ≈ ${lot.actualRiskUsd.toFixed(0)} $; ținta ${riskPct}% = ${riskUsd.toFixed(0)} $, lotul e rotunjit în jos)`
+          : lot.reason === 'LOT_SUB_MINIM'
+            ? `Lot: <b>— SARI PESTE</b> (stopul e prea larg: chiar și lotul minim 0.01 ar risca ≈ ${(0.01 * lot.perLotRiskUsd).toFixed(0)} $, peste ținta de ${riskUsd.toFixed(0)} $)`
+            : `Lot: <b>— (${lot.reason.replace(/_/g, ' ').toLowerCase()})</b> (risc ${riskPct}% = ${riskUsd.toFixed(0)} $)`,
         delayed[sym]
           ? `<i>⚠️ Acum datele vin de la o sursă de rezervă, cu ~15 minute întârziere: pune SL și TP la PREȚURILE de mai sus (nu la distanțe). Dacă prețul din platformă a trecut deja de SL sau de TP, sari peste.</i>`
           : `<i>Dacă prețul tău de intrare e altul decât referința, păstrează aceleași distanțe pentru stop loss și take profit. Strategie nouă: încă se dovedește live.</i>`

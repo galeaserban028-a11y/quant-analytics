@@ -80,14 +80,21 @@ async function main() {
   const quiet = roHour >= 23 || roHour < 8;
   st.outbox = st.outbox || [];
   const send = async (text) => {
-    const res = await sendTelegram(text, { enabled: LIVE });
+    let res = await sendTelegram(text, { enabled: LIVE });
+    // o pană scurtă de rețea / Telegram (timeout, 429, 5xx) nu trebuie să piardă un semnal: încă 2 încercări
+    for (let k = 1; k <= 2 && LIVE && !res.sent && res.mode !== 'DRY_RUN' && !(res.statusCode >= 400 && res.statusCode < 429); k++) {
+      await new Promise((r) => setTimeout(r, 3000 * k));
+      res = await sendTelegram(text, { enabled: LIVE });
+    }
     sent.push(res.sent ? 'trimis' : (res.mode || res.statusCode));
     console.log(`[telegram ${res.sent ? 'OK' : (res.mode || res.statusCode)}] ${text.replace(/<[^>]+>/g, '').split('\n')[0]}`);
     if (LIVE && !res.sent) console.log('  eroare Telegram:', res.body || res.error || '');
     return res;
   };
   const notify = async (text) => {
-    if (quiet && !/[🚨⛔⚠️]/u.test(text.slice(0, 4))) { st.outbox.push({ at: now, text }); console.log(`[telegram AMÂNAT până la 08:00] ${text.replace(/<[^>]+>/g, '').split('\n')[0]}`); return { sent: true, queued: true }; }
+    // strategia M15 (Toni) nu se amână niciodată: sesiunea americană se închide la 23:00 ora României, iar „ÎNCHIDE ACUM” trebuie să vină atunci
+    const urgent = /[🚨⛔⚠️⏰]/u.test(text.slice(0, 4)) || /M15/.test(text.split('\n')[0]);
+    if (quiet && !urgent) { st.outbox.push({ at: now, text }); console.log(`[telegram AMÂNAT până la 08:00] ${text.replace(/<[^>]+>/g, '').split('\n')[0]}`); return { sent: true, queued: true }; }
     return send(text);
   };
   if (!quiet && st.outbox.length && LIVE && process.env.TELEGRAM_TOKEN) {
