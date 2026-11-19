@@ -3,7 +3,10 @@
 // în același format ca istoricul (timestamp,open,high,low,close,spread). FROM=yyyy-mm-dd (implicit 2025-12-01).
 const fs = require('fs'), zlib = require('zlib'), path = require('path');
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36';
-const LIST = { 'USA500.IDX/USD': 'USA500IDXUSD', 'USATECH.IDX/USD': 'USATECHIDXUSD', 'DEU.IDX/EUR': 'DEUIDXEUR', 'USA30.IDX/USD': 'USA30IDXUSD' };
+const ALL = { 'USA500.IDX/USD': 'USA500IDXUSD', 'USATECH.IDX/USD': 'USATECHIDXUSD', 'DEU.IDX/EUR': 'DEUIDXEUR', 'USA30.IDX/USD': 'USA30IDXUSD',
+  'GBR.IDX/GBP': 'GBRIDXGBP', 'JPN.IDX/JPY': 'JPNIDXJPY', 'FRA.IDX/EUR': 'FRAIDXEUR', 'EUS.IDX/EUR': 'EUSIDXEUR', 'XAU/USD': 'XAUUSD', 'EUR/USD': 'EURUSD', 'GBP/USD': 'GBPUSD' };
+// INST=listă separată prin virgulă (implicit primii 4, indicii semnalelor)
+const LIST = process.env.INST ? Object.fromEntries(process.env.INST.split(',').map((x) => [x.trim(), ALL[x.trim()]])) : Object.fromEntries(Object.entries(ALL).slice(0, 4));
 async function page(inst, ts) {
   const u = `https://freeserv.dukascopy.com/2.0/?path=chart/json3&instrument=${encodeURIComponent(inst)}&offer_side=B&interval=15MIN&splits=true&stocks=true&limit=1000&time_direction=P&timestamp=${ts}&jsonp=_cb`;
   for (let k = 0; k < 4; k++) {

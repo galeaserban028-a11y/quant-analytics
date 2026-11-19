@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       from: { description: 'de la (yyyy-mm-dd)', default: '2025-12-01', required: false }
+      inst: { description: 'instrumente (gol = indicii semnalelor)', default: '', required: false }
 
 permissions:
   contents: write
@@ -12,7 +13,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,6 +22,7 @@ jobs:
       - run: node scripts/dk-m15-update.js
         env:
           FROM: ${{ inputs.from }}
+          INST: ${{ inputs.inst }}
       - run: |
           git config user.name "apex-bot"; git config user.email "apex-bot@users.noreply.github.com"
           git add data/fx/dk/m15
