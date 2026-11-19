@@ -45,7 +45,7 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   const slot = Math.floor((now - 60e3) / M15);
   // Semnale reale pe Telegram doar pentru piețele din TONI_SIGNAL_SYMS. Implicit US500, US100 și GER40 (19.11.2026, ca să avem ~3,5
   // tranzacții pe săptămână): aceleași reguli, nemodificate, sunt pe plus pe fiecare dintre ei (NAS100 2022–2025 +0,19R, DAX
-  // 2019–2025 +0,15R, +0,11R și cu întârzierea de 15 min a datelor). US30 a ieșit zero ⇒ rămâne doar pe hârtie, ca aurul și forexul.
+  // 2019–2025 +0,15R; DAX vine live de la Dukascopy, iar pe rezerva întârziată 15 min tot +0,11R). US30 a ieșit zero ⇒ rămâne doar pe hârtie, ca aurul și forexul.
   // TONI_SIGNALS=1 trimite pentru toate.
   const signalSyms = String(env.TONI_SIGNAL_SYMS != null ? env.TONI_SIGNAL_SYMS : 'SPX500,NAS100,GER40').split(',').map((x) => x.trim()).filter(Boolean);
   const sendFor = (sym) => Boolean(notify) && (env.TONI_SIGNALS === '1' || signalSyms.includes(sym));
@@ -53,13 +53,15 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   const account = Number(env.TONI_ACCOUNT || 5000), riskPct = Number(env.TONI_RISK_PCT || 1);
   const report = { opened: 0, closed: 0, skipped: 0, errors: {} };
   const prices = {};
-  const series = {};
+  const series = {}, delayed = {};
 
   for (const [sym, mk] of Object.entries(A.MARKETS)) {
     if (book.slot[sym] === slot && !book.open[sym]) continue;
-    try { series[sym] = await fetchBars(sym, mk); } catch (err) { report.errors[sym] = err.message; continue; }
+    let raw;
+    try { raw = await fetchBars(sym, mk); } catch (err) { report.errors[sym] = err.message; continue; }
     book.slot[sym] = slot;
-    series[sym] = (series[sym] || []).filter((b) => b.t + M15 <= now - 30e3).sort((a, b) => a.t - b.t);
+    series[sym] = (raw || []).filter((b) => b.t + M15 <= now - 30e3).sort((a, b) => a.t - b.t);
+    if (raw && raw.delayed) delayed[sym] = true; // sursa de rezervă e întârziată ⇒ mesajul o spune
     const last = series[sym][series[sym].length - 1];
     if (last) prices[sym] = last.c;
   }
@@ -168,8 +170,8 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
           : `Take profit: <b>~${px(tpPx)}</b> (${fmtDist(mk, tpDist)}, marginea ${s.dir > 0 ? 'de sus (VAH)' : 'de jos (VAL)'} a zonei de valoare, ~${(tpDist / dist).toFixed(1)}R)`,
         `Tipul zilei: ${s.inside ? (s.edge ? 'deschidere lângă o margine ⇒ a traversat banda și a ieșit pe partea opusă, cu trendul' : 'deschidere ÎN bandă ⇒ ieșire acceptată în direcția trendului') : 'deschidere ÎN AFARA benzii ⇒ revenire în bandă'}`,
         `Lot: <b>${lot.ok ? lot.lots.toFixed(2) : '— (' + lot.reason.replace(/_/g, ' ').toLowerCase() + ')'}</b> (risc ${riskPct}% = ${riskUsd.toFixed(0)} $)`,
-        mk.bf
-          ? `<i>⚠️ Datele DAX vin cu ~15 minute întârziere: pune SL și TP la PREȚURILE de mai sus (nu la distanțe). Dacă prețul din platformă a trecut deja de SL sau de TP, sari peste.</i>`
+        delayed[sym]
+          ? `<i>⚠️ Acum datele vin de la o sursă de rezervă, cu ~15 minute întârziere: pune SL și TP la PREȚURILE de mai sus (nu la distanțe). Dacă prețul din platformă a trecut deja de SL sau de TP, sari peste.</i>`
           : `<i>Dacă prețul tău de intrare e altul decât referința, păstrează aceleași distanțe pentru stop loss și take profit. Strategie nouă: încă se dovedește live.</i>`
       ].filter(Boolean).join('\n'));
     }

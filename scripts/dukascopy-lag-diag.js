@@ -1,22 +1,24 @@
 'use strict';
-// Cât de proaspete sunt lumânările Dukascopy (freeserv)? Rulează de 6 ori, la 25 s distanță.
-const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36';
-const H = { 'User-Agent': UA, Referer: 'https://freeserv.dukascopy.com/2.0/?path=chart/index&showUI=true&instrument=DEU.IDX/EUR' };
-async function duka(inst, interval) {
-  const u = `https://freeserv.dukascopy.com/2.0/?path=chart/json3&instrument=${encodeURIComponent(inst)}&offer_side=B&interval=${interval}&splits=true&stocks=true&limit=5&time_direction=P&timestamp=${Date.now()}&jsonp=_cb`;
-  const t = await (await fetch(u, { headers: H })).text();
-  return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')')));
-}
+// Verifică sursa Dukascopy exact cum o folosește sistemul live: câte lumânări M15, cât de nouă e ultima, nivelurile de azi,
+// și comparația cu Börse Frankfurt (întârziat) și Hyperliquid (S&P / Nasdaq). Rulează de 3 ori, la un minut distanță.
+const F = require('../src/data/toniFeed');
+const A = require('../src/strategies/amtAgent');
 (async () => {
-  for (let k = 0; k < 6; k++) {
+  for (let k = 0; k < 3; k++) {
     const now = Date.now();
-    try {
-      const m1 = await duka('DEU.IDX/EUR', '1MIN'), m15 = await duka('DEU.IDX/EUR', '15MIN');
-      const os = (await (await fetch('https://metadata-backend.ostium.io/PricePublish/latest-prices')).json()).find((x) => x.from === 'DAX');
-      const ts = (a) => a.map((x) => x[0]).sort((p, q) => q - p);
-      const n1 = m1.find((x) => x[0] === ts(m1)[0]), n15 = m15.find((x) => x[0] === ts(m15)[0]);
-      console.log(`::notice::#${k} ${new Date(now).toISOString()} | M1 cea mai nouă deschisă acum ${((now - n1[0]) / 1000).toFixed(0)} s close ${n1[4]} | M15 cea mai nouă deschisă acum ${((now - n15[0]) / 60000).toFixed(1)} min close ${n15[4]} | Ostium live mid ${os.mid.toFixed(1)} (acum ${(now / 1000 - os.timestampSeconds).toFixed(0)} s)`);
-    } catch (e) { console.log('::notice::#' + k + ' EROARE ' + e.message); }
-    await new Promise((r) => setTimeout(r, 25000));
+    for (const sym of ['GER40', 'SPX500', 'NAS100']) {
+      const mk = A.MARKETS[sym];
+      try {
+        const b = await F.fetchM15Dukascopy(mk.duka, now);
+        const done = b.filter((x) => x.t + 900e3 <= now - 30e3), L = done[done.length - 1];
+        const S = A.sessions(done, mk).filter((x) => x.full), prev = S[S.length - 1];
+        const va = A.valueArea(done, prev.idx, done[prev.idx[0]].c * 0.0005);
+        let cmp = '';
+        if (sym === 'GER40') { const bf = await F.fetchM15BoerseFrankfurt(mk.bf, now); const m = new Map(bf.map((x) => [x.t, x])); const common = done.filter((x) => m.has(x.t)).slice(-200); const diff = common.map((x) => Math.abs(x.c - m.get(x.t).c)); cmp = ` | față de Börse Frankfurt: ${common.length} lumânări comune, dif. medie a close ${(diff.reduce((a, c) => a + c, 0) / diff.length).toFixed(1)} pct; ultima BF închisă: acum ${((now - bf[bf.length - 1].t) / 60000 - 15).toFixed(1)} min`; }
+        if (mk.hl) { const h = await F.fetchM15Hyperliquid(mk.hl); const m = new Map(h.map((x) => [x.t, x])); const common = done.filter((x) => m.has(x.t)).slice(-200); const diff = common.map((x) => x.c - m.get(x.t).c); cmp = ` | față de Hyperliquid: ${common.length} comune, dif. medie ${(diff.reduce((a, c) => a + c, 0) / diff.length).toFixed(2)} pct`; }
+        console.log(`::notice::#${k} ${sym}: ${b.length} lumânări M15 (${done.length} încheiate), prima ${new Date(b[0].t).toISOString().slice(0, 10)}; ultima încheiată s-a închis acum ${((now - L.t - 900e3) / 60000).toFixed(1)} min (close ${L.c}); sesiuni pline ${S.length}; ieri ${prev.day}: VAH ${va.VAH.toFixed(1)} POC ${va.POC.toFixed(1)} VAL ${va.VAL.toFixed(1)}${cmp}`);
+      } catch (e) { console.log(`::notice::#${k} ${sym}: EROARE ${e.message}`); }
+    }
+    if (k < 2) await new Promise((r) => setTimeout(r, 60000));
   }
 })();
