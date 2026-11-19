@@ -19,7 +19,8 @@ async function page(inst, ts) {
   const from = Date.parse(process.env.FROM || '2025-12-01'), dir = path.join(__dirname, '..', 'data', 'fx', 'dk', 'm15');
   for (const [inst, file] of Object.entries(LIST)) {
     const m = new Map(); let ts = Date.now();
-    while (ts > from) { const a = await page(inst, ts); if (!a.length) break; for (const x of a) m.set(+x[0], x); const o = Math.min(...a.map((x) => +x[0])); if (o >= ts) break; ts = o - 1; }
+    try { await page(inst, ts); } catch (e) { console.log(`${inst}: indisponibil (${e.message}), sar peste`); continue; }
+    while (ts > from) { let a; try { a = await page(inst, ts); } catch (e) { console.log(`${inst}: oprit la ${new Date(ts).toISOString()} (${e.message})`); break; } if (!a.length) break; for (const x of a) m.set(+x[0], x); const o = Math.min(...a.map((x) => +x[0])); if (o >= ts) break; ts = o - 1; }
     const now = Date.now(), byMonth = {};
     for (const x of [...m.values()].sort((p, q) => p[0] - q[0])) {
       if (x[0] < from || x[0] + 900e3 > now) continue; // doar lumânări încheiate
