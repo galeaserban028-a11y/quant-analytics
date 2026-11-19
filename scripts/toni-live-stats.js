@@ -28,9 +28,9 @@ function run(tag, sym, bars, from) {
   console.log(`INFO ${tag} ${sym}: ${bars.length} lumânări, de la ${new Date(bars[0].t).toISOString().slice(0, 10)} la ${new Date(bars[bars.length - 1].t).toISOString().slice(0, 16)}, ${n} tranzacții`);
 }
 (async () => {
-  const from = Date.parse('2026-01-01T00:00:00Z');
+  const from = Date.parse(process.env.FROM || '2026-01-01T00:00:00Z');
   for (const sym of ['SPX500', 'NAS100', 'GER40']) {
-    try { run('duka', sym, await history(A.MARKETS[sym].duka, Date.parse('2025-10-15')), from); } catch (e) { console.log(`INFO duka ${sym} EROARE ${e.message}`); }
+    try { run('duka', sym, await history(A.MARKETS[sym].duka, Date.parse(process.env.HIST || '2025-10-15')), from); } catch (e) { console.log(`INFO duka ${sym} EROARE ${e.message}`); }
     if (A.MARKETS[sym].hl) { try { const b = await F.fetchM15Hyperliquid(A.MARKETS[sym].hl); run('hl', sym, b, 0); } catch (e) { console.log(`INFO hl ${sym} EROARE ${e.message}`); } }
   }
 })();

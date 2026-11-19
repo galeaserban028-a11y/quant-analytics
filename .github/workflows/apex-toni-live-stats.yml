@@ -2,7 +2,10 @@
 name: APEX Toni statistică live
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      from: { description: 'de la (statistică)', default: '2026-01-01', required: false }
+      hist: { description: 'istoric de la', default: '2025-10-15', required: false }
 
 jobs:
   stats:
@@ -14,3 +17,6 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/toni-live-stats.js
+        env:
+          FROM: ${{ inputs.from }}
+          HIST: ${{ inputs.hist }}
