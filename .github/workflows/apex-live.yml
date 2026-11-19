@@ -11,7 +11,7 @@ name: APEX live
 
 on:
   schedule:
-    - cron: '17 * * * *'     # plasă de siguranță: dacă bucla s-a oprit, o repornește în cel mult o oră
+    - cron: '7,22,37,52 * * * *'   # plasă de siguranță: dacă serverul a căzut, bucla repornește la următorul sfert de oră (GitHub mai întârzie programările)
   workflow_dispatch: {}       # buton „Run workflow” și repornirea automată a buclei
 
 permissions:

@@ -55,7 +55,7 @@ test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract 
   const closed = quiet.bus.state.toni.trades[0].closedAt;
   const d = A.local(closed, 'Europe/Bucharest').day;
   const at = Date.parse(d + 'T21:20:00Z'); // 23:20 ora României (iarna) / 00:20 vara
-  const bus = quiet.bus; bus.state.toni.summaryDay = null; const msgs = [];
+  const bus = quiet.bus; bus.state.toni.summaryDay = null; bus.state.toni.slot = {}; const msgs = [];
   await runToniCycle({ bus, instruments: INSTR, fetchBars: async () => [], notify: async (x) => { msgs.push(x); }, now: at, env: {} });
   if (A.local(at, 'Europe/Bucharest').day === d) { assert.equal(msgs.length, 1); assert.match(msgs[0], /Media de la pornire/); assert.match(msgs[0], /NASDAQ/); }
 });
@@ -119,4 +119,15 @@ test('sărbătorile americane nu sunt sesiuni (Hyperliquid tranzacționează și
   const day = Date.parse('2026-11-26T14:30:00Z'); // Thanksgiving, 9:30 la New York
   const bars = []; for (let k = 0; k < 30; k++) bars.push({ t: day + k * 900e3, o: 1, h: 2, l: 0.5, c: 1.5 });
   assert.equal(A.sessions(bars, A.MARKETS.SPX500).length, 0);
+});
+
+test('paza: dacă bucla n-a rulat ≥ 30 de minute în timpul sesiunii, vine un mesaj; noaptea / în weekend nu', async () => {
+  const { zonedToUtc } = require('../src/data/dailySources');
+  const at = zonedToUtc(2026, 11, 18, 14, 0, 'America/New_York'); // miercuri, în sesiunea americană
+  const mk = (gapMin, now) => ({ state: { toni: { v: 2, startedAt: 0, trades: [], open: {}, seen: {}, lossDay: {}, passed: {}, slot: { SPX500: Math.floor((now - 60e3) / 900e3) - Math.round(gapMin / 15) } } } });
+  const run = async (gapMin, now) => { const msgs = []; await runToniCycle({ bus: mk(gapMin, now), instruments: INSTR, fetchBars: async () => [], notify: async (m) => msgs.push(m), now, env: {} }); return msgs.filter((m) => /n-a rulat/.test(m)); };
+  assert.equal((await run(120, at)).length, 1);
+  assert.equal((await run(15, at)).length, 0, 'un ciclu normal (15 min) nu e pană');
+  const sun = zonedToUtc(2026, 11, 22, 14, 0, 'America/New_York'); // duminică
+  assert.equal((await run(120, sun)).length, 0);
 });

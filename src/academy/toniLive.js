@@ -52,6 +52,17 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   const SHOWN = { SPX500: 'US500', NAS100: 'US100', GER40: 'GER40', XAUUSD: 'XAUUSD', EURUSD: 'EURUSD', GBPUSD: 'GBPUSD' };
   const account = Number(env.TONI_ACCOUNT || 5000), riskPct = Number(env.TONI_RISK_PCT || 1);
   const report = { opened: 0, closed: 0, skipped: 0, errors: {} };
+  // Paza: dacă bucla n-a rulat ≥ 30 de minute (a căzut serverul GitHub) în timpul unei sesiuni cu semnale reale, spunem pe Telegram,
+  // ca să nu crezi că „nu e nimic” când de fapt sistemul n-a văzut piața. book.slot ține ultimul sfert de oră procesat.
+  const prevSlot = Math.max(0, ...Object.values(book.slot || {}));
+  if (notify && prevSlot && slot - prevSlot >= 2 && slot - prevSlot <= 48) { // peste 12 ore = sistem oprit intenționat, nu pană
+    const inSession = (t) => signalSyms.some((sym) => { const mk = A.MARKETS[sym]; if (!mk) return false; const L = A.local(t, mk.tz); const wd = new Date(L.day + 'T12:00:00Z').getUTCDay(); return wd > 0 && wd < 6 && !A.isClosedDay(L.day, mk.tz) && L.m >= mk.s0 && L.m < mk.s1; });
+    const from = (prevSlot + 1) * M15, gapMin = Math.round((now - from) / 60e3);
+    let hit = false; for (let t = from; t <= now; t += M15) if (inSession(t)) { hit = true; break; }
+    if (hit) await notify(`⚠️ <b>Sistemul M15 n-a rulat ~${gapMin} minute</b> (de la ${roHM(from)} până acum; a căzut serverul GitHub). ` +
+      `În timpul ăsta n-am putut trimite semnale. Dacă ai o poziție deschisă de la mine, verifică-i SL-ul și TP-ul în platformă; ` +
+      `mesajele de închidere vin acum, dacă e cazul.`);
+  }
   const prices = {};
   const series = {}, delayed = {};
 
