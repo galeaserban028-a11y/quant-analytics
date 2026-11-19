@@ -1,0 +1,16 @@
+# Cât de proaspete sunt lumânările DAX de la Dukascopy.
+name: APEX Dukascopy lag
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/dukascopy-lag-diag.js
