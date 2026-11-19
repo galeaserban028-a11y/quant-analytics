@@ -5430,26 +5430,22 @@
         "outcome": "TP",
         "r": 0.246,
         "sent": false
+      },
+      {
+        "sym": "SPX500",
+        "setup": "deschidere peste valoare, revenire în VA ⇒ spre VAL",
+        "dir": -1,
+        "openedAt": 1795102200000,
+        "closedAt": 1795103100000,
+        "outcome": "TP",
+        "r": 0.164,
+        "sent": false
       }
     ],
-    "open": {
-      "SPX500": {
-        "dir": -1,
-        "stop": 7422.732174999999,
-        "tp": 7314.0426,
-        "setup": "deschidere peste valoare, revenire în VA ⇒ spre VAL",
-        "inside": false,
-        "day": "2026-11-19",
-        "entryT": 1795102200000,
-        "ref": 7331.4,
-        "riskUsd": 45.96608749999978,
-        "sent": false,
-        "kind": "out"
-      }
-    },
+    "open": {},
     "seen": {
       "NAS100": 1795101300000,
-      "SPX500": 1795101300000,
+      "SPX500": 1795102200000,
       "XAUUSD": 1795101300000,
       "EURUSD": 1795101300000,
       "GBPUSD": 1795101300000,
@@ -5476,7 +5472,7 @@
     "summaryDay": "2026-11-18",
     "px": {
       "NAS100": 27283,
-      "SPX500": 7331.4,
+      "SPX500": 7308.6,
       "GER40": 25618.999,
       "XAUUSD": 3690.2,
       "EURUSD": 1.0982975959777832,
@@ -5486,5 +5482,5 @@
       "us": "2026-11-19"
     }
   },
-  "savedAt": "2026-11-19T15:31:47.134Z"
+  "savedAt": "2026-11-19T15:45:44.880Z"
 }
