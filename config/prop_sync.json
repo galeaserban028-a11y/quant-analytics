@@ -1,11 +1,13 @@
 {
-  "id": "mt5-2026-11-18",
-  "_sursa": "Istoricul din MT5 trimis de utilizator pe 18.11.2026 (ora din MT5 = ora României; aici în UTC). Utilizatorul a luat semnalele US30 cu 0,1 loturi și le-a închis singur.",
-  "balance": 5230.14,
+  "id": "mt5-2026-11-20",
+  "_sursa": "Istoricul din MT5 trimis de utilizator pe 20.11.2026 (ora din MT5 = ora României; aici în UTC). Pe 19.11 a intrat manual pe UK100 cu loturi mult mai mari decât semnalul (1,07 / 1,07 / 2,07 / 9,07) și a închis pe minus; poziția UK100|bb a sistemului nu e deschisă la broker.",
+  "balance": 5100.54,
   "highestEod": 5310.69,
-  "closePositions": ["US30|bb"],
+  "closePositions": ["UK100|bb"],
   "manualTrades": [
-    { "sym": "US30", "direction": "LONG", "closedAt": "2026-11-17T14:54:41Z", "pnl": 99.74 },
-    { "sym": "US30", "direction": "LONG", "closedAt": "2026-11-18T14:40:45Z", "pnl": -80.55 }
+    { "sym": "UK100", "direction": "LONG", "closedAt": "2026-11-19T14:38:06Z", "pnl": -15.36 },
+    { "sym": "UK100", "direction": "LONG", "closedAt": "2026-11-19T14:38:11Z", "pnl": -16.10 },
+    { "sym": "UK100", "direction": "LONG", "closedAt": "2026-11-19T14:38:11Z", "pnl": -50.20 },
+    { "sym": "UK100", "direction": "LONG", "closedAt": "2026-11-19T14:39:48Z", "pnl": -47.94 }
   ]
 }

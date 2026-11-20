@@ -40,7 +40,7 @@ test('Toni live: trimite intrarea și ieșirea marcate TEST, cu lot pe contract 
     for (let k = 1; k <= 200 && bus.state.toni.open.NAS100; k++) { now += 900e3; await runToniCycle({ bus, instruments: INSTR, fetchBars: fetchAt(now), notify, now, env }); }
     return { bus, msgs, opened };
   };
-  const live = await run({ TONI_SIGNALS: '1' });
+  const live = await run({ TONI_SIGNALS: '1', TONI_RISK_PCT: '1' });
   assert.ok(live.opened, 'poziție deschisă');
   assert.equal(live.bus.state.toni.trades.length, 1, 'tranzacția s-a închis și e în scor');
   assert.equal(live.msgs.filter((m) => !/rezumatul zilei/.test(m)).length, 2, live.msgs.join('\n---\n'));

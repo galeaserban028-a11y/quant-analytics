@@ -55,7 +55,7 @@ async function runToniCycle({ bus, instruments, fetchBars, notify = null, now = 
   const realKinds = String(env.TONI_REAL_KINDS != null ? env.TONI_REAL_KINDS : 'mid').split(',').map((x) => x.trim());
   const kindOf = (sg) => (sg.inside ? (sg.edge ? 'edge' : 'mid') : 'out');
   const SHOWN = { SPX500: 'US500', NAS100: 'US100', GER40: 'GER40', XAUUSD: 'XAUUSD', EURUSD: 'EURUSD', GBPUSD: 'GBPUSD' };
-  const account = Number(env.TONI_ACCOUNT || 5000), riskPct = Number(env.TONI_RISK_PCT || 1);
+  const account = Number(env.TONI_ACCOUNT || 5000), riskPct = Number(env.TONI_RISK_PCT || 0.5); // 0,5% din 20.11.2026: contul e la ~90 $ de limita de pierdere
   const report = { opened: 0, closed: 0, skipped: 0, errors: {} };
   // Paza: dacă bucla n-a rulat ≥ 30 de minute (a căzut serverul GitHub) în timpul unei sesiuni cu semnale reale, spunem pe Telegram,
   // ca să nu crezi că „nu e nimic” când de fapt sistemul n-a văzut piața. book.slot ține ultimul sfert de oră procesat.
