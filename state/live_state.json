@@ -20,33 +20,19 @@
     "firm": "FTM_1STEP_NITRO",
     "phase": 0,
     "initial": 5000,
-    "balance": 5230.14,
+    "balance": 5100.54,
     "dayKey": "2026-11-20",
-    "dayStart": 5230.14,
+    "dayStart": 5100.54,
     "highestEod": 5310.69,
     "tradingDays": [
       "2026-11-09",
       "2026-11-12",
       "2026-11-16",
       "2026-11-17",
-      "2026-11-18"
+      "2026-11-18",
+      "2026-11-19"
     ],
-    "positions": {
-      "UK100|bb": {
-        "symbol": "UK100",
-        "direction": "LONG",
-        "entry": 10556.1201171875,
-        "initialStop": 10424.414271763393,
-        "stop": 10424.414271763393,
-        "openedAt": 1795075200000,
-        "desk": "BB",
-        "strategy": "bb",
-        "agent": null,
-        "who": "Simona (Banda Bollinger)",
-        "riskUsd": 98.97994632199345,
-        "lots": 0.57
-      }
-    },
+    "positions": {},
     "skipped": {
       "GER40|d7": 1794988800000,
       "GER40|bb": 1795075200000,
@@ -130,6 +116,38 @@
         "closedAt": 1795012845000,
         "pnl": -80.55,
         "outcome": "MANUAL"
+      },
+      {
+        "sym": "UK100",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1795099086000,
+        "pnl": -15.36,
+        "outcome": "MANUAL"
+      },
+      {
+        "sym": "UK100",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1795099091000,
+        "pnl": -16.1,
+        "outcome": "MANUAL"
+      },
+      {
+        "sym": "UK100",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1795099091000,
+        "pnl": -50.2,
+        "outcome": "MANUAL"
+      },
+      {
+        "sym": "UK100",
+        "strategy": "manual",
+        "direction": "LONG",
+        "closedAt": 1795099188000,
+        "pnl": -47.94,
+        "outcome": "MANUAL"
       }
     ],
     "startedAt": 1794217249902,
@@ -138,7 +156,7 @@
       "GBPUSD": 1.3146650791168213
     },
     "fxFetchedAt": 1795181939395,
-    "syncId": "mt5-2026-11-18"
+    "syncId": "mt5-2026-11-20"
   },
   "fx": null,
   "fxVirtual": {
@@ -5636,5 +5654,5 @@
       "dax": "2026-11-20"
     }
   },
-  "savedAt": "2026-11-20T13:46:04.157Z"
+  "savedAt": "2026-11-20T13:48:59.880Z"
 }
