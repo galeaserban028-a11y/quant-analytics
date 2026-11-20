@@ -5402,14 +5402,38 @@
         "outcome": "TIME",
         "resultR": 4.091,
         "enteredAt": 1795100400000
+      },
+      {
+        "sym": "SPX500",
+        "day": "2026-11-20",
+        "live": false,
+        "direction": "LONG",
+        "entry": 7187.77001953125,
+        "stop": 7133.5498046875,
+        "exit": 7133.5498046875,
+        "outcome": "STOP",
+        "resultR": -1.0148,
+        "enteredAt": 1795186800000
+      },
+      {
+        "sym": "NAS100",
+        "day": "2026-11-20",
+        "live": false,
+        "direction": "LONG",
+        "entry": 26397.927734375,
+        "stop": 26048.236328125,
+        "exit": 26048.236328125,
+        "outcome": "STOP",
+        "resultR": -1.0071,
+        "enteredAt": 1795186800000
       }
     ],
     "skips": {
       "INTERVAL_PREA_LARG": 14
     },
     "settled": {
-      "SPX500": "2026-11-19",
-      "NAS100": "2026-11-19"
+      "SPX500": "2026-11-20",
+      "NAS100": "2026-11-20"
     },
     "graduated": null,
     "paused": false,
@@ -5691,5 +5715,5 @@
       "dax": "2026-11-20"
     }
   },
-  "savedAt": "2026-11-20T21:01:24.345Z"
+  "savedAt": "2026-11-20T21:15:19.838Z"
 }
