@@ -12,12 +12,7 @@
     "lastAsOf": {},
     "failSince": null,
     "heartbeatDate": "2026-11-24",
-    "outbox": [
-      {
-        "at": 1795554901133,
-        "text": "🧪 <b>TEST TONI · rezumatul zilei</b> (tranzacții pe hârtie, făcute automat; nu faci nimic)\nAzi: 2 tranzacții, 0 pe plus, total -1.66R (≈ -42 $ la 0.5% risc)\n\n<b>Media de la pornire, pe fiecare piață:</b>\nNASDAQ (NAS100): 2 tranz., media -0.14R, total -0.28R\nS&P 500 (US500): 3 tranz., media -0.02R, total -0.07R\nAUR (XAUUSD): 4 tranz., media -0.09R, total -0.36R\nEUR/USD: 3 tranz., media -1.18R, total -3.54R\nGBP/USD: 4 tranz., media -0.28R, total -1.11R\n\n<b>Total:</b> 16 tranzacții, media -0.33R (pe 5.000 $ la 0.5%: -134 $). Testul e trecut la ≥ 50 tranzacții pe o piață cu media ≥ +0.05R."
-      }
-    ],
+    "outbox": [],
     "weeklyDate": "2026-11-22"
   },
   "prop": {
@@ -6201,5 +6196,5 @@
       "dax": "2026-11-24"
     }
   },
-  "savedAt": "2026-11-25T05:46:24.304Z"
+  "savedAt": "2026-11-25T06:00:19.010Z"
 }
